@@ -188,12 +188,10 @@ if __name__=="__main__":
     
     source = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     source.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, bytes(intf, 'utf-8'))
-    source.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
     source.bind((local_ip, source_port))
     
     destination = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     destination.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, bytes(intf, 'utf-8'))
-    destination.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
     destination.bind((local_ip, relay_port))
     
     #shared data between all processes
