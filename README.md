@@ -73,5 +73,5 @@ Followed by the following command on the client (10.0.0.1):
 
 in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server (10.0.0.1). Replies will be automatically forwarded back to the source on the same link.
 
-**Note:** the client can actually run on different host, not the end host on which the game server is running, however that host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. Note that this may add to the overall latency, and is generally not recommended, although possible. 
+**Note:** the client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. Note that this may add to the overall link latency, and is generally not recommended (although entirely possible).
 
