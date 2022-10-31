@@ -14,11 +14,7 @@ I'll add a list of games that are known to work once I've tested out more, but i
 
 It is fortunate most games provide support for Direct IP through TCP. Those won't need tricks like the Wookiee Unicaster, because you can simply sort them out by using remote port forwarding with SSH/Putty. More details here: https://phoenixnap.com/kb/ssh-port-forwarding
 
-UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experience this myself, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP.
-
-In case you want to try it anyway, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel
-
-But at least with gaming in mind, performance seems to be terrible, regardless of tuning. I've even tried to disable 
+UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experienced this myself, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP. In case you want to try it anyway, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel But at least with gaming in mind, performance seems to be rather terrible, regardless of tuning. I've even tried to disable TCP's Nagle algorithm by setting the SCTP_NODELAY to 0, but that hasn't helped much.
 
 ### I still don't get it... can you draw it out for me?
 
