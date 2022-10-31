@@ -1,6 +1,8 @@
 ﻿# The Wookiee Unicaster
 
-A UDP packet forwarding script for **Linux**, written in **Python 3**, which enables UDP routing and NAT punch-through using a public IP relay server. This is particularly useful for playing some LAN/Direct IP games over the internet. The Wookie Unicaster comes with a server mode that must run on the relay system (public IP), and a client mode, which must be run on the system hosting the game server. Any number of remote peers can connect to the game server once the Wookiee Unicaster client/server link is set up properly. Duplex traffic is automatically handled and forwarded using a high-performance multi-process worker queue model.
+A UDP packet forwarding script for **Linux**, written in **Python 3**, which enables UDP routing and NAT punch-through using a public IP relay server. This is particularly useful for playing some LAN/Direct IP games over the internet.
+
+The Wookie Unicaster comes with a server mode that must run on the relay system (public IP), and a client mode, which must be run on the system hosting the game server. Any number of remote peers can connect to the game server once the Wookiee Unicaster client/server link is set up properly. Duplex traffic is automatically handled and forwarded using a high-performance multi-process worker queue model.
 
 ### Does it have any requirements?
 
@@ -12,7 +14,7 @@ I'll add a list of games that are known to work once I've tested out more, but i
 
 ### How do I get access to a public IP? It's not like they grow on trees, you know...
 
-Any IaaS vendor out there will typically provide a public IP for your Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using a Ubuntu "nanode" from [Linode](https://www.linode.com/).
+Any IaaS vendor out there will typically provide a public IP for your Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "nanode" from [Linode](https://www.linode.com/).
 
 ### What about Direct IP games that support TCP?
 
@@ -25,20 +27,20 @@ UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides 
 Say no more! ASCII art away!
 
 ```
-Remote Peer 1                         Relay Server                          Game Server
- ----------                         ----------------                       ------------
-|          |                       |                |                     |            |
-| 10.0.1.1 |-----------------------| 216.58.212.164 |---------------------|  10.0.0.1  |
-|          |          -------------|                |                     |            |
- ----------           |             ----------------                       ------------
-(behind NAT)          |               (Public IP)                          (behind NAT)
-     .                |
-     .                |
-     .                |
-Remote Peer N         |
- ----------           |
-|          |          |
-| 10.0.2.1 |-----------
+Remote Peer 1                         Relay Server                         Game Server
+ ----------                         ----------------                      ------------
+|          |                       |                |                    |            |
+| 10.0.1.1 |-----------------------| 216.58.212.164 |--------------------|  10.0.0.1  |
+|          |          -------------|                |                    |            |
+ ----------           :             ----------------                      ------------
+(behind NAT)          :               (Public IP)                         (behind NAT)
+     .                :
+     .                :
+     .                :
+Remote Peer N         :
+ ----------           :
+|          |          :
+| 10.0.N.1 |-----------
 |          |
  ----------
 (behind NAT)

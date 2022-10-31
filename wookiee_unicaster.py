@@ -13,8 +13,6 @@ import subprocess
 import signal
 import queue
 from time import sleep
-#uncomment for debugging purposes only
-#import traceback
 
 ##logging configuration block
 logger_format = '%(asctime)s %(levelname)s >>> %(message)s'
@@ -32,7 +30,7 @@ UDP_KEEP_ALIVE_INTERVAL = 0.5 #seconds
 SERVER_RELAY_PORT = 23000
 CLIENT_RELAY_PORT = 23001
 #might need to be bumped in case applications use very large packet sizes,
-#but 1024/2048 seems like a resonable amount in most cases (i.e. gaming)
+#but 2048/4096 seems like a resonable amount in most cases (i.e. gaming)
 RECV_BUFFER_SIZE = 2048
 INTF_SOCKOPT_REF = 25
 
@@ -46,13 +44,18 @@ source_queue = multiprocessing.Queue(8)
 destination_queue = multiprocessing.Queue(8)
 
 def sigterm_handler(signum, frame):
-    logger.critical('WU >>> Stopping wookiee_unicaster process due to SIGTERM...')
+    #exceptions may happen here as well due to logger syncronization mayhem on shutdown
+    try:
+        logger.debug('WU >>> Stopping Wookiee Unicaster process due to SIGTERM...')
+    except:
+        raise SystemExit(0)
+            
     raise SystemExit(0)
 
 def sigint_handler(signum, frame):
-    #exceptions may happen here as well due to process syncronization mayhem on shutdown
+    #exceptions may happen here as well due to logger syncronization mayhem on shutdown
     try:
-        logger.debug('WU >>> Stopping wookiee_unicaster child process due to SIGINT...')
+        logger.debug('WU >>> Stopping Wookiee Unicaster child process due to SIGINT...')
     except:
         raise SystemExit(0)
             
@@ -332,8 +335,6 @@ if __name__=="__main__":
                 logger.info('WU >>> Stopping Wookie Unicaster...')
             except KeyboardInterrupt:
                 reset_loop = False
-            #uncomment for debugging purposes only
-            #logger.error(traceback.format_exc())
             
         finally:
             
