@@ -10,7 +10,7 @@ Run it on a potato. Profiling has shown that ~98% of its execution time will be 
 
 Also ensure port **23000** is open on both the server and the client, since it will be used for UDP packet relaying and NAT punch-through. Port **24000** also needs to be unused/available on the client (there's no requirement for it to be open, since it will only be used to locally relay traffic to the end destination).
 
-Why is there only a single relay port, since UDP is stateless? Well, because as of now only one remote peer is supported. By I plan to extend it support multiple peers in the near future (using multiple input and relay ports).
+Why is there only a single relay port, since UDP is stateless? Well, because as of now only one remote peer is supported. I plan to add support for multiple peers in the near future (using multiple input and relay ports).
 
 ### Say what? Which games support Direct IP connections through UDP?
 
