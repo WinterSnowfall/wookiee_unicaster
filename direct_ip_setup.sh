@@ -87,7 +87,7 @@ case $game in
     4)
         ### Ports: 17011 (TCP)
         echo ">>> Setting up Worms Armageddon..."
-        start_udp_forwarding 17011      
+        start_tcp_forwarding 17011      
         ;;
     5)
         ### Ports: 23253 (UDP) + 23000 (UDP) - WU relay port
