@@ -20,6 +20,8 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 * Supreme Commander
 * Supreme Commander - Forged Alliance
 * Divinity Original Sin - Enhanced Edition
+* Anno 1701
+* Anno 1701 - The Sunken Dragon
 
 ### How do I get access to a public IP? It's not like they grow on trees, you know...
 

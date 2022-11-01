@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#NOTE: this script uses ufw to automatically allow network traffic on
-#all of the required ports. Please make sure ufw is installed and enabled on
-#target system and that the ufw command can be run by the REMOTE_SSH_USER
+# NOTE: this script uses ufw to automatically allow network traffic on
+# all of the required ports. Please make sure ufw is installed and enabled on
+# target system and that the ufw command can be run by the REMOTE_SSH_USER.
 
 ############### SCRIPT PARAMETERS - MUST BE CONFIGURED PROPERLY #################
 #
@@ -62,12 +62,12 @@ echo "#   (2)  Warhammer 40,000 Gladius - Relics Of War    #"
 echo "#   (3)  Supreme Commander (+ Forged Alliance)       #"
 echo "#   (4)  Worms Armageddon                            #"
 echo "#   (5)  Divinity Original Sin - Enhanced Edition    #"
+echo "#   (6)  Anno 1701 (+ The Sunken Dragon)             #"
 echo "#                                                    #"
 echo "######################################################"
 echo ""
 read -p ">>> Pick a game for Direct IP play: " game
 
-# forward/tunnel ports through SSH based on the selected option
 case $game in
     1)
         ### Ports: 6112 (TCP)
@@ -87,12 +87,17 @@ case $game in
     4)
         ### Ports: 17011 (TCP)
         echo ">>> Setting up Worms Armageddon..."
-        start_tcp_forwarding 17011      
+        start_udp_forwarding 17011      
         ;;
     5)
         ### Ports: 23253 (UDP) + 23000 (UDP) - WU relay port
         echo ">>> Setting up Divinity Original Sin - Enhanced Edition..."
         start_udp_forwarding 23253
+        ;;
+    6)
+        ### Ports: 21701 + 23000 (UDP) - WU relay port
+        echo ">>> Setting up Anno 1701 (+ The Sunken Dragon)..."
+        start_udp_forwarding 21701
         ;;
     *)
         echo ">>> Invalid option!"
@@ -129,6 +134,11 @@ case $game in
         ### Ports: 23253 (UDP) + 23000 (UDP) - WU relay port
         echo ">>> Deconfiguring Divinity Original Sin - Enhanced Edition..."
         stop_udp_forwarding 23253
+        ;;
+    6)
+        ### Ports: 21701 (UDP) + 23000 (UDP) - WU relay port
+        echo ">>> Deconfiguring Anno 1701 (+ The Sunken Dragon)..."
+        stop_udp_forwarding 21701
         ;;
     *)
         ;;
