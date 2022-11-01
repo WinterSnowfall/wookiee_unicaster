@@ -14,7 +14,7 @@ Why is there only a single relay port, since UDP is stateless? Well, because as 
 
 ### Say what? Which games support Direct IP connections through UDP?
 
-I've developed Wookie Unicaster primarily for Supreme Commander, but there are other games our there that may benefit from it.
+I've developed Wookie Unicaster primarily for Supreme Commander, but there are other games out there that may benefit from it.
 
 Here's a non-exhaustive (and rather limited) list of games I've tested and are known to work:
 * Supreme Commander

@@ -50,7 +50,7 @@ stop_udp_forwarding () {
     killall wookiee_unicaster
 }
 
-echo "*** WinterSnowfall's port fowarding setup script for Mint/Ubuntu ***"
+echo "*** WinterSnowfall's port forwarding setup script for Linux ***"
 echo ""
 echo ">>> Configured remote IP : $REMOTE_PUBLIC_IP"
 echo ">>> Detected local IP : $LOCAL_PRIVATE_IP"
