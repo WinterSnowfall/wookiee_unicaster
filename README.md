@@ -6,11 +6,20 @@ The Wookie Unicaster comes with a server mode that must run on the relay system 
 
 ### Does it have any requirements?
 
-Run it on a potato. Also ensure port **23000** is open on both the server and the client, since it will be used for UDP packet relaying and NAT punch-through. Port **23001** also needs to be unused/available on the client (there's no requirement for it to be open, since it will only be used to locally relay traffic to the end destination).
+Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
+
+Also ensure port **23000** is open on both the server and the client, since it will be used for UDP packet relaying and NAT punch-through. Port **24000** also needs to be unused/available on the client (there's no requirement for it to be open, since it will only be used to locally relay traffic to the end destination).
+
+Why is there only a single relay port, since UDP is stateless? Well, because as of now only one remote peer is supported. By I plan to extend it support multiple peers in the near future (using multiple input and relay ports).
 
 ### Say what? Which games support Direct IP connections through UDP?
 
-I'll add a list of games that are known to work once I've tested out more, but in short I've developed this for use with Supreme Commander (Forged Alliance).
+I've developed Wookie Unicaster primarily for Supreme Commander, but there are other games our there that may benefit from it.
+
+Here's a non-exhaustive (and rather limited) list of games I've tested and are known to work:
+* Supreme Commander
+* Supreme Commander - Forged Alliance
+* Divinity Original Sin - Enhanced Edition
 
 ### How do I get access to a public IP? It's not like they grow on trees, you know...
 
