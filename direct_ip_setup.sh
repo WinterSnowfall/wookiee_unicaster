@@ -76,6 +76,7 @@ echo "#   (3)  Supreme Commander (+ Forged Alliance)       #"
 echo "#   (4)  Worms Armageddon                            #"
 echo "#   (5)  Divinity Original Sin - Enhanced Edition    #"
 echo "#   (6)  Anno 1701 (+ The Sunken Dragon)             #"
+echo "#   (7)  Civilization IV (& Addons)                  #"
 echo "#                                                    #"
 echo "######################################################"
 echo ""
@@ -112,6 +113,11 @@ case $game in
         ### Ports: 21701 + WU relay ports
         echo ">>> Setting up Anno 1701 (+ The Sunken Dragon)..."
         start_udp_forwarding 21701
+        ;;
+    7)
+        ### Ports: 2056 + WU relay ports
+        echo ">>> Setting up Civilization IV (& Addons)..."
+        start_udp_forwarding 2056
         ;;
     *)
         echo ">>> Invalid option!"
@@ -153,6 +159,11 @@ case $game in
         ### Ports: 21701 (UDP) + WU relay ports
         echo ">>> Deconfiguring Anno 1701 (+ The Sunken Dragon)..."
         stop_udp_forwarding 21701
+        ;;
+    7)
+        ### Ports: 2056 (UDP) + WU relay ports
+        echo ">>> Deconfiguring Civilization IV (& Addons)..."
+        stop_udp_forwarding 2056
         ;;
     *)
         ;;

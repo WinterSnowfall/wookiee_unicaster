@@ -14,6 +14,7 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 * Divinity Original Sin - Enhanced Edition
 * Anno 1701
 * Anno 1701 - The Sunken Dragon
+* Civilization IV (& Addons, including "Colonization")
 
 ### Does it have any requirements?
 
@@ -25,12 +26,13 @@ Also ensure ports starting from **23001** and above are open on both the server 
 
 In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their mutiplayer code on a client-server model will work with the maximum number of possible players, as advertized by the game.
 
-To be more specific, based on the game above, here is how things stand:
+To be more specific, based on the game list above, here is how things stand:
 * Supreme Commander -> **2 players only** (1 remote peer)
 * Supreme Commander - Forged Alliance -> **2 players only** (1 remote peer)
 * Divinity Original Sin - Enhanced Edition -> the game only supports **2 players** anyway
 * Anno 1701 -> **4 players** (as advertized by the game)
 * Anno 1701 - The Sunken Dragon -> **4 players** (as advertized by the game)
+* Civilization IV (& Addons, including "Colonization") -> **2 players only** (1 remote peer)
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
