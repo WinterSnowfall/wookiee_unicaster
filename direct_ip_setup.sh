@@ -27,7 +27,7 @@ LOCAL_WU_PATH="/home/username/wookiee_unicaster.py"
 # -> leave the value blank in order to set up one remote peer only
 # -> use "-p 3" to enable 3 remote peers, for a total of 4 players
 WU_REMOTE_PEERS=""
-# ports that will be open for WU interal relaying of traffic
+# ports that will be open for WU internal relaying of traffic
 # use "23001" for one remote peer, and a range such as "23001:23003" 
 # for 3 remote peers
 WU_RELAY_PORT_RANGE="23001"
@@ -101,7 +101,7 @@ case $game in
     4)
         ### Ports: 17011 (TCP)
         echo ">>> Setting up Worms Armageddon..."
-        start_udp_forwarding 17011      
+        start_tcp_forwarding 17011      
         ;;
     5)
         ### Ports: 23253 (UDP) + WU relay ports
