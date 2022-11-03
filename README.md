@@ -4,14 +4,6 @@ A UDP packet forwarding script for **Linux**, written in **Python 3**, which ena
 
 The Wookie Unicaster comes with a server mode that must run on the relay system (public IP), and a client mode, which must be run on the system hosting the game server. Any number of remote peers can connect to the game server once the Wookiee Unicaster client/server link is set up properly. Duplex traffic is automatically handled and forwarded using a high-performance multi-process worker queue model.
 
-### Does it have any requirements?
-
-Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
-
-Also ensure port **23000** is open on both the server and the client, since it will be used for UDP packet relaying and NAT punch-through. Port **24000** also needs to be unused/available on the client (there's no requirement for it to be open, since it will only be used to locally relay traffic to the end destination).
-
-Why is there only a single relay port, since UDP is stateless? Well, because as of now only one remote peer is supported. I plan to add support for multiple peers in the near future (using multiple input and relay ports).
-
 ### Say what? Which games support Direct IP connections through UDP?
 
 I've developed Wookie Unicaster primarily for Supreme Commander, but there are other games out there that may benefit from it.
@@ -23,7 +15,24 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 * Anno 1701
 * Anno 1701 - The Sunken Dragon
 
-### How do I get access to a public IP? It's not like they grow on trees, you know...
+### Does it have any requirements?
+
+Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
+
+Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 for 2 remote peers, 23003 as well for 3 peers etc). Ports in the **24001+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used to locally relay traffic onto the end destination).
+
+### Does every UDP-based Direct IP multiplayer game out there work?
+
+In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their mutiplayer code on a client-server model will work with the maximum number of possible players, as advertized by the game.
+
+To be more specific, based on the game above, here is how things stand:
+* Supreme Commander -> **2 players only** (1 remote peer)
+* Supreme Commander - Forged Alliance -> **2 players only** (1 remote peer)
+* Divinity Original Sin - Enhanced Edition -> the game only supports **2 players** anyway
+* Anno 1701 -> **4 players** (as advertized by the game)
+* Anno 1701 - The Sunken Dragon -> **4 players** (as advertized by the game)
+
+### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
 Any IaaS vendor out there will typically provide a public IP for your Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "nanode" from [Linode](https://www.linode.com/).
 
@@ -66,6 +75,7 @@ It's written for Linux, so you'll need a **Linux OS** with **python 3.6+** insta
 You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'll need to specify:
 
 * -m <mode> = enables "server" or "client" mode
+* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client
 * -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen for perform the relaying of UDP packets
 * -s <sourceip> = source IP address - only needed in client mode, where it represents the relay server's public IP
 * -d <destip> = destination IP address - only needed in client mode, where is represents the end IP of the game server
@@ -84,7 +94,7 @@ Followed by the following command on the client (10.0.0.1):
 ./wookiee_unicaster.py -m client -e enp1s0 -s 216.58.212.164 -d 10.0.0.1 -o 16010 > /dev/null 2>&1 &
 ```
 
-in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server (10.0.0.1). Replies will be automatically forwarded back to the source on the same link.
+in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server (10.0.0.1). Replies will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
 
 **Note:** the client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. Note that this may add to the overall link latency, and is generally not recommended (although entirely possible).
 

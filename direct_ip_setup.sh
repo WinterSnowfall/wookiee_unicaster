@@ -20,6 +20,17 @@ REMOTE_SSH_SUDO=""
 REMOTE_WU_PATH="/root/wookiee_unicaster.py"
 # path to the Wookiee Unicaster script on the local host
 LOCAL_WU_PATH="/home/username/wookiee_unicaster.py"
+# number of remote players to enable with the Wookiee Unicaster
+# some games that use a client-server Direct IP approach will
+# work with the full number of advertized players, while P2P
+# implementations will only support the default of one remote peer
+# -> leave the value blank in order to set up one remote peer only
+# -> use "-p 3" to enable 3 remote peers, for a total of 4 players
+WU_REMOTE_PEERS=""
+# ports that will be open for WU interal relaying of traffic
+# use "23001" for one remote peer, and a range such as "23001:23003" 
+# for 3 remote peers
+WU_RELAY_PORT_RANGE="23001"
 # local LAN interface name
 LAN_INTF_NAME="enp1s0"
 # local IP - this is where the game server needs to run, as all remote peers
@@ -34,9 +45,10 @@ start_tcp_forwarding () {
 }
 
 start_udp_forwarding () {
-    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw allow $1,23000/udp" > /dev/null 2>&1
-    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_WU_PATH -m server -e $REMOTE_INFT_NAME -i $1 >> wookiee_unicaster.log 2>&1 &" > /dev/null 2>&1
-    $LOCAL_WU_PATH -m client -e $LAN_INTF_NAME -s $REMOTE_PUBLIC_IP -d $LOCAL_PRIVATE_IP -o $1 >> wookiee_unicaster.log 2>&1 &
+    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw allow $1/udp" > /dev/null 2>&1
+    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw allow $WU_RELAY_PORT_RANGE/udp" > /dev/null 2>&1
+    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_WU_PATH -m server $WU_REMOTE_PEERS -e $REMOTE_INFT_NAME -i $1 >> wookiee_unicaster.log 2>&1 &" > /dev/null 2>&1
+    $LOCAL_WU_PATH -m client $WU_REMOTE_PEERS -e $LAN_INTF_NAME -s $REMOTE_PUBLIC_IP -d $LOCAL_PRIVATE_IP -o $1 >> wookiee_unicaster.log 2>&1 &
 }
 
 stop_tcp_forwarding () {
@@ -45,9 +57,10 @@ stop_tcp_forwarding () {
 }
 
 stop_udp_forwarding () {
-    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw delete allow $1,23000/udp" > /dev/null 2>&1
+    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw delete allow $1/udp" > /dev/null 2>&1
+    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw delete allow $WU_RELAY_PORT_RANGE/udp" > /dev/null 2>&1
     ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "killall wookiee_unicaster" > /dev/null 2>&1
-    killall wookiee_unicaster
+    killall wookiee_unicaster > /dev/null 2>&1
 }
 
 echo "*** WinterSnowfall's port forwarding setup script for Linux ***"
@@ -68,6 +81,7 @@ echo "######################################################"
 echo ""
 read -p ">>> Pick a game for Direct IP play: " game
 
+# forward/tunnel ports through SSH based on the selected option
 case $game in
     1)
         ### Ports: 6112 (TCP)
@@ -80,22 +94,22 @@ case $game in
         start_tcp_forwarding 6120
         ;;
     3)
-        ### Ports: 16010 (UDP) + 23000 (UDP) - WU relay port
+        ### Ports: 16010 (UDP) + WU relay ports
         echo ">>> Setting up Supreme Commander (+ Forged Alliance)..."
         start_udp_forwarding 16010
         ;;
     4)
         ### Ports: 17011 (TCP)
         echo ">>> Setting up Worms Armageddon..."
-        start_tcp_forwarding 17011      
+        start_udp_forwarding 17011      
         ;;
     5)
-        ### Ports: 23253 (UDP) + 23000 (UDP) - WU relay port
+        ### Ports: 23253 (UDP) + WU relay ports
         echo ">>> Setting up Divinity Original Sin - Enhanced Edition..."
         start_udp_forwarding 23253
         ;;
     6)
-        ### Ports: 21701 + 23000 (UDP) - WU relay port
+        ### Ports: 21701 + WU relay ports
         echo ">>> Setting up Anno 1701 (+ The Sunken Dragon)..."
         start_udp_forwarding 21701
         ;;
@@ -121,7 +135,7 @@ case $game in
         stop_tcp_forwarding 6120
         ;;
     3)
-        ### Ports: 16010 (UDP) + 23000 (UDP) - WU relay port
+        ### Ports: 16010 (UDP) + WU relay ports
         echo ">>> Deconfiguring Supreme Commander (+ Forged Alliance)..."
         stop_udp_forwarding 16010
         ;;
@@ -131,12 +145,12 @@ case $game in
         stop_tcp_forwarding 17011
         ;;
     5)
-        ### Ports: 23253 (UDP) + 23000 (UDP) - WU relay port
+        ### Ports: 23253 (UDP) + WU relay ports
         echo ">>> Deconfiguring Divinity Original Sin - Enhanced Edition..."
         stop_udp_forwarding 23253
         ;;
     6)
-        ### Ports: 21701 (UDP) + 23000 (UDP) - WU relay port
+        ### Ports: 21701 (UDP) + WU relay ports
         echo ">>> Deconfiguring Anno 1701 (+ The Sunken Dragon)..."
         stop_udp_forwarding 21701
         ;;
