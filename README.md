@@ -86,25 +86,25 @@ You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'l
 
 * -m <mode> = enables "server" or "client" mode
 * -p <peers> = number of remote peers you want to relay - must be set identically on both server and client
-* -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen for perform the relaying of UDP packets
+* -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen to perform the relaying of UDP packets
 * -s <sourceip> = source IP address - only needed in client mode, where it represents the relay server's public IP
 * -d <destip> = destination IP address - only needed in client mode, where is represents the end IP of the game server
-* -i <iport> = port on which the server will listen for incoming UDP packets from remote peers - only needed in server mode, and it will typically be the port that the game server uses for listening to incoming connections
-* -o <oport> = end relay port - only needed in client mode, where it represents the port that the game server is using to listen for incoming connections
+* -i <iport> = port on which the server will listen for incoming UDP packets from remote peers - only needed in server mode, where it will need to be set to the port that the game server uses for listening to incoming connections
+* -o <oport> = end relay port - only needed in client mode, where it represents the port that the game server is using to listen for incoming connections (typically the same as <iport> on the server)
 
-To give you an example, you can run the following command on the server (216.58.212.164):
+To give you an example, you can run the following command on the server (216.58.212.164 in the diagram above):
 
 ```
 ./wookiee_unicaster.py -m server -e eth0 -i 16010 > /dev/null 2>&1 &
 ```
 
-Followed by the following command on the client (10.0.0.1):
+Followed by the following command on the client (10.0.0.1 in the diagram above):
 
 ```
 ./wookiee_unicaster.py -m client -e enp1s0 -s 216.58.212.164 -d 10.0.0.1 -o 16010 > /dev/null 2>&1 &
 ```
 
-in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server (10.0.0.1). Replies will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
+in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server. Replies from the game server will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
 
-**Note:** the client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. Note that this may add to the overall link latency, and is generally not recommended (although entirely possible).
+**Note:** the client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. Note that this may add to the overall link latency, and is generally not recommended (although entirely possible). Also, please don't use wireless networks and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of ethernet traffic, though it does employ some buffering.
 
