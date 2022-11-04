@@ -4,6 +4,13 @@
 # all of the required ports. Please make sure ufw is installed and enabled on
 # target system and that the ufw command can be run by the REMOTE_SSH_USER.
 
+#bash output styles and colors
+DEFAULT="\033[0m"
+BOLD="\033[1m"
+BLINK="\033[5m"
+GREEN="\033[1;32m"
+YELLOW="\033[1;33m"
+
 ############### SCRIPT PARAMETERS - MUST BE CONFIGURED PROPERLY #################
 #
 # name of the ethernet interface on which the public IP resides
@@ -65,8 +72,8 @@ stop_udp_forwarding () {
 
 echo "*** WinterSnowfall's port forwarding setup script for Linux ***"
 echo ""
-echo ">>> Configured remote IP : $REMOTE_PUBLIC_IP"
-echo ">>> Detected local IP : $LOCAL_PRIVATE_IP"
+echo -e ">>> Configured remote IP : "$YELLOW$REMOTE_PUBLIC_IP$DEFAULT
+echo -e ">>> Detected local IP : "$GREEN$LOCAL_PRIVATE_IP$DEFAULT
 echo ""
 echo "######################################################"
 echo "#                                                    #"
@@ -80,44 +87,43 @@ echo "#   (7)  Civilization IV (& Addons)                  #"
 echo "#                                                    #"
 echo "######################################################"
 echo ""
-read -p ">>> Pick a game for Direct IP play: " game
+read -p ">>> Pick a game for Direct IP play: " GAME
 
-# forward/tunnel ports through SSH based on the selected option
-case $game in
+case $GAME in
     1)
-        ### Ports: 6112 (TCP)
-        echo ">>> Setting up Sins Of A Solar Empire - Rebellion..."
-        start_tcp_forwarding 6112
+        #Sins Of A Solar Empire - Rebellion
+        GAME_PROTO="TCP"
+        GAME_PORTS="6112"
         ;;
     2)
-        ### Ports: 6120 (TCP)
-        echo ">>> Setting up Warhammer 40,000 Gladius - Relics Of War..."
-        start_tcp_forwarding 6120
+        #Warhammer 40,000 Gladius - Relics Of War
+        GAME_PROTO="TCP"
+        GAME_PORTS="6120"
         ;;
     3)
-        ### Ports: 16010 (UDP) + WU relay ports
-        echo ">>> Setting up Supreme Commander (+ Forged Alliance)..."
-        start_udp_forwarding 16010
+        #Supreme Commander (+ Forged Alliance)
+        GAME_PROTO="UDP"
+        GAME_PORTS="16010"
         ;;
     4)
-        ### Ports: 17011 (TCP)
-        echo ">>> Setting up Worms Armageddon..."
-        start_tcp_forwarding 17011      
+        #Worms Armageddon
+        GAME_PROTO="TCP"
+        GAME_PORTS="17011"
         ;;
     5)
-        ### Ports: 23253 (UDP) + WU relay ports
-        echo ">>> Setting up Divinity Original Sin - Enhanced Edition..."
-        start_udp_forwarding 23253
+        #Divinity Original Sin - Enhanced Edition
+        GAME_PROTO="UDP"
+        GAME_PORTS="23253"
         ;;
     6)
-        ### Ports: 21701 + WU relay ports
-        echo ">>> Setting up Anno 1701 (+ The Sunken Dragon)..."
-        start_udp_forwarding 21701
+        #Anno 1701 (+ The Sunken Dragon)
+        GAME_PROTO="UDP"
+        GAME_PORTS="21701"
         ;;
     7)
-        ### Ports: 2056 + WU relay ports
-        echo ">>> Setting up Civilization IV (& Addons)..."
-        start_udp_forwarding 2056
+        #Civilization IV (& Addons)
+        GAME_PROTO="UDP"
+        GAME_PORTS="2056"
         ;;
     *)
         echo ">>> Invalid option!"
@@ -125,47 +131,27 @@ case $game in
         ;;
 esac
 
-echo ">>> Port forwarding has been configured."
-
-read -p ">>> Press any key to terminate..."
-
-case $game in
-    1)
-        ### Ports: 6112 (TCP)
-        echo ">>> Deconfiguring Sins Of A Solar Empire - Rebellion..."
-        stop_tcp_forwarding 6112
+# forward/tunnel ports through SSH based on the selected option
+case $GAME_PROTO in
+    TCP)
+        echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
+        start_tcp_forwarding $GAME_PORTS
+        echo -en ">>> "$GREEN"DONE"$DEFAULT". "
+        echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
+        read
+        stop_tcp_forwarding $GAME_PORTS
         ;;
-    2)
-        ### Ports: 6120 (TCP)
-        echo ">>> Deconfiguring Warhammer 40,000 Gladius - Relics Of War..."
-        stop_tcp_forwarding 6120
-        ;;
-    3)
-        ### Ports: 16010 (UDP) + WU relay ports
-        echo ">>> Deconfiguring Supreme Commander (+ Forged Alliance)..."
-        stop_udp_forwarding 16010
-        ;;
-    4)
-        ### Ports: 17011 (TCP)
-        echo ">>> Deconfiguring Worms Armageddon..."
-        stop_tcp_forwarding 17011
-        ;;
-    5)
-        ### Ports: 23253 (UDP) + WU relay ports
-        echo ">>> Deconfiguring Divinity Original Sin - Enhanced Edition..."
-        stop_udp_forwarding 23253
-        ;;
-    6)
-        ### Ports: 21701 (UDP) + WU relay ports
-        echo ">>> Deconfiguring Anno 1701 (+ The Sunken Dragon)..."
-        stop_udp_forwarding 21701
-        ;;
-    7)
-        ### Ports: 2056 (UDP) + WU relay ports
-        echo ">>> Deconfiguring Civilization IV (& Addons)..."
-        stop_udp_forwarding 2056
+    UDP)
+        echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
+        start_udp_forwarding $GAME_PORTS
+        echo -en ">>> "$GREEN"DONE"$DEFAULT". "
+        echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
+        read
+        stop_udp_forwarding $GAME_PORTS
         ;;
     *)
+        echo ">>> Invalid option!"
+        exit 1
         ;;
 esac
 
