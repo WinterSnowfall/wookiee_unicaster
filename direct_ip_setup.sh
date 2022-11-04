@@ -131,9 +131,9 @@ case $GAME in
         ;;
 esac
 
-# forward/tunnel ports through SSH based on the selected option
 case $GAME_PROTO in
     TCP)
+        # forward/tunnel ports through SSH based on the selected option
         echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
         start_tcp_forwarding $GAME_PORTS
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
@@ -142,6 +142,7 @@ case $GAME_PROTO in
         stop_tcp_forwarding $GAME_PORTS
         ;;
     UDP)
+        # relay port traffic using the Wookiee Unicaster based on the selected option 
         echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
         start_udp_forwarding $GAME_PORTS
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
