@@ -16,6 +16,10 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 * Anno 1701 - The Sunken Dragon
 * Civilization IV (& Addons, including "Colonization")
 
+### UDP traffic over the internet? Is that... safe?
+
+No. Use it at your own risk. Most games will not encryt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unecrypted traffic over the internet, although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall. If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not. That being said, will your system get hacked into if you occassionally play an Anno 1701 match with the Wookiee Unicaster? Probably not.
+
 ### Does it have any requirements?
 
 Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
