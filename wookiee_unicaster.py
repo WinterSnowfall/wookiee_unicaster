@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.20
+@version: 2.30
 @date: 04/11/2022
 '''
 
@@ -30,6 +30,9 @@ CLIENT_UDP_CONNECTION_TIMEOUT = 30 #seconds
 SENDTO_QUEUE_TIMEOUT = 5 #seconds
 UDP_KEEP_ALIVE_INTERVAL = 1 #seconds
 UDP_CLIENT_KEEP_ALIVE_PACKET = b'Hello there!'
+#the client will keep sending keep alive packets even if 
+#the server doesn't reply within this interval
+UDP_CLIENT_KEEP_ALIVE_TIMEOUT = 4 #seconds
 UDP_SERVER_KEEP_ALIVE_PACKET = b'General Kenobi!'
 UDP_SERVER_KEEP_ALIVE_HALT_PACKET = b'STOP! Hammer time!'
 THREAD_SPAWN_WAIT_INTERVAL = 0.1 #seconds
@@ -61,9 +64,9 @@ def sigint_handler(signum, frame):
             
     raise SystemExit(0)
 
-def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, 
-                               source_queue_list, remote_peer_addr_reverse_dict,
-                               max_packet_size, source_packet_count):
+def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_queue_list, 
+                               remote_peer_addr_reverse_dict, max_packet_size, 
+                               source_packet_count, child_proc_started_event):
     #catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
     
@@ -75,7 +78,7 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list,
     vacant_queue_index = None
     
     #allow the other server processes to spin up before accepting remote peers
-    sleep(THREAD_SPAWN_WAIT_INTERVAL * 8)
+    child_proc_started_event.wait()
     
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread started.')
     
@@ -178,17 +181,27 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
             sleep(UDP_KEEP_ALIVE_INTERVAL)
             
             logger.debug(f'WU P{peer} {wookiee_mode} +++ Listening for a keep alive packet...')
-            rdata, raddr = isocket.recvfrom(RECV_BUFFER_SIZE)
-            logger.debug(f'WU P{peer} {wookiee_mode} +++ Received a keep alive packet.')
-            logger.debug(f'WU P{peer} {wookiee_mode} +++ {raddr[0]}:{raddr[1]} sent: {rdata}')
+            isocket.settimeout(UDP_CLIENT_KEEP_ALIVE_TIMEOUT)
             
-            if not peer_connection_received:
-                logger.info(f'WU P{peer} {wookiee_mode} +++ Server connection confirmed!')
-                peer_connection_received = True
+            try:
+                rdata, raddr = isocket.recvfrom(RECV_BUFFER_SIZE)
+                 
+                logger.debug(f'WU P{peer} {wookiee_mode} +++ Received a keep alive packet.')
+                logger.debug(f'WU P{peer} {wookiee_mode} +++ {raddr[0]}:{raddr[1]} sent: {rdata}')
+                
+                if not peer_connection_received:
+                    logger.info(f'WU P{peer} {wookiee_mode} +++ Server connection confirmed!')
+                    peer_connection_received = True
+                    
+                if rdata == UDP_SERVER_KEEP_ALIVE_HALT_PACKET:
+                    logger.info(f'WU P{peer} {wookiee_mode} +++ Connection keep alive halted.')
+                    remote_peer_event.set()
             
-            if rdata == UDP_SERVER_KEEP_ALIVE_HALT_PACKET:
-                logger.info(f'WU P{peer} {wookiee_mode} +++ Connection keep alive halted.')
-                remote_peer_event.set()
+            except socket.timeout:
+                logger.debug(f'WU P{peer} {wookiee_mode} +++ Timed out waiting for a reply.')
+            
+            finally:
+                isocket.settimeout(None)
         ####################### UDP KEEP ALIVE LOGIC - CLIENT #########################
         
     if wookiee_mode == 'server-destination-receive':
@@ -494,6 +507,8 @@ if __name__=="__main__":
     remote_peer_event_list = [multiprocessing.Event() for i in range(peers)]
     process_loop_event = threading.Event()
     process_loop_event.set()
+    child_proc_started_event = multiprocessing.Event()
+    child_proc_started_event.clear()
     source_queue_list = [multiprocessing.Queue(PACKET_QUEUE_SIZE) for i in range(peers)]
     destination_queue_list = [multiprocessing.Queue(PACKET_QUEUE_SIZE) for i in range(peers)]
     wookiee_peer_handler_threads = [None] * peers
@@ -513,7 +528,7 @@ if __name__=="__main__":
         main_remote_peer_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
                                                         args=(peers, main_remote_peer_socket, remote_peer_event_list,
                                                               source_queue_list, remote_peer_addr_reverse_dict,
-                                                              max_packet_size, source_packet_count), 
+                                                              max_packet_size, source_packet_count, child_proc_started_event), 
                                                         daemon=True)
         main_remote_peer_proc.start()
         
@@ -543,6 +558,9 @@ if __name__=="__main__":
                                                            daemon=True)
         wookiee_peer_handler_threads[peer].start()
         sleep(THREAD_SPAWN_WAIT_INTERVAL)
+        
+    #signal the main remote peer process that all child threads have been started
+    child_proc_started_event.set()
         
     try:
         for i in range(peers): 
