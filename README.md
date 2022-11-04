@@ -18,11 +18,11 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 
 ### UDP traffic over the internet? Is that... safe?
 
-No. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unecrypted traffic over the internet (including Direct IP UDP multiplayer without using the Wookie Unicaster, asuming the game host has an ISP-provided public IP already), although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall.
+No. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unecrypted traffic over the internet (including Direct IP UDP multiplayer without using the Wookiee Unicaster, assuming the game host has an ISP-provided public IP already), although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall.
 
-Since the Wookiee Unicaster only handles traffic between the relay server and the game host, it can't offer a solution to this problem, like a VPN can, even if it were to encrypt the traffic it is relaying.
+Since the Wookiee Unicaster only handles end-to-end traffic between the relay server and the game server, it can't offer a solution to this problem, like a VPN can, even if it were to encrypt the traffic it is relaying. If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not.
 
-If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not. That being said, will your system get hacked into if you occasionally play an Anno 1701 match with the Wookiee Unicaster? Probably not.
+That being said, will your system get hacked into if you occasionally play an Anno 1701 match over the internet with the Wookiee Unicaster (or even without it)? Probably not. But caveat emptor, since I have no desire or interest to sugar coat the situation and everyone should be aware of the risks.
 
 ### Does it have any requirements?
 
