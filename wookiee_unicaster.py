@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.02
+@version: 2.10
 @date: 04/11/2022
 '''
 
@@ -42,7 +42,7 @@ def sigterm_handler(signum, frame):
     try:
         logger.debug('WU >>> Stopping Wookiee Unicaster process due to SIGTERM...')
     except:
-        raise SystemExit(0)
+        pass
             
     raise SystemExit(0)
 
@@ -51,7 +51,7 @@ def sigint_handler(signum, frame):
     try:
         logger.debug('WU >>> Stopping Wookiee Unicaster child process due to SIGINT...')
     except:
-        raise SystemExit(0)
+        pass
             
     raise SystemExit(0)
 
@@ -68,7 +68,7 @@ def wookiee_remote_peer_worker(peers, intf, isocket, remote_peer_event_list,
     queue_vacancy = [True] * peers
     vacant_queue_index = None
     
-    #allow the other processes to spin up before accepting remote peers
+    #allow the other server processes to spin up before accepting remote peers
     sleep(THREAD_SPAWN_WAIT_INTERVAL * 8)
     
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread started.')
@@ -314,6 +314,7 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
                         remote_peer_event, process_loop_event, remote_peer_addr_reverse_dict,
                         main_proc_socket, max_packet_size, 
                         source_packet_count, destination_packet_count):
+    
     logger.debug(f'WU P{peer} >>> source_ip: {source_ip}')
     logger.debug(f'WU P{peer} >>> destination_ip: {destination_ip}')
     logger.debug(f'WU P{peer} >>> source_port: {source_port}')
@@ -346,41 +347,41 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
             
             #only clients must spawn a peer count of -source-receive processes, since servers will only need one receive process
             if wookiee_mode != 'server':
-                wookiee_thread_source_receive = multiprocessing.Process(target=wookiee_receive_worker, 
-                                                                args=(peer, ''.join((wookiee_mode, '-source-receive')), intf, source,
-                                                                      source_ip, source_port, socket_timeout, link_event, remote_peer_event, 
-                                                                      exit_event, source_queue, destination_queue, 
-                                                                      max_packet_size, source_packet_count), 
+                wookiee_proc_source_receive = multiprocessing.Process(target=wookiee_receive_worker, 
+                                                                      args=(peer, ''.join((wookiee_mode, '-source-receive')), intf, source,
+                                                                            source_ip, source_port, socket_timeout, link_event, remote_peer_event, 
+                                                                            exit_event, source_queue, destination_queue, 
+                                                                            max_packet_size, source_packet_count), 
+                                                                      daemon=True)
+            wookiee_proc_source_relay = multiprocessing.Process(target=wookiee_relay_worker, 
+                                                                args=(peer, ''.join((wookiee_mode, '-source-relay')), intf, destination, 
+                                                                      ((destination_ip, destination_port)), link_event, remote_peer_event, 
+                                                                      exit_event, source_queue, destination_queue, None,
+                                                                      destination_packet_count), 
                                                                 daemon=True)
-            wookiee_thread_source_relay = multiprocessing.Process(target=wookiee_relay_worker, 
-                                                               args=(peer, ''.join((wookiee_mode, '-source-relay')), intf, destination, 
-                                                                     ((destination_ip, destination_port)), link_event, remote_peer_event, 
-                                                                     exit_event, source_queue, destination_queue, None,
-                                                                     destination_packet_count), 
-                                                               daemon=True)
-            wookiee_thread_destination_receive = multiprocessing.Process(target=wookiee_receive_worker, 
-                                                             args=(peer, ''.join((wookiee_mode, '-destination-receive')), intf, destination,
-                                                                   None, None, socket_timeout, link_event, remote_peer_event, 
-                                                                   exit_event, source_queue, destination_queue,
-                                                                   max_packet_size, source_packet_count), 
-                                                             daemon=True)
-            wookiee_thread_destination_relay = multiprocessing.Process(target=wookiee_relay_worker, 
-                                                             args=(peer, ''.join((wookiee_mode, '-destination-relay')), intf, source, 
-                                                                   ((source_ip, source_port)), link_event, remote_peer_event, exit_event,
-                                                                   source_queue, destination_queue, remote_peer_addr_reverse_dict,
-                                                                   destination_packet_count), 
-                                                             daemon=True)
+            wookiee_proc_destination_receive = multiprocessing.Process(target=wookiee_receive_worker, 
+                                                                       args=(peer, ''.join((wookiee_mode, '-destination-receive')), intf, destination,
+                                                                             None, None, socket_timeout, link_event, remote_peer_event, 
+                                                                             exit_event, source_queue, destination_queue,
+                                                                             max_packet_size, source_packet_count), 
+                                                                       daemon=True)
+            wookiee_proc_destination_relay = multiprocessing.Process(target=wookiee_relay_worker, 
+                                                                     args=(peer, ''.join((wookiee_mode, '-destination-relay')), intf, source, 
+                                                                           ((source_ip, source_port)), link_event, remote_peer_event, exit_event,
+                                                                           source_queue, destination_queue, remote_peer_addr_reverse_dict,
+                                                                           destination_packet_count), 
+                                                                     daemon=True)
             if wookiee_mode != 'server':
-                wookiee_thread_source_receive.start()
-            wookiee_thread_source_relay.start()
-            wookiee_thread_destination_receive.start()
-            wookiee_thread_destination_relay.start()
+                wookiee_proc_source_receive.start()
+            wookiee_proc_source_relay.start()
+            wookiee_proc_destination_receive.start()
+            wookiee_proc_destination_relay.start()
         
             if wookiee_mode != 'server':
-                wookiee_thread_source_receive.join()
-            wookiee_thread_source_relay.join()
-            wookiee_thread_destination_receive.join()
-            wookiee_thread_destination_relay.join()
+                wookiee_proc_source_receive.join()
+            wookiee_proc_source_relay.join()
+            wookiee_proc_destination_receive.join()
+            wookiee_proc_destination_relay.join()
             
             logger.info(f'WU P{peer} >>> Stopped all Wookie Unicaster child processes.')
             
@@ -391,14 +392,14 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
     try:
         logger.info(f'WU P{peer} >>> Closing source socket...')
         source.close()
-        logger.info(f'WU P{peer} >>> Source socket closed...')
+        logger.info(f'WU P{peer} >>> Source socket closed.')
     except:
         pass
     
     try:
         logger.info(f'WU P{peer} >>> Closing destination socket...')
         destination.close()
-        logger.info(f'WU P{peer} >>> Destination socket closed...')
+        logger.info(f'WU P{peer} >>> Destination socket closed.')
     except:
         pass
 
@@ -490,21 +491,21 @@ if __name__=="__main__":
     manager = multiprocessing.Manager()
     remote_peer_addr_reverse_dict = manager.dict()
     max_packet_size = multiprocessing.Value('i', 0)
-    source_packet_count = multiprocessing.Value('i',0)
+    source_packet_count = multiprocessing.Value('i', 0)
     destination_packet_count = multiprocessing.Value('i', 0)
-    main_proc_socket = None
+    main_remote_peer_socket = None
     
     if wookiee_mode == 'server':
-        main_proc_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        main_proc_socket.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, bytes(intf, 'utf-8'))
-        main_proc_socket.bind((local_ip, source_port))
+        main_remote_peer_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        main_remote_peer_socket.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, bytes(intf, 'utf-8'))
+        main_remote_peer_socket.bind((local_ip, source_port))
         
-        main_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
-                                       args=(peers, intf, main_proc_socket, remote_peer_event_list,
-                                             source_queue_list, remote_peer_addr_reverse_dict,
-                                             max_packet_size, source_packet_count), 
-                                       daemon=True)
-        main_proc.start()
+        main_remote_peer_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
+                                                        args=(peers, intf, main_remote_peer_socket, remote_peer_event_list,
+                                                              source_queue_list, remote_peer_addr_reverse_dict,
+                                                              max_packet_size, source_packet_count), 
+                                                        daemon=True)
+        main_remote_peer_proc.start()
         
         sleep(THREAD_SPAWN_WAIT_INTERVAL)
     
@@ -527,7 +528,7 @@ if __name__=="__main__":
                                                                  destination_ip, source_port, destination_port, relay_port,
                                                                  source_queue, destination_queue, link_event, exit_event,
                                                                  remote_peer_event, process_loop_event,
-                                                                 remote_peer_addr_reverse_dict, main_proc_socket,
+                                                                 remote_peer_addr_reverse_dict, main_remote_peer_socket,
                                                                  max_packet_size, source_packet_count, destination_packet_count), 
                                                            daemon=True)
         wookiee_peer_handler_threads[peer].start()
@@ -537,7 +538,7 @@ if __name__=="__main__":
         for i in range(peers): 
             wookiee_peer_handler_threads[i].join()
         if wookiee_mode == 'server':
-            main_proc.join()
+            main_remote_peer_proc.join()
             
     except KeyboardInterrupt:
         #not sure why a second KeyboardInterrupt gets thrown here on shutdown at times
@@ -560,12 +561,13 @@ if __name__=="__main__":
         
         manager.shutdown()
         
-        try:
-            logger.info(f'WU P{peer} >>> Closing main source socket...')
-            main_proc.close()
-            logger.info(f'WU P{peer} >>> Main source socket closed...')
-        except:
-            pass
+        if wookiee_mode == 'server':
+            try:
+                logger.info(f'WU >>> Closing remote peer server socket...')
+                main_remote_peer_socket.close()
+                logger.info(f'WU >>> Remote peer socket closed.')
+            except:
+                pass
     
     logger.info('WU >>> Ruow! (Goodbye)')
     
