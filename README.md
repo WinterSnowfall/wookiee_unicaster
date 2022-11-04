@@ -18,7 +18,7 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 
 ### UDP traffic over the internet? Is that... safe?
 
-No. Use it at your own risk. Most games will not encryt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unecrypted traffic over the internet, although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall. If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not. That being said, will your system get hacked into if you occassionally play an Anno 1701 match with the Wookiee Unicaster? Probably not.
+No. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unecrypted traffic over the internet, although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall. If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not. That being said, will your system get hacked into if you occasionally play an Anno 1701 match with the Wookiee Unicaster? Probably not.
 
 ### Does it have any requirements?
 
@@ -28,14 +28,14 @@ Also ensure ports starting from **23001** and above are open on both the server 
 
 ### Does every UDP-based Direct IP multiplayer game out there work?
 
-In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their mutiplayer code on a client-server model will work with the maximum number of possible players, as advertized by the game.
+In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their multiplayer code on a client-server model will work with the maximum number of possible players, as advertised by the game.
 
 To be more specific, based on the game list above, here is how things stand:
 * Supreme Commander -> **2 players only** (1 remote peer)
 * Supreme Commander - Forged Alliance -> **2 players only** (1 remote peer)
 * Divinity Original Sin - Enhanced Edition -> the game only supports **2 players** anyway
-* Anno 1701 -> **4 players** (as advertized by the game)
-* Anno 1701 - The Sunken Dragon -> **4 players** (as advertized by the game)
+* Anno 1701 -> **4 players** (as advertised by the game)
+* Anno 1701 - The Sunken Dragon -> **4 players** (as advertised by the game)
 * Civilization IV (& Addons, including "Colonization") -> **2 players only** (1 remote peer)
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
