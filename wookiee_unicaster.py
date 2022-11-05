@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.30
-@date: 04/11/2022
+@version: 2.40
+@date: 06/11/2022
 '''
 
 import socket
@@ -24,15 +24,16 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO) #DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 #constants
-SERVER_PEER_UDP_CONNECTION_TIMEOUT = 30 #seconds
-SERVER_UDP_CONNECTION_TIMEOUT = 20 #seconds
-CLIENT_UDP_CONNECTION_TIMEOUT = 30 #seconds
-SENDTO_QUEUE_TIMEOUT = 5 #seconds
-UDP_KEEP_ALIVE_INTERVAL = 1 #seconds
+SERVER_PEER_UDP_CONNECTION_TIMEOUT = 40 #seconds
+SERVER_UDP_CONNECTION_TIMEOUT = 40 #seconds
+CLIENT_UDP_CONNECTION_TIMEOUT = 40 #seconds
+SENDTO_QUEUE_TIMEOUT = 10 #seconds
+UDP_KEEP_ALIVE_INTERVAL = 2 #seconds
 UDP_CLIENT_KEEP_ALIVE_PACKET = b'Hello there!'
 #the client will keep sending keep alive packets even if 
-#the server doesn't reply within this interval
-UDP_CLIENT_KEEP_ALIVE_TIMEOUT = 4 #seconds
+#the server doesn't reply within this interval;
+#stacks up with UDP_KEEP_ALIVE_INTERVAL in case of no reply
+UDP_CLIENT_KEEP_ALIVE_TIMEOUT = 3 #seconds
 UDP_SERVER_KEEP_ALIVE_PACKET = b'General Kenobi!'
 UDP_SERVER_KEEP_ALIVE_HALT_PACKET = b'STOP! Hammer time!'
 THREAD_SPAWN_WAIT_INTERVAL = 0.1 #seconds
@@ -170,7 +171,8 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
     
     if wookiee_mode == 'client-source-receive':
         ####################### UDP KEEP ALIVE LOGIC - CLIENT #########################
-        logger.info(f'WU P{peer} {wookiee_mode} +++ Initiating relay connection keep alive...')
+        if not remote_peer_event.is_set():
+            logger.info(f'WU P{peer} {wookiee_mode} +++ Initiating relay connection keep alive...')
         
         peer_connection_received = False
         
@@ -268,7 +270,8 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
     
     if wookiee_mode == 'server-source-relay':
         ####################### UDP KEEP ALIVE LOGIC - SERVER #########################
-        logger.info(f'WU P{peer} {wookiee_mode} --- Initiating relay connection keep alive...')
+        if not remote_peer_event.is_set():
+            logger.info(f'WU P{peer} {wookiee_mode} --- Initiating relay connection keep alive...')
         
         peer_connection_received = False
         
@@ -290,8 +293,8 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
             else:
                 logger.debug(f'WU P{peer} {wookiee_mode} --- Halting keep alive...')
                 osocket.sendto(UDP_SERVER_KEEP_ALIVE_HALT_PACKET, oaddr)
+                logger.info(f'WU P{peer} {wookiee_mode} --- Connection keep alive halted.')
              
-        logger.info(f'WU P{peer} {wookiee_mode} --- Connection keep alive halted.')
         ####################### UDP KEEP ALIVE LOGIC - SERVER #########################
                 
         logger.debug(f'WU P{peer} {wookiee_mode} --- Clearing link event...')
@@ -309,12 +312,17 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
             else:
                 odata = destination_queue.get(True, SENDTO_QUEUE_TIMEOUT)
             
-            logger.debug(f'WU P{peer} {wookiee_mode} --- Using remote peer: {oaddr}')
-            osocket.sendto(odata, oaddr)
-            logger.debug(f'WU P{peer} {wookiee_mode} --- Replicated a packet to {oaddr[0]}:{oaddr[1]}...')
-            
-            if wookiee_mode.endswith('-destination-relay'):
-                destination_packet_count.value += 1
+            try:
+                logger.debug(f'WU P{peer} {wookiee_mode} --- Using remote peer: {oaddr}')
+                osocket.sendto(odata, oaddr)
+                logger.debug(f'WU P{peer} {wookiee_mode} --- Replicated a packet to {oaddr[0]}:{oaddr[1]}...')
+                
+                if wookiee_mode.endswith('-destination-relay'):
+                    destination_packet_count.value += 1
+            #sometimes when a peer is dropped relay packets may still get sent its way;
+            #simply ignore/drop them on relay if that's the case
+            except TypeError:
+                logger.warning(f'WU P{peer} {wookiee_mode} --- Unknown or dropped remote peer. Dropping packet.')
                 
         except queue.Empty:
             logger.debug(f'WU P{peer} {wookiee_mode} --- Timed out while waiting to send packet...')
@@ -413,16 +421,16 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
                       
     try:
         if wookiee_mode != 'server':
-            logger.info(f'WU P{peer} >>> Closing source socket...')
+            logger.debug(f'WU P{peer} >>> Closing source socket...')
             source.close()
-            logger.info(f'WU P{peer} >>> Source socket closed.')
+            logger.debug(f'WU P{peer} >>> Source socket closed.')
     except:
         pass
     
     try:
-        logger.info(f'WU P{peer} >>> Closing destination socket...')
+        logger.debug(f'WU P{peer} >>> Closing destination socket...')
         destination.close()
-        logger.info(f'WU P{peer} >>> Destination socket closed.')
+        logger.debug(f'WU P{peer} >>> Destination socket closed.')
     except:
         pass
 
@@ -591,9 +599,9 @@ if __name__=="__main__":
         
         if wookiee_mode == 'server':
             try:
-                logger.info('WU >>> Closing remote peer server socket...')
+                logger.debug('WU >>> Closing remote peer server socket...')
                 main_remote_peer_socket.close()
-                logger.info('WU >>> Remote peer socket closed.')
+                logger.debug('WU >>> Remote peer socket closed.')
             except:
                 pass
     
