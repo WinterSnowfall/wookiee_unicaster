@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.40
+@version: 2.41
 @date: 06/11/2022
 '''
 
@@ -509,26 +509,28 @@ if __name__=="__main__":
         logger.info((f'Starting Wookie Unicaster in CLIENT mode, connecting to the server on {source_ip} ' 
                      f'and forwarding to {destination_ip}:{destination_port}.'))
     
-    #shared events and queues
     link_event_list = [multiprocessing.Event() for i in range(peers)]
     exit_event_list = [multiprocessing.Event() for i in range(peers)]
     remote_peer_event_list = [multiprocessing.Event() for i in range(peers)]
-    process_loop_event = threading.Event()
-    process_loop_event.set()
-    child_proc_started_event = multiprocessing.Event()
-    child_proc_started_event.clear()
     source_queue_list = [multiprocessing.Queue(PACKET_QUEUE_SIZE) for i in range(peers)]
     destination_queue_list = [multiprocessing.Queue(PACKET_QUEUE_SIZE) for i in range(peers)]
-    wookiee_peer_handler_threads = [None] * peers
-        
+    
     manager = multiprocessing.Manager()
     remote_peer_addr_reverse_dict = manager.dict()
     max_packet_size = multiprocessing.Value('i', 0)
     source_packet_count = multiprocessing.Value('i', 0)
     destination_packet_count = multiprocessing.Value('i', 0)
+    
+    wookiee_peer_handler_threads = [None] * peers
+    process_loop_event = threading.Event()
+    process_loop_event.set()
+    
     main_remote_peer_socket = None
     
     if wookiee_mode == 'server':
+        child_proc_started_event = multiprocessing.Event()
+        child_proc_started_event.clear()
+        
         main_remote_peer_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         main_remote_peer_socket.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
         main_remote_peer_socket.bind((local_ip, source_port))
@@ -540,35 +542,31 @@ if __name__=="__main__":
                                                         daemon=True)
         main_remote_peer_proc.start()
         
-        sleep(THREAD_SPAWN_WAIT_INTERVAL)
-    
     for peer in range(peers):
+        sleep(THREAD_SPAWN_WAIT_INTERVAL)
+        
         if wookiee_mode == 'server':
             relay_port += 1
             destination_port += 1
         else:
             source_port += 1
             relay_port += 1
-            
-        source_queue = source_queue_list[peer]
-        destination_queue = destination_queue_list[peer]
-        link_event = link_event_list[peer]
-        exit_event = exit_event_list[peer]
-        remote_peer_event = remote_peer_event_list[peer]
         
         wookiee_peer_handler_threads[peer] = threading.Thread(target=wookie_peer_handler, 
-                                                           args=(peer + 1, wookiee_mode, intf, local_ip, source_ip, 
-                                                                 destination_ip, source_port, destination_port, relay_port,
-                                                                 source_queue, destination_queue, link_event, exit_event,
-                                                                 remote_peer_event, process_loop_event,
-                                                                 remote_peer_addr_reverse_dict, main_remote_peer_socket,
-                                                                 max_packet_size, source_packet_count, destination_packet_count), 
-                                                           daemon=True)
+                                                              args=(peer + 1, wookiee_mode, intf, local_ip, source_ip, 
+                                                                    destination_ip, source_port, destination_port, relay_port,
+                                                                    source_queue_list[peer], destination_queue_list[peer], 
+                                                                    link_event_list[peer], exit_event_list[peer],
+                                                                    remote_peer_event_list[peer], process_loop_event,
+                                                                    remote_peer_addr_reverse_dict, main_remote_peer_socket,
+                                                                    max_packet_size, source_packet_count, destination_packet_count), 
+                                                              daemon=True)
         wookiee_peer_handler_threads[peer].start()
-        sleep(THREAD_SPAWN_WAIT_INTERVAL)
         
-    #signal the main remote peer process that all child threads have been started
-    child_proc_started_event.set()
+    if wookiee_mode == 'server':
+        sleep(THREAD_SPAWN_WAIT_INTERVAL)
+        #signal the main remote peer process that all child threads have been started
+        child_proc_started_event.set()
         
     try:
         for i in range(peers): 
