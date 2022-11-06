@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.42
+@version: 2.43
 @date: 06/11/2022
 '''
 
@@ -360,12 +360,20 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
         source = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         source.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
         logger.debug(f'WU P{peer} >>> Binding source to: {local_ip}:{source_port}')
-        source.bind((local_ip, source_port))
+        try:
+            source.bind((local_ip, source_port))
+        except OSError:
+            logger.critical(f'WU P{peer} >>> Interface unavailable or port {source_port} is in use.')
+            raise SystemExit(7)
         
     destination = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     destination.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
     logger.debug(f'WU P{peer} >>> Binding destination to: {local_ip}:{relay_port}')
-    destination.bind((local_ip, relay_port))
+    try:
+        destination.bind((local_ip, relay_port))
+    except OSError:
+        logger.critical(f'WU P{peer} >>> Interface unavailable or port {relay_port} is in use.')
+        raise SystemExit(8)
     
     while reset_loop and process_loop_event.is_set():    
         try:
@@ -533,7 +541,11 @@ if __name__=="__main__":
         
         main_remote_peer_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         main_remote_peer_socket.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
-        main_remote_peer_socket.bind((local_ip, source_port))
+        try:
+            main_remote_peer_socket.bind((local_ip, source_port))
+        except OSError:
+            logger.critical(f'WU >>> Interface unavailable or port {source_port} is in use.')
+            raise SystemExit(6)
         
         main_remote_peer_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
                                                         args=(peers, main_remote_peer_socket, remote_peer_event_list,
