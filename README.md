@@ -28,7 +28,7 @@ That being said, will your system get hacked into if you occasionally play an An
 
 Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
 
-Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 for 2 remote peers, 23003 as well for 3 peers etc). Ports in the **24001+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used to locally relay traffic onto the end destination).
+Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 for 2 remote peers, 23003 as well for 3 peers etc). Ports in the **23101+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used to locally relay traffic onto the end destination).
 
 ### Does every UDP-based Direct IP multiplayer game out there work?
 

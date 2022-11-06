@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.41
+@version: 2.42
 @date: 06/11/2022
 '''
 
@@ -38,7 +38,7 @@ UDP_SERVER_KEEP_ALIVE_PACKET = b'General Kenobi!'
 UDP_SERVER_KEEP_ALIVE_HALT_PACKET = b'STOP! Hammer time!'
 THREAD_SPAWN_WAIT_INTERVAL = 0.1 #seconds
 SERVER_RELAY_BASE_PORT = 23000
-CLIENT_RELAY_BASE_PORT = 24000
+CLIENT_RELAY_BASE_PORT = 23100
 #might need to be bumped in case applications use very large packet sizes,
 #but 2048/4096 seems like a resonable amount in most cases (i.e. gaming)
 RECV_BUFFER_SIZE = 2048
@@ -149,7 +149,7 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
         except socket.timeout:
             logger.debug(f'WU P{peer} {wookiee_mode} *** Timed out while waiting to receive packet...')
             
-            logger.debug(f'WU P{peer} {wookiee_mode} *** Purging peer lists...')
+            logger.info(f'WU P{peer} {wookiee_mode} *** Purging peer lists...')
             remote_peer_addr_dict.clear()
             remote_peer_addr_reverse_dict.clear()
             queue_vacancy = [True] * peers
@@ -250,7 +250,7 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
     try:
         logger.debug(f'WU P{peer} {wookiee_mode} +++ Closing process socket instance...')
         isocket.close()
-        logger.debug(f'WU P{peer} {wookiee_mode} +++ Process socket instance closed')
+        logger.debug(f'WU P{peer} {wookiee_mode} +++ Process socket instance closed.')
     except:
         pass
                 
@@ -304,7 +304,7 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
     while not exit_event.is_set():
         if wookiee_mode == 'server-destination-relay':
             remote_peer_event.wait()
-            oaddr = remote_peer_addr_reverse_dict.get(peer-1, None)
+            oaddr = remote_peer_addr_reverse_dict.get(peer - 1, None)
 
         try:
             if wookiee_mode.endswith('-source-relay'):
@@ -330,7 +330,7 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
     try:
         logger.debug(f'WU P{peer} {wookiee_mode} --- Closing process socket instance...')
         osocket.close()
-        logger.debug(f'WU P{peer} {wookiee_mode} --- Process socket instance closed')
+        logger.debug(f'WU P{peer} {wookiee_mode} --- Process socket instance closed.')
     except:
         pass
             
@@ -418,14 +418,14 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
         except:
             reset_loop = False
             logger.info(f'WU P{peer} >>> Stopping Wookiee Unicaster spawn thread...')
-                      
-    try:
-        if wookiee_mode != 'server':
+         
+    if wookiee_mode != 'server':
+        try:
             logger.debug(f'WU P{peer} >>> Closing source socket...')
             source.close()
             logger.debug(f'WU P{peer} >>> Source socket closed.')
-    except:
-        pass
+        except:
+            pass
     
     try:
         logger.debug(f'WU P{peer} >>> Closing destination socket...')
