@@ -14,6 +14,7 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 * Anno 1701 (+ The Sunken Dragon)
 * Civilization IV (& Addons, including "Colonization")
 * Quake III Arena (+ Team Arena)
+* War For The Overworld
 
 ### UDP traffic over the internet? Is that... safe?
 
@@ -39,6 +40,7 @@ To be more specific, based on the game list above, here is how things stand:
 * Anno 1701 (+The Sunken Dragon) -> **4 players** (as advertised by the game)
 * Civilization IV (& Addons, including "Colonization") -> **2 players only** (1 remote peer limitation)
 * Quake III Arena (+ Team Arena) -> **16 players** (as advertised by the game)
+* War For The Overworld -> **4 players** (as advertised by the game)
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 

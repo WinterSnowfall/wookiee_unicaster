@@ -85,6 +85,7 @@ echo "#   (5)  Divinity Original Sin - Enhanced Edition    #"
 echo "#   (6)  Anno 1701 (+ The Sunken Dragon)             #"
 echo "#   (7)  Civilization IV (& Addons)                  #"
 echo "#   (8)  Quake III - Arena (+ Team Arena)            #"
+echo "#   (9)  War For The Overworld                       #"
 echo "#                                                    #"
 echo "######################################################"
 echo ""
@@ -131,15 +132,20 @@ case $GAME in
         GAME_PROTO="UDP"
         GAME_PORTS="27960"
         ;;
+    9)
+        #War For The Overworld
+        GAME_PROTO="UDP"
+        GAME_PORTS="27015"
+        ;;
     *)
         echo ">>> Invalid option!"
         exit 1
         ;;
 esac
 
-# forward/tunnel ports through SSH based on the selected option
 case $GAME_PROTO in
     TCP)
+        # forward/tunnel ports through SSH based on the selected option
         echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
         start_tcp_forwarding $GAME_PORTS
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
@@ -148,6 +154,7 @@ case $GAME_PROTO in
         stop_tcp_forwarding $GAME_PORTS
         ;;
     UDP)
+        # relay port traffic using the Wookiee Unicaster based on the selected option 
         echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
         start_udp_forwarding $GAME_PORTS
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
