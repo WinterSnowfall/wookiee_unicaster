@@ -17,6 +17,7 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 * War For The Overworld
 * Star Wars - Jedi Academy
 * Unreal Tournament '99
+* Hammerwatch
 
 ### UDP traffic over the internet? Is that... safe?
 
@@ -45,6 +46,7 @@ To be more specific, based on the game list above, here is how things stand:
 * War For The Overworld -> **4 players** (as advertised by the game)
 * Star Wars - Jedi Academy -> **16 players** (as advertised by the game)
 * Unreal Tournament '99 -> **16 players** (as advertised by the game) - use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer
+* Hammerwatch -> **4 players** (as advertised by the game)
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 

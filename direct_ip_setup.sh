@@ -88,6 +88,7 @@ echo "#  (8)   Quake III - Arena (+ Team Arena)          #"
 echo "#  (9)   War For The Overworld                     #"
 echo "#  (10)  Star Wars - Jedi Academy                  #"
 echo "#  (11)  Unreal Tournament '99                     #"
+echo "#  (12)  Hammerwatch                               #"
 echo "#                                                  #"
 echo "####################################################"
 echo ""
@@ -148,6 +149,11 @@ case $GAME in
         #Unreal Tournament '99'
         GAME_PROTO="UDP"
         GAME_PORTS="7777"
+        ;;
+    12)
+        #Hammerwatch
+        GAME_PROTO="UDP"
+        GAME_PORTS="9995"
         ;;
     *)
         echo ">>> Invalid option!"
