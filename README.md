@@ -21,7 +21,7 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Unreal Tournament 2004
 * Hammerwatch
 * Factorio
-* Solider Of Fortune 2
+* Soldier Of Fortune 2
 * Scrapland (Remastered)
 
 ### UDP traffic over the internet? Is that... safe?
@@ -43,20 +43,23 @@ Also ensure ports starting from **23001** and above are open on both the server 
 In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their multiplayer code on a client-server model will work with the maximum number of possible players, as advertised by the game.
 
 To be more specific, based on the game list above, here is how things stand:
-* Supreme Commander (+ Forged Alliance) -> **2 players only** (1 remote peer limitation)
-* Divinity Original Sin - Enhanced Edition -> **2 players** (the game only supports a maximum of 2 players anyway)
-* Anno 1701 (+The Sunken Dragon) -> **4 players** (as advertised by the game)
-* Civilization IV (& Addons, including "Colonization") -> **2 players only** (1 remote peer limitation)
-* Quake III Arena (+ Team Arena) -> **16 players** (as advertised by the game)
-* War For The Overworld -> **4 players** (as advertised by the game)
-* Star Wars - Jedi Knight II -> **16 players** (as advertised by the game) - use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join
-* Star Wars - Jedi Academy -> **16 players** (as advertised by the game) - use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join
-* Unreal Tournament '99 -> **16 players** (as advertised by the game) - use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer
-* Unreal Tournament 2004 -> **16 players** (as advertised by the game) - use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip>
-* Hammerwatch -> **4 players** (as advertised by the game)
-* Factorio -> **no player limit** (as advertised by the game) - hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so
-* Solider Of Fortune 2 -> **16 players** (as advertised by the game) - use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join
-* Scrapland (Remastered) -> **16 players** (as advertised by the game)
+
+| Game Title | Maximum Number Of Players | Peer LOS Limitation | Comments |
+| --- | :-: | :-: | --- |
+| Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
+| Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
+| Anno 1701 (+The Sunken Dragon) | **4 players** | 🟢 | |
+| Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
+| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | |
+| War For The Overworld | **4 players** | 🟢 | |
+| Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer |
+| Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip> |
+| Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
+| Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so |
+| Solider Of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Scrapland (Remastered) | **16 players** | 🟢 | |
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
