@@ -2,11 +2,11 @@
 
 A UDP packet forwarding script for **Linux**, written in **Python 3**, which enables UDP routing and NAT punch-through using a public IP relay server. This is particularly useful for playing some LAN/Direct IP games over the internet.
 
-The Wookie Unicaster comes with a server mode that must run on the relay system (public IP), and a client mode, which must be run on the system hosting the game server. Any number of remote peers can connect to the game server once the Wookiee Unicaster client/server link is set up properly. Duplex traffic is automatically handled and forwarded using a high-performance multi-process worker queue model.
+The Wookiee Unicaster comes with a server mode that must run on the relay system (public IP), and a client mode, which must be run on the system hosting the game server. Any number of remote peers can connect to the game server once the Wookiee Unicaster client/server link is set up properly. Duplex traffic is automatically handled and forwarded using a high-performance multi-process worker queue model.
 
 ### Say what? Which games support Direct IP connections through UDP?
 
-I've developed Wookie Unicaster primarily for Supreme Commander, but there are other games out there that may benefit from it.
+I've developed Wookiee Unicaster primarily for Supreme Commander, but there are other games out there that may benefit from it.
 
 Here's a non-exhaustive (and rather limited) list of games I've tested and are known to work:
 * Supreme Commander (+ Forged Alliance)
@@ -20,7 +20,7 @@ Here's a non-exhaustive (and rather limited) list of games I've tested and are k
 
 ### UDP traffic over the internet? Is that... safe?
 
-No. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unecrypted traffic over the internet (including Direct IP UDP multiplayer without using the Wookiee Unicaster, assuming the game host has an ISP-provided public IP already), although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall.
+No. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unencrypted traffic over the internet (including Direct IP UDP multiplayer without using the Wookiee Unicaster, assuming the game host has an ISP-provided public IP already), although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall.
 
 Since the Wookiee Unicaster only handles end-to-end traffic between the relay server and the game server, it can't offer a solution to this problem, like a VPN can, even if it were to encrypt the traffic it is relaying. If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not.
 
@@ -28,9 +28,9 @@ That being said, will your system get hacked into if you occasionally play an An
 
 ### Does it have any requirements?
 
-Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
+Run it on a potato (as long as it runs Linux). Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
 
-Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 for 2 remote peers, 23003 as well for 3 peers etc). Ports in the **23101+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used to locally relay traffic onto the end destination).
+Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 will be used as well when configuring 2 remote peers, 23003 as well for 3 peers etc). Ports in the **23101+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used as points of origin to locally relay traffic onto the end destination).
 
 ### Does every UDP-based Direct IP multiplayer game out there work?
 
@@ -48,7 +48,7 @@ To be more specific, based on the game list above, here is how things stand:
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
-Any IaaS vendor out there will typically provide a public IP for your Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "nanode" from [Linode](https://www.linode.com/).
+Any IaaS vendor out there will typically provide a public IP for your Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
 
 ### What about Direct IP games that support TCP?
 
@@ -80,11 +80,11 @@ Remote Peer N         :
 (behind NAT)
 ```
 
-**Note:** The Wookie Unicaster needs to run on both the relay server (in server mode) and the game server (client mode). Remote peers need only know the relay server's IP and host port to connect.
+**Note:** The Wookiee Unicaster needs to run on both the relay server (in server mode) and the game server (client mode). Remote peers need only know the relay server's IP and host port to connect.
 
 The client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. This will add to the overall link latency, and is generally not recommended if it can be avoided. That being said, this deployment option can be leveraged for Windows(remote peers)-to-Windows(game server) operation, assuming the client is run on a local VM or on a Linux host that resides in the same LAN as the game server.
 
-Also, please don't use wireless networks in these situations and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of ethernet traffic, though it does employ some buffering.
+Also, please don't use wireless networks in these situations and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of Ethernet traffic, though it does employ some buffering.
 
 ### How does it work?
 
@@ -113,4 +113,8 @@ Followed by the following command on the client (10.0.0.1 in the diagram above):
 ```
 
 in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server. Replies from the game server will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
+
+### A build script? What's that for? Isn't Python an interpreted language?
+
+Yes, it is interpreted - you're not going crazy. The script uses [Nuitka](https://nuitka.net/doc/user-manual.html), which optimizes then compiles Python code down to C, packing it, along with dependent libraries, in a portable executable. Based on my testing the improvements are only marginal when a small number of remote peers are involved, however it will help provide some extra performance when things get crowded. If you're aiming to shave every nanosecond off of your overall latency, then you should probably consider getting Nuitka and using the build script.
 
