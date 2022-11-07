@@ -86,9 +86,11 @@ echo "#  (6)   Anno 1701 (+ The Sunken Dragon)           #"
 echo "#  (7)   Civilization IV (& Addons)                #"
 echo "#  (8)   Quake III - Arena (+ Team Arena)          #"
 echo "#  (9)   War For The Overworld                     #"
-echo "#  (10)  Star Wars - Jedi Academy                  #"
-echo "#  (11)  Unreal Tournament '99                     #"
-echo "#  (12)  Hammerwatch                               #"
+echo "#  (10)  Star Wars - Jedi Knight II                #"
+echo "#  (11)  Star Wars - Jedi Academy                  #"
+echo "#  (12)  Unreal Tournament '99 / 2004              #"
+echo "#  (13)  Hammerwatch                               #"
+echo "#  (14)  Factorio                                  #"
 echo "#                                                  #"
 echo "####################################################"
 echo ""
@@ -141,19 +143,29 @@ case $GAME in
         GAME_PORTS="27015"
         ;;
     10)
+        #Star Wars - Jedi Knight II
+        GAME_PROTO="UDP"
+        GAME_PORTS="28070"
+        ;;
+    11)
         #Star Wars - Jedi Academy
         GAME_PROTO="UDP"
         GAME_PORTS="29070"
         ;;
-    11)
+    12)
         #Unreal Tournament '99'
         GAME_PROTO="UDP"
         GAME_PORTS="7777"
         ;;
-    12)
+    13)
         #Hammerwatch
         GAME_PROTO="UDP"
         GAME_PORTS="9995"
+        ;;
+    14)
+        #Factorio
+        GAME_PROTO="UDP"
+        GAME_PORTS="34197"
         ;;
     *)
         echo ">>> Invalid option!"

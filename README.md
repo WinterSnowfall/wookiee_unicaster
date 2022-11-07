@@ -8,16 +8,19 @@ The Wookiee Unicaster comes with a server mode that must run on the relay system
 
 I've developed Wookiee Unicaster primarily for Supreme Commander, but there are other games out there that may benefit from it.
 
-Here's a non-exhaustive (and rather limited) list of games I've tested and are known to work:
+Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Supreme Commander (+ Forged Alliance)
 * Divinity Original Sin - Enhanced Edition
 * Anno 1701 (+ The Sunken Dragon)
 * Civilization IV (& Addons, including "Colonization")
 * Quake III Arena (+ Team Arena)
 * War For The Overworld
+* Star Wars - Jedi Knight II
 * Star Wars - Jedi Academy
 * Unreal Tournament '99
+* Unreal Tournament 2004
 * Hammerwatch
+* Factorio
 
 ### UDP traffic over the internet? Is that... safe?
 
@@ -44,9 +47,12 @@ To be more specific, based on the game list above, here is how things stand:
 * Civilization IV (& Addons, including "Colonization") -> **2 players only** (1 remote peer limitation)
 * Quake III Arena (+ Team Arena) -> **16 players** (as advertised by the game)
 * War For The Overworld -> **4 players** (as advertised by the game)
-* Star Wars - Jedi Academy -> **16 players** (as advertised by the game)
+* Star Wars - Jedi Knight II -> **16 players** (as advertised by the game) - use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join
+* Star Wars - Jedi Academy -> **16 players** (as advertised by the game) - use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join
 * Unreal Tournament '99 -> **16 players** (as advertised by the game) - use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer
+* Unreal Tournament 2004 -> **16 players** (as advertised by the game) - use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip>
 * Hammerwatch -> **4 players** (as advertised by the game)
+* Factorio -> **no player limit** (as advertised by the game) - hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
@@ -54,7 +60,7 @@ Any IaaS vendor out there will typically provide a public IP for your Linux IaaS
 
 ### What about Direct IP games that support TCP?
 
-It is fortunate most games provide support for Direct IP through TCP. Those won't need tricks like the Wookiee Unicaster, because you can simply sort them out by using remote port forwarding with SSH/Putty. More details here: https://phoenixnap.com/kb/ssh-port-forwarding
+It is fortunate some games provide support for Direct IP through TCP. Such games won't need "tricks" like the Wookiee Unicaster, because you can simply sort them out by using remote port forwarding with SSH/Putty. More details here: https://phoenixnap.com/kb/ssh-port-forwarding
 
 UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experienced this firsthand, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP. I've even tried to disable TCP's Nagle algorithm by setting the SCTP_NODELAY to 0, but that hasn't helped much. In case you want to try it for yourself, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel
 
