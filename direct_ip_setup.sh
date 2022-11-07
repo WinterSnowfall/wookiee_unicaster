@@ -70,24 +70,26 @@ stop_udp_forwarding () {
     killall wookiee_unicaster > /dev/null 2>&1
 }
 
-echo "*** WinterSnowfall's port forwarding setup script for Linux ***"
+echo "*** WinterSnowfall's port forwarding script for Linux ***"
 echo ""
 echo -e ">>> Configured remote IP : "$YELLOW$REMOTE_PUBLIC_IP$DEFAULT
 echo -e ">>> Detected local IP : "$GREEN$LOCAL_PRIVATE_IP$DEFAULT
 echo ""
-echo "######################################################"
-echo "#                                                    #"
-echo "#   (1)  Sins Of A Solar Empire - Rebellion          #"
-echo "#   (2)  Warhammer 40,000 Gladius - Relics Of War    #"
-echo "#   (3)  Supreme Commander (+ Forged Alliance)       #"
-echo "#   (4)  Worms Armageddon                            #"
-echo "#   (5)  Divinity Original Sin - Enhanced Edition    #"
-echo "#   (6)  Anno 1701 (+ The Sunken Dragon)             #"
-echo "#   (7)  Civilization IV (& Addons)                  #"
-echo "#   (8)  Quake III - Arena (+ Team Arena)            #"
-echo "#   (9)  War For The Overworld                       #"
-echo "#                                                    #"
-echo "######################################################"
+echo "####################################################"
+echo "#                                                  #"
+echo "#  (1)   Sins Of A Solar Empire - Rebellion        #"
+echo "#  (2)   Warhammer 40,000 Gladius - Relics Of War  #"
+echo "#  (3)   Supreme Commander (+ Forged Alliance)     #"
+echo "#  (4)   Worms Armageddon                          #"
+echo "#  (5)   Divinity Original Sin - Enhanced Edition  #"
+echo "#  (6)   Anno 1701 (+ The Sunken Dragon)           #"
+echo "#  (7)   Civilization IV (& Addons)                #"
+echo "#  (8)   Quake III - Arena (+ Team Arena)          #"
+echo "#  (9)   War For The Overworld                     #"
+echo "#  (10)  Star Wars - Jedi Academy                  #"
+echo "#  (11)  Unreal Tournament '99                     #"
+echo "#                                                  #"
+echo "####################################################"
 echo ""
 read -p ">>> Pick a game for Direct IP play: " GAME
 
@@ -136,6 +138,16 @@ case $GAME in
         #War For The Overworld
         GAME_PROTO="UDP"
         GAME_PORTS="27015"
+        ;;
+    10)
+        #Star Wars - Jedi Academy
+        GAME_PROTO="UDP"
+        GAME_PORTS="29070"
+        ;;
+    11)
+        #Unreal Tournament '99'
+        GAME_PROTO="UDP"
+        GAME_PORTS="7777"
         ;;
     *)
         echo ">>> Invalid option!"
