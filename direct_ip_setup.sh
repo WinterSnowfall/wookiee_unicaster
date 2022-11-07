@@ -91,6 +91,8 @@ echo "#  (11)  Star Wars - Jedi Academy                  #"
 echo "#  (12)  Unreal Tournament '99 / 2004              #"
 echo "#  (13)  Hammerwatch                               #"
 echo "#  (14)  Factorio                                  #"
+echo "#  (15)  Soldier Of Fortune 2                      #"
+echo "#  (16)  Scrapland (Remastered)                    #"
 echo "#                                                  #"
 echo "####################################################"
 echo ""
@@ -166,6 +168,16 @@ case $GAME in
         #Factorio
         GAME_PROTO="UDP"
         GAME_PORTS="34197"
+        ;;
+    15)
+        #Soldier Of Fortune 2
+        GAME_PROTO="UDP"
+        GAME_PORTS="20100"
+        ;;
+    16)
+        #Scrapland (Remastered)
+        GAME_PROTO="UDP"
+        GAME_PORTS="28086"
         ;;
     *)
         echo ">>> Invalid option!"

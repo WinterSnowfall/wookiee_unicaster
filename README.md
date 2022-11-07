@@ -21,6 +21,8 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Unreal Tournament 2004
 * Hammerwatch
 * Factorio
+* Solider Of Fortune 2
+* Scrapland (Remastered)
 
 ### UDP traffic over the internet? Is that... safe?
 
@@ -53,6 +55,8 @@ To be more specific, based on the game list above, here is how things stand:
 * Unreal Tournament 2004 -> **16 players** (as advertised by the game) - use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip>
 * Hammerwatch -> **4 players** (as advertised by the game)
 * Factorio -> **no player limit** (as advertised by the game) - hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so
+* Solider Of Fortune 2 -> **16 players** (as advertised by the game) - use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join
+* Scrapland (Remastered) -> **16 players** (as advertised by the game)
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
