@@ -78,6 +78,10 @@ Remote Peer N         :
 
 **Note:** The Wookie Unicaster needs to run on both the relay server (in server mode) and the game server (client mode). Remote peers need only know the relay server's IP and host port to connect.
 
+The client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. This will add to the overall link latency, and is generally not recommended if it can be avoided. That being said, this deployment option can be leveraged for Windows(remote peers)-to-Windows(game server) operation, assuming the client is run on a local VM or on a Linux host that resides in the same LAN as the game server.
+
+Also, please don't use wireless networks in these situations and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of ethernet traffic, though it does employ some buffering.
+
 ### How does it work?
 
 It's written for Linux, so you'll need a **Linux OS** with **python 3.6+** installed on the machine you plan to run it on (at least in theory, I can't and won't test this on Windows, but it **MAY** work). Since I've only used the standard sockets library, no external/additional packets are required.
@@ -105,6 +109,4 @@ Followed by the following command on the client (10.0.0.1 in the diagram above):
 ```
 
 in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server. Replies from the game server will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
-
-**Note:** the client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. Note that this may add to the overall link latency, and is generally not recommended (although entirely possible). Also, please don't use wireless networks and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of ethernet traffic, though it does employ some buffering.
 
