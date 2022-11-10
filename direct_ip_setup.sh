@@ -95,7 +95,7 @@ echo "#  (15)  Star Wars - Jedi Knight II                    #"
 echo "#  (16)  Supreme Commander (+ Forged Alliance)         #"
 echo "#  (17)  Unreal Tournament '99 / 2004                  #"
 echo "#  (18)  War for the Overworld                         #"
-echo "#  (19)  Warhammer 40,000 Gladius - Relics Of War      #"
+echo "#  (19)  Warhammer 40,000 Gladius - Relics of War      #"
 echo "#  (20)  Worms Armageddon                              #"
 echo "#                                                      #"
 echo "########################################################"
@@ -184,7 +184,7 @@ case $GAME in
         GAME_PORT="16010"
         ;;
     17)
-        #Unreal Tournament '99'
+        #Unreal Tournament '99 / 2004
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
@@ -194,7 +194,7 @@ case $GAME in
         GAME_PORT="27015"
         ;;
     19)
-        #Warhammer 40,000 Gladius - Relics Of War
+        #Warhammer 40,000 Gladius - Relics of War
         GAME_PROTOCOL="TCP"
         GAME_PORT="6120"
         ;;

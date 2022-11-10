@@ -20,7 +20,7 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Quake III Arena (+ Team Arena)
 * Return to Castle Wolfenstein
 * Scrapland (Remastered)
-* Soldier Of Fortune 2
+* Soldier of Fortune 2
 * Star Wars - Jedi Academy
 * Star Wars - Jedi Knight II
 * Supreme Commander (+ Forged Alliance)
@@ -56,12 +56,12 @@ To be more specific, based on the game list above, here is how things stand:
 | Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
 | Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so |
 | Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
-| Kohan - Immortal Sovereigns / Ahriman's Gift | **12 players** | 🟢 | |
+| Kohan - Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
 | Kohan II - Kings of War | **12 players** | 🟢 | |
 | Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter <public_ip> |
 | Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Scrapland (Remastered) | **16 players** | 🟢 | |
-| Soldier Of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Soldier of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
