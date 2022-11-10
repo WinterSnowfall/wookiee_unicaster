@@ -75,138 +75,168 @@ echo ""
 echo -e ">>> Configured remote IP : "$YELLOW$REMOTE_PUBLIC_IP$DEFAULT
 echo -e ">>> Detected local IP : "$GREEN$LOCAL_PRIVATE_IP$DEFAULT
 echo ""
-echo "####################################################"
-echo "#                                                  #"
-echo "#  (1)   Sins Of A Solar Empire - Rebellion        #"
-echo "#  (2)   Warhammer 40,000 Gladius - Relics Of War  #"
-echo "#  (3)   Supreme Commander (+ Forged Alliance)     #"
-echo "#  (4)   Worms Armageddon                          #"
-echo "#  (5)   Divinity Original Sin - Enhanced Edition  #"
-echo "#  (6)   Anno 1701 (+ The Sunken Dragon)           #"
-echo "#  (7)   Civilization IV (& Addons)                #"
-echo "#  (8)   Quake III - Arena (+ Team Arena)          #"
-echo "#  (9)   War For The Overworld                     #"
-echo "#  (10)  Star Wars - Jedi Knight II                #"
-echo "#  (11)  Star Wars - Jedi Academy                  #"
-echo "#  (12)  Unreal Tournament '99 / 2004              #"
-echo "#  (13)  Hammerwatch                               #"
-echo "#  (14)  Factorio                                  #"
-echo "#  (15)  Soldier Of Fortune 2                      #"
-echo "#  (16)  Scrapland (Remastered)                    #"
-echo "#                                                  #"
-echo "####################################################"
+echo "########################################################"
+echo "#                                                      #"
+echo "#  (1)   Age of Mythology (+ The Titans)               #"
+echo "#  (2)   Anno 1701 (+ The Sunken Dragon)               #"
+echo "#  (3)   Civilization IV (& Addons)                    #"
+echo "#  (4)   Divinity Original Sin - Enhanced Edition      #"
+echo "#  (5)   Factorio                                      #"
+echo "#  (6)   Hammerwatch                                   #"
+echo "#  (7)   Kohan - Immortal Sovereigns / Ahriman's Gift  #"         
+echo "#  (8)   Kohan II - Kings of War                       #"                    
+echo "#  (9)   Quake III - Arena (+ Team Arena)              #"
+echo "#  (10)  Return to Castle Wolfenstein                  #"
+echo "#  (11)  Scrapland (Remastered)                        #"
+echo "#  (12)  Sins of a Solar Empire - Rebellion            #"
+echo "#  (13)  Soldier of Fortune 2                          #"
+echo "#  (14)  Star Wars - Jedi Academy                      #"
+echo "#  (15)  Star Wars - Jedi Knight II                    #"
+echo "#  (16)  Supreme Commander (+ Forged Alliance)         #"
+echo "#  (17)  Unreal Tournament '99 / 2004                  #"
+echo "#  (18)  War for the Overworld                         #"
+echo "#  (19)  Warhammer 40,000 Gladius - Relics Of War      #"
+echo "#  (20)  Worms Armageddon                              #"
+echo "#                                                      #"
+echo "########################################################"
 echo ""
-read -p ">>> Pick a game for Direct IP play: " GAME
+read -p ">>> Pick a game for Direct IP play or press ENTER: " GAME
 
 case $GAME in
     1)
-        #Sins Of A Solar Empire - Rebellion
-        GAME_PROTO="TCP"
-        GAME_PORTS="6112"
+        #Age of Mythology (+ The Titans)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="2299"
         ;;
     2)
-        #Warhammer 40,000 Gladius - Relics Of War
-        GAME_PROTO="TCP"
-        GAME_PORTS="6120"
+        #Anno 1701 (+ The Sunken Dragon)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="21701"
         ;;
     3)
-        #Supreme Commander (+ Forged Alliance)
-        GAME_PROTO="UDP"
-        GAME_PORTS="16010"
+        #Civilization IV (& Addons)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="2056"
         ;;
     4)
-        #Worms Armageddon
-        GAME_PROTO="TCP"
-        GAME_PORTS="17011"
+        #Divinity Original Sin - Enhanced Edition
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="23253"
         ;;
     5)
-        #Divinity Original Sin - Enhanced Edition
-        GAME_PROTO="UDP"
-        GAME_PORTS="23253"
+        #Factorio
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="34197"
         ;;
     6)
-        #Anno 1701 (+ The Sunken Dragon)
-        GAME_PROTO="UDP"
-        GAME_PORTS="21701"
+        #Hammerwatch
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="9995"
         ;;
     7)
-        #Civilization IV (& Addons)
-        GAME_PROTO="UDP"
-        GAME_PORTS="2056"
+        #Kohan - Immortal Sovereigns / Ahriman's Gift
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="17437"
         ;;
     8)
-        #Quake III - Arena (+ Team Arena)
-        GAME_PROTO="UDP"
-        GAME_PORTS="27960"
+        #Kohan II - Kings of War
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="5860"
         ;;
     9)
-        #War For The Overworld
-        GAME_PROTO="UDP"
-        GAME_PORTS="27015"
+        #Quake III - Arena (+ Team Arena)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="27960"
         ;;
     10)
-        #Star Wars - Jedi Knight II
-        GAME_PROTO="UDP"
-        GAME_PORTS="28070"
+        #Return to Castle Wolfenstein
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="27960"
         ;;
     11)
-        #Star Wars - Jedi Academy
-        GAME_PROTO="UDP"
-        GAME_PORTS="29070"
+        #Scrapland (Remastered)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="28086"
         ;;
     12)
-        #Unreal Tournament '99'
-        GAME_PROTO="UDP"
-        GAME_PORTS="7777"
+        #Sins of a Solar Empire - Rebellion
+        GAME_PROTOCOL="TCP"
+        GAME_PORT="6112"
         ;;
     13)
-        #Hammerwatch
-        GAME_PROTO="UDP"
-        GAME_PORTS="9995"
+        #Soldier of Fortune 2
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="20100"
         ;;
     14)
-        #Factorio
-        GAME_PROTO="UDP"
-        GAME_PORTS="34197"
+        #Star Wars - Jedi Academy
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="29070"
         ;;
     15)
-        #Soldier Of Fortune 2
-        GAME_PROTO="UDP"
-        GAME_PORTS="20100"
+        #Star Wars - Jedi Knight II
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="28070"
         ;;
     16)
-        #Scrapland (Remastered)
-        GAME_PROTO="UDP"
-        GAME_PORTS="28086"
+        #Supreme Commander (+ Forged Alliance)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="16010"
+        ;;
+    17)
+        #Unreal Tournament '99'
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="7777"
+        ;;
+    18)
+        #War for the Overworld
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="27015"
+        ;;
+    19)
+        #Warhammer 40,000 Gladius - Relics Of War
+        GAME_PROTOCOL="TCP"
+        GAME_PORT="6120"
+        ;;
+    20)
+        #Worms Armageddon
+        GAME_PROTOCOL="TCP"
+        GAME_PORT="17011"
         ;;
     *)
-        echo ">>> Invalid option!"
-        exit 1
+        read -p ">>> Select forwarding protcol (TCP or UDP): " GAME_PROTOCOL
+        read -p ">>> Select forwarding port: " GAME_PORT
+
+        if ! [[ "$GAME_PORT" =~ ^[0-9]+$ ]] || [ "$GAME_PORT" -lt 1000 -o "$GAME_PORT" -gt 65535 ]
+        then
+            echo ">>> Invalid port selection!"
+            exit 1
+        fi
         ;;
 esac
 
-case $GAME_PROTO in
+case $GAME_PROTOCOL in
     TCP)
         # forward/tunnel ports through SSH based on the selected option
-        echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
-        start_tcp_forwarding $GAME_PORTS
+        echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORT$DEFAULT
+        start_tcp_forwarding $GAME_PORT
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
         echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
         read
-        stop_tcp_forwarding $GAME_PORTS
+        stop_tcp_forwarding $GAME_PORT
         ;;
     UDP)
         # relay port traffic using the Wookiee Unicaster based on the selected option 
-        echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$GAME_PORTS$DEFAULT
-        start_udp_forwarding $GAME_PORTS
+        echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$GAME_PORT$DEFAULT
+        start_udp_forwarding $GAME_PORT
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
         echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
         read
-        stop_udp_forwarding $GAME_PORTS
+        stop_udp_forwarding $GAME_PORT
         ;;
     *)
-        echo ">>> Invalid option!"
-        exit 1
+        echo ">>> Invalid protocol selection!"
+        exit 2
         ;;
 esac
 

@@ -9,20 +9,24 @@ The Wookiee Unicaster comes with a server mode that must run on the relay system
 I've developed Wookiee Unicaster primarily for Supreme Commander, but there are other games out there that may benefit from it.
 
 Here's a non-exhaustive list of games I've tested myself and are known to work:
-* Supreme Commander (+ Forged Alliance)
-* Divinity Original Sin - Enhanced Edition
+* Age of Mythology (+ The Titans)
 * Anno 1701 (+ The Sunken Dragon)
 * Civilization IV (& Addons, including "Colonization")
+* Divinity Original Sin - Enhanced Edition
+* Factorio
+* Hammerwatch
+* Kohan - Immortal Sovereigns / Ahriman's Gift
+* Kohan II - Kings of War
 * Quake III Arena (+ Team Arena)
-* War For The Overworld
-* Star Wars - Jedi Knight II
+* Return to Castle Wolfenstein
+* Scrapland (Remastered)
+* Soldier Of Fortune 2
 * Star Wars - Jedi Academy
+* Star Wars - Jedi Knight II
+* Supreme Commander (+ Forged Alliance)
 * Unreal Tournament '99
 * Unreal Tournament 2004
-* Hammerwatch
-* Factorio
-* Soldier Of Fortune 2
-* Scrapland (Remastered)
+* War for the Overworld
 
 ### UDP traffic over the internet? Is that... safe?
 
@@ -46,20 +50,24 @@ To be more specific, based on the game list above, here is how things stand:
 
 | Game Title | Maximum Number Of Players | Peer LOS Limitation | Comments |
 | --- | :-: | :-: | --- |
-| Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
-| Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
+| Age of Mythology (+ The Titans) | **12 players** | 🟢 | |
 | Anno 1701 (+The Sunken Dragon) | **4 players** | 🟢 | |
 | Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
-| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | |
-| War For The Overworld | **4 players** | 🟢 | |
-| Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
+| Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so |
+| Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
+| Kohan - Immortal Sovereigns / Ahriman's Gift | **12 players** | 🟢 | |
+| Kohan II - Kings of War | **12 players** | 🟢 | |
+| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter <public_ip> |
+| Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Scrapland (Remastered) | **16 players** | 🟢 | |
+| Soldier Of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
 | Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer |
 | Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip> |
-| Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
-| Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so |
-| Solider Of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
-| Scrapland (Remastered) | **16 players** | 🟢 | |
+| War for the Overworld | **4 players** | 🟢 | |
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
