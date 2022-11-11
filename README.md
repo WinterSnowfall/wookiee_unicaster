@@ -1,6 +1,6 @@
 ﻿# The Wookiee Unicaster
 
-A UDP packet forwarding script for **Linux**, written in **Python 3**, which enables UDP routing and NAT punch-through using a public IP relay server. This is particularly useful for playing some LAN/Direct IP games over the internet.
+A UDP packet forwarding script, written in **Python 3**, which enables UDP routing and NAT punch-through using a public IP relay server. This is particularly useful for playing some LAN/Direct IP games over the internet.
 
 The Wookiee Unicaster comes with a server mode that must run on the relay system (public IP), and a client mode, which must be run on the system hosting the game server. Any number of remote peers can connect to the game server once the Wookiee Unicaster client/server link is set up properly. Duplex traffic is automatically handled and forwarded using a high-performance multi-process worker queue model.
 
@@ -38,9 +38,21 @@ That being said, will your system get hacked into if you occasionally play an An
 
 ### Does it have any requirements?
 
-Run it on a potato (as long as it runs Linux). Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
+Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
 
 Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 will be used as well when configuring 2 remote peers, 23003 as well for 3 peers etc). Ports in the **23101+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used as points of origin to locally relay traffic onto the end destination).
+
+### Does it work on Windows?
+
+Yes. Windows is officially supported in client mode and I've briefly tested it to confirm everything works as expected. Server mode should also work on Windows, but isn't officially supported. Performance is expected to be better on Linux in both cases, so you'll have to "pick your poison" if you're not a friend of ol' Tux (either become friends or trudge through the molasses of Windows). The neat little bash setup script I've provided as an example also won't ever work on Windows, so you'll have to configure things manually if you insist on going down this route.
+
+I strongly recommend the use of [WinPython](https://winpython.github.io/) if you're planning to run the Wookiee Unicaster in client mode directly on Windows, but the official CPython installer/environment may work as well.
+
+**Note:** Remember that you'll have to use **CTRL + BREAK** in order to terminate the script (instead of **CTRL + C** on Linux).
+
+### What about macOS?
+
+What about it? I expect the Wookiee Unicaster to work on macOS as well, but your milage may vary. I won't be able to test it or officially support it. 
 
 ### Does every UDP-based Direct IP multiplayer game out there work?
 
@@ -71,7 +83,7 @@ To be more specific, based on the game list above, here is how things stand:
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
-Any IaaS vendor out there will typically provide a public IP for your Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
+Any IaaS vendor out there will typically provide a public IP with a Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
 
 ### What about Direct IP games that support TCP?
 
@@ -105,31 +117,32 @@ Remote Peer N         :
 
 **Note:** The Wookiee Unicaster needs to run on both the relay server (in server mode) and the game server (client mode). Remote peers need only know the relay server's IP and host port to connect.
 
-The client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. This will add to the overall link latency, and is generally not recommended if it can be avoided. That being said, this deployment option can be leveraged for Windows(remote peers)-to-Windows(game server) operation, assuming the client is run on a local VM or on a Linux host that resides in the same LAN as the game server.
+The client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. This will add to the overall link latency, and is generally not recommended if it can be avoided.
 
 Also, please don't use wireless networks in these situations and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of Ethernet traffic, though it does employ some buffering.
 
 ### How does it work?
 
-It's written for Linux, so you'll need a **Linux OS** with **python 3.6+** installed on the machine you plan to run it on (at least in theory, I can't and won't test this on Windows, but it **MAY** work). Since I've only used the standard sockets library, no external/additional packets are required.
+You'll need a **python 3.6+** environment on the machine you plan to run it on. Or you can build your own portable executable as explained below. Since I've only used the standard sockets library, no external/additional dependencies are required.
 
 You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'll need to specify:
 
 * -m <mode> = enables "server" or "client" mode
-* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client
-* -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen to perform the relaying of UDP packets
+* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client (is set to **1** if unspecified)
+* -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen to perform the relaying of UDP packets - to be used on Linux
+* -l <localip> = directly specify the local IP address - this is only explicitly needed on Windows and replaces -e
 * -s <sourceip> = source IP address - only needed in client mode, where it represents the relay server's public IP
 * -d <destip> = destination IP address - only needed in client mode, where is represents the end IP of the game server
 * -i <iport> = port on which the server will listen for incoming UDP packets from remote peers - only needed in server mode, where it will need to be set to the port that the game server uses for listening to incoming connections
 * -o <oport> = end relay port - only needed in client mode, where it represents the port that the game server is using to listen for incoming connections (typically the same as <iport> on the server)
 
-To give you an example, you can run the following command on the server (216.58.212.164 in the diagram above):
+To give you an example, you can run the following command on the Linux server (216.58.212.164 in the diagram above):
 
 ```
 ./wookiee_unicaster.py -m server -e eth0 -i 16010 > /dev/null 2>&1 &
 ```
 
-Followed by the following command on the client (10.0.0.1 in the diagram above):
+Followed by the following command on Linux the client (10.0.0.1 in the diagram above):
 
 ```
 ./wookiee_unicaster.py -m client -e enp1s0 -s 216.58.212.164 -d 10.0.0.1 -o 16010 > /dev/null 2>&1 &
@@ -137,7 +150,14 @@ Followed by the following command on the client (10.0.0.1 in the diagram above):
 
 in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server. Replies from the game server will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
 
-### A build script? What's that for? Isn't Python an interpreted language?
+Similary:
+```
+python wookiee_unicaster.py -m client -l 10.0.0.1 -s 216.58.212.164 -d 10.0.0.1 -o 16010
+```
 
-Yes, it is interpreted - you're not going crazy. The script uses [Nuitka](https://nuitka.net/doc/user-manual.html), which optimizes then compiles Python code down to C, packing it, along with dependent libraries, in a portable executable. Based on my testing the improvements are only marginal when a small number of remote peers are involved, however it will help provide some extra performance when things get crowded. If you're aiming to shave every nanosecond off of your overall latency, then you should probably consider getting Nuitka and using the build script.
+can be used on Windows to start a client with the same configuration as in the example provided for Linux.
+
+### Build scripts? What are those for? Isn't Python an interpreted language?
+
+Yes, it is interpreted - you're not going crazy. The scripts use [Nuitka](https://nuitka.net/doc/user-manual.html), which optimizes then compiles Python code down to C, packing it, along with dependent libraries, in a portable executable. Based on my testing the improvements are only marginal when a small number of remote peers are involved, however it will help provide some extra performance when things get crowded. If you're aiming to shave every nanosecond off of your overall latency, then you should probably consider getting Nuitka and using either the .bat or .sh build script to generate a portable executable for your platform of choice.
 

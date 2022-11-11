@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.43
-@date: 06/11/2022
+@version: 2.44
+@date: 10/11/2022
 '''
 
 import socket
@@ -45,7 +45,6 @@ RECV_BUFFER_SIZE = 2048
 #set an arbitrary small buffer size for queues, since packets shouldn't
 #stack up too much between processes (and large queues may increase latency)
 PACKET_QUEUE_SIZE = 8
-INTF_SOCKOPT_REF = 25
 
 def sigterm_handler(signum, frame):
     #exceptions may happen here as well due to logger syncronization mayhem on shutdown
@@ -149,11 +148,12 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
         except socket.timeout:
             logger.debug(f'WU P{peer} {wookiee_mode} *** Timed out while waiting to receive packet...')
             
-            logger.info(f'WU P{peer} {wookiee_mode} *** Purging peer lists...')
-            remote_peer_addr_dict.clear()
-            remote_peer_addr_reverse_dict.clear()
-            queue_vacancy = [True] * peers
-            vacant_queue_index = None
+            if len(remote_peer_addr_dict) != 0 or len(remote_peer_addr_reverse_dict) != 0:
+                logger.info(f'WU P{peer} {wookiee_mode} *** Purging peer lists...')
+                remote_peer_addr_dict.clear()
+                remote_peer_addr_reverse_dict.clear()
+                queue_vacancy = [True] * peers
+                vacant_queue_index = None
                 
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread stopped.')
     
@@ -358,22 +358,34 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
         source = main_remote_peer_socket
     else:
         source = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        source.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
+        try:
+            source.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
+        except AttributeError:
+            logger.warning(f'WU P{peer} >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
+        except OSError:
+            logger.critical(f'WU P{peer} >>> Interface not found or unavailable.')
+            raise SystemExit(8)
         logger.debug(f'WU P{peer} >>> Binding source to: {local_ip}:{source_port}')
         try:
             source.bind((local_ip, source_port))
         except OSError:
             logger.critical(f'WU P{peer} >>> Interface unavailable or port {source_port} is in use.')
-            raise SystemExit(7)
+            raise SystemExit(9)
         
     destination = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-    destination.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
+    try:
+        destination.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
+    except AttributeError:
+        logger.warning(f'WU P{peer} >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
+    except OSError:
+        logger.critical(f'WU P{peer} >>> Interface not found or unavailable.')
+        raise SystemExit(10)
     logger.debug(f'WU P{peer} >>> Binding destination to: {local_ip}:{relay_port}')
     try:
         destination.bind((local_ip, relay_port))
     except OSError:
         logger.critical(f'WU P{peer} >>> Interface unavailable or port {relay_port} is in use.')
-        raise SystemExit(8)
+        raise SystemExit(11)
     
     while reset_loop and process_loop_event.is_set():    
         try:
@@ -450,10 +462,13 @@ if __name__=="__main__":
                                                   'Useful for UDP based multiplayer/LAN games enjoyed using Direct IP connections over the internet.'), add_help=False)
     
     required = parser.add_argument_group('required arguments')
+    group = required.add_mutually_exclusive_group(required=True)
     optional = parser.add_argument_group('optional arguments')
     
     required.add_argument('-m', '--mode', help='Can be either server or client, depending on the run location.', required=True)
-    required.add_argument('-e', '--interface', help='Local ethernet interface name.', required=True)
+    group.add_argument('-e', '--interface', help='Local ethernet interface name. Must be the public facing interface in server mode.')
+    group.add_argument('-l', '--localip', help=('Local IP address. Must be a public IP address in server mode. '
+                                               'Can be identical to destination IP in client mode. Only needed on Windows.'))
     
     optional.add_argument('-h', '--help', action='help', help='show this help message and exit')
     optional.add_argument('-p', '--peers', help='Number of remote peers. Is only useful for client-server UDP implementations.')
@@ -484,14 +499,21 @@ if __name__=="__main__":
         raise SystemExit(1)
     
     wookiee_mode = args.mode
-    #the interface name will only be used in socket operations 
-    #and the API expects a byte sequence, not a string
-    intf = bytes(args.interface, 'utf-8')
-    logger.debug(f'WU >>> intf: {args.interface}')
-    #determine the local_ip based on the network interface name
-    local_ip_query_subprocess = subprocess.Popen(''.join(('ifconfig ', args.interface, ' | grep -w inet | awk \'{print $2;}\'')), 
-                                                 shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    local_ip = local_ip_query_subprocess.communicate()[0].decode('utf-8').strip()
+
+    #use the inteface name on Linux and fallback to local IP value on Windows
+    if args.interface is not None:
+        #the interface name will only be used in socket operations 
+        #and the API expects a byte sequence, not a string
+        intf = bytes(args.interface, 'utf-8')
+        logger.debug(f'WU >>> intf: {args.interface}')
+        #determine the local_ip based on the network interface name
+        local_ip_query_subprocess = subprocess.Popen(''.join(('ifconfig ', args.interface, ' | grep -w inet | awk \'{print $2;}\'')), 
+                                                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        local_ip = local_ip_query_subprocess.communicate()[0].decode('utf-8').strip()
+    else:
+        intf = None
+        local_ip = args.localip
+    
     logger.debug(f'WU >>> Local IP address is: {local_ip}')
     #the number of remote peers defaults to 1 if unspecified otherwise
     peers = 1 if args.peers is None else int(args.peers)
@@ -540,12 +562,18 @@ if __name__=="__main__":
         child_proc_started_event.clear()
         
         main_remote_peer_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        main_remote_peer_socket.setsockopt(socket.SOL_SOCKET, INTF_SOCKOPT_REF, intf)
+        try:
+            main_remote_peer_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
+        except AttributeError:
+            logger.warning('WU >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
+        except OSError:
+            logger.critical('WU >>> Interface not found or unavailable.')
+            raise SystemExit(6)
         try:
             main_remote_peer_socket.bind((local_ip, source_port))
         except OSError:
             logger.critical(f'WU >>> Interface unavailable or port {source_port} is in use.')
-            raise SystemExit(6)
+            raise SystemExit(7)
         
         main_remote_peer_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
                                                         args=(peers, main_remote_peer_socket, remote_peer_event_list,

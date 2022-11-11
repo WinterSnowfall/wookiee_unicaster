@@ -210,7 +210,7 @@ case $GAME in
         if ! [[ "$GAME_PORT" =~ ^[0-9]+$ ]] || [ "$GAME_PORT" -lt 1000 -o "$GAME_PORT" -gt 65535 ]
         then
             echo ">>> Invalid port selection!"
-            exit 1
+            exit 2
         fi
         ;;
 esac
@@ -236,7 +236,7 @@ case $GAME_PROTOCOL in
         ;;
     *)
         echo ">>> Invalid protocol selection!"
-        exit 2
+        exit 1
         ;;
 esac
 
