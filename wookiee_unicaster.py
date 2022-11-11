@@ -500,7 +500,7 @@ if __name__=="__main__":
     
     wookiee_mode = args.mode
 
-    #use the inteface name on Linux and fallback to local IP value on Windows
+    #use the interface name on Linux and fallback to local IP value on Windows
     if args.interface is not None:
         #the interface name will only be used in socket operations 
         #and the API expects a byte sequence, not a string

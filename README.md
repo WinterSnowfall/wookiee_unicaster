@@ -52,7 +52,7 @@ I strongly recommend the use of [WinPython](https://winpython.github.io/) if you
 
 ### What about macOS?
 
-What about it? I expect the Wookiee Unicaster to work on macOS as well, but your milage may vary. I won't be able to test it or officially support it. 
+What about it? I expect the Wookiee Unicaster to work on macOS as well, but your mileage may vary. I won't be able to test it or officially support it.
 
 ### Does every UDP-based Direct IP multiplayer game out there work?
 
@@ -150,7 +150,7 @@ Followed by the following command on Linux the client (10.0.0.1 in the diagram a
 
 in order to start a background process which will replicate UDP packets received by the server on port 16010 onto the 16010 port on the game server. Replies from the game server will be automatically forwarded back to the source on the same link. You can add **-p 3** to the above commands in order to enable support for 3 remote peers.
 
-Similary:
+Similarly:
 ```
 python wookiee_unicaster.py -m client -l 10.0.0.1 -s 216.58.212.164 -d 10.0.0.1 -o 16010
 ```
