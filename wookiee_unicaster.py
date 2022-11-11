@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.44
-@date: 10/11/2022
+@version: 2.45
+@date: 11/11/2022
 '''
 
 import socket
@@ -155,6 +155,10 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
                 queue_vacancy = [True] * peers
                 vacant_queue_index = None
                 
+        #this is only raised on Windows, apparently
+        except ConnectionResetError:
+            logger.warning(f'WU P{peer} {wookiee_mode} +++ Packet transmission was forcibly halted.')
+                
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread stopped.')
     
 def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
@@ -246,6 +250,10 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
                 exit_event.set()
             else:
                 logger.debug(f'WU P{peer} {wookiee_mode} +++ Timed out while waiting to receive packet...')
+                
+        #this is only raised on Windows, apparently
+        except ConnectionResetError:
+            logger.warning(f'WU P{peer} {wookiee_mode} +++ Packet transmission was forcibly halted.')
                 
     try:
         logger.debug(f'WU P{peer} {wookiee_mode} +++ Closing process socket instance...')
