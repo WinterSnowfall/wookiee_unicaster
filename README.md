@@ -11,12 +11,16 @@ I've developed Wookiee Unicaster primarily for Supreme Commander, but there are 
 Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Age of Mythology (+ The Titans)
 * Anno 1701 (+ The Sunken Dragon)
+* Baldur's Gate - Enhanced Edition
+* Baldur's Gate II - Enhanced Edition
 * Civilization IV (& Addons, including "Colonization")
 * Divinity Original Sin - Enhanced Edition
 * Factorio
 * Hammerwatch
+* Icewind Dale - Enhanced Edition 
 * Kohan - Immortal Sovereigns / Ahriman's Gift
 * Kohan II - Kings of War
+* Medal of Honor - Allied Assault (& Addons)
 * Quake III Arena (+ Team Arena)
 * Return to Castle Wolfenstein
 * Scrapland (Remastered)
@@ -64,12 +68,16 @@ To be more specific, based on the game list above, here is how things stand:
 | --- | :-: | :-: | --- |
 | Age of Mythology (+ The Titans) | **12 players** | 🟢 | |
 | Anno 1701 (+The Sunken Dragon) | **4 players** | 🟢 | |
+| Baldur's Gate - Enhanced Edition | **6 players** | 🟢 | |
+| Baldur's Gate II - Enhanced Edition | **6 players** | 🟢 | |
 | Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
 | Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
 | Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so |
 | Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
+| Icewind Dale - Enhanced Edition | **6 players** | 🟢 | |
 | Kohan - Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
 | Kohan II - Kings of War | **12 players** | 🟢 | |
+| Medal of Honor - Allied Assault (& Addons) | **32 players** | 🟢 | |
 | Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter <public_ip> |
 | Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Scrapland (Remastered) | **16 players** | 🟢 | |

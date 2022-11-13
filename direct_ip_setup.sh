@@ -79,24 +79,27 @@ echo "########################################################"
 echo "#                                                      #"
 echo "#  (1)   Age of Mythology (+ The Titans)               #"
 echo "#  (2)   Anno 1701 (+ The Sunken Dragon)               #"
-echo "#  (3)   Civilization IV (& Addons)                    #"
-echo "#  (4)   Divinity Original Sin - Enhanced Edition      #"
-echo "#  (5)   Factorio                                      #"
-echo "#  (6)   Hammerwatch                                   #"
-echo "#  (7)   Kohan - Immortal Sovereigns / Ahriman's Gift  #"         
-echo "#  (8)   Kohan II - Kings of War                       #"                    
-echo "#  (9)   Quake III - Arena (+ Team Arena)              #"
-echo "#  (10)  Return to Castle Wolfenstein                  #"
-echo "#  (11)  Scrapland (Remastered)                        #"
-echo "#  (12)  Sins of a Solar Empire - Rebellion            #"
-echo "#  (13)  Soldier of Fortune 2                          #"
-echo "#  (14)  Star Wars - Jedi Academy                      #"
-echo "#  (15)  Star Wars - Jedi Knight II                    #"
-echo "#  (16)  Supreme Commander (+ Forged Alliance)         #"
-echo "#  (17)  Unreal Tournament '99 / 2004                  #"
-echo "#  (18)  War for the Overworld                         #"
-echo "#  (19)  Warhammer 40,000 Gladius - Relics of War      #"
-echo "#  (20)  Worms Armageddon                              #"
+echo "#  (3)   Baldur's Gate / II - Enhanced Edition         #"
+echo "#  (4)   Civilization IV (& Addons)                    #"
+echo "#  (5)   Divinity Original Sin - Enhanced Edition      #"
+echo "#  (6)   Factorio                                      #"
+echo "#  (7)   Hammerwatch                                   #"
+echo "#  (8)   Icewind Dale - Enhanced Edition               #"
+echo "#  (9)   Kohan - Immortal Sovereigns / Ahriman's Gift  #"
+echo "#  (10)  Kohan II - Kings of War                       #"
+echo "#  (11)  Medal of Honor - Allied Assault (& Addons)    #"
+echo "#  (12)  Quake III - Arena (+ Team Arena)              #"
+echo "#  (13)  Return to Castle Wolfenstein                  #"
+echo "#  (14)  Scrapland (Remastered)                        #"
+echo "#  (15)  Sins of a Solar Empire - Rebellion            #"
+echo "#  (16)  Soldier of Fortune 2                          #"
+echo "#  (17)  Star Wars - Jedi Academy                      #"
+echo "#  (18)  Star Wars - Jedi Knight II                    #"
+echo "#  (19)  Supreme Commander (+ Forged Alliance)         #"
+echo "#  (20)  Unreal Tournament '99 / 2004                  #"
+echo "#  (21)  War for the Overworld                         #"
+echo "#  (22)  Warhammer 40,000 Gladius - Relics of War      #"
+echo "#  (23)  Worms Armageddon                              #"
 echo "#                                                      #"
 echo "########################################################"
 echo ""
@@ -114,91 +117,106 @@ case $GAME in
         GAME_PORT="21701"
         ;;
     3)
+        #Baldur's Gate / II - Enhanced Edition
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="47630"
+        ;;
+    4)
         #Civilization IV (& Addons)
         GAME_PROTOCOL="UDP"
         GAME_PORT="2056"
         ;;
-    4)
+    5)
         #Divinity Original Sin - Enhanced Edition
         GAME_PROTOCOL="UDP"
         GAME_PORT="23253"
         ;;
-    5)
+    6)
         #Factorio
         GAME_PROTOCOL="UDP"
         GAME_PORT="34197"
         ;;
-    6)
+    7)
         #Hammerwatch
         GAME_PROTOCOL="UDP"
         GAME_PORT="9995"
         ;;
-    7)
+    8)
+        #Icewind Dale - Enhanced Edition
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="47630"
+        ;;
+    9)
         #Kohan - Immortal Sovereigns / Ahriman's Gift
         GAME_PROTOCOL="UDP"
         GAME_PORT="17437"
         ;;
-    8)
+    10)
         #Kohan II - Kings of War
         GAME_PROTOCOL="UDP"
         GAME_PORT="5860"
         ;;
-    9)
+    11)
+        #Medal of Honor - Allied Assault (& Addons)
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="12203"
+        ;;
+    12)
         #Quake III - Arena (+ Team Arena)
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
-    10)
+    13)
         #Return to Castle Wolfenstein
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
-    11)
+    14)
         #Scrapland (Remastered)
         GAME_PROTOCOL="UDP"
         GAME_PORT="28086"
         ;;
-    12)
+    15)
         #Sins of a Solar Empire - Rebellion
         GAME_PROTOCOL="TCP"
         GAME_PORT="6112"
         ;;
-    13)
+    16)
         #Soldier of Fortune 2
         GAME_PROTOCOL="UDP"
         GAME_PORT="20100"
         ;;
-    14)
+    17)
         #Star Wars - Jedi Academy
         GAME_PROTOCOL="UDP"
         GAME_PORT="29070"
         ;;
-    15)
+    18)
         #Star Wars - Jedi Knight II
         GAME_PROTOCOL="UDP"
         GAME_PORT="28070"
         ;;
-    16)
+    19)
         #Supreme Commander (+ Forged Alliance)
         GAME_PROTOCOL="UDP"
         GAME_PORT="16010"
         ;;
-    17)
+    20)
         #Unreal Tournament '99 / 2004
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
-    18)
+    21)
         #War for the Overworld
         GAME_PROTOCOL="UDP"
         GAME_PORT="27015"
         ;;
-    19)
+    22)
         #Warhammer 40,000 Gladius - Relics of War
         GAME_PROTOCOL="TCP"
         GAME_PORT="6120"
         ;;
-    20)
+    23)
         #Worms Armageddon
         GAME_PROTOCOL="TCP"
         GAME_PORT="17011"
