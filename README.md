@@ -21,12 +21,17 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Kohan - Immortal Sovereigns / Ahriman's Gift
 * Kohan II - Kings of War
 * Medal of Honor - Allied Assault (& Addons)
+* Neverwinter Nights - Enhanced Edition
 * Quake III Arena (+ Team Arena)
+* Red Faction
 * Return to Castle Wolfenstein
 * Scrapland (Remastered)
 * Soldier of Fortune 2
+* Star Trek: Voyager - Elite Force (Holomatch)
+* Star Trek - Elite Force II
 * Star Wars - Jedi Academy
 * Star Wars - Jedi Knight II
+* Star Wars - Republic Commando
 * Supreme Commander (+ Forged Alliance)
 * Unreal Tournament '99
 * Unreal Tournament 2004
@@ -78,12 +83,17 @@ To be more specific, based on the game list above, here is how things stand:
 | Kohan - Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
 | Kohan II - Kings of War | **12 players** | 🟢 | |
 | Medal of Honor - Allied Assault (& Addons) | **32 players** | 🟢 | |
+| Neverwinter Nights - Enhanced Edition | **6 players** (in theory) | 🟡 | Multiplayer is protected by a CD-key check and multiple peers with the same key aren't allowed on a server (was unable to test the LOS limitation) |
 | Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter <public_ip> |
+| Red Faction | **32 players** | 🟢 | Use "Add Server" and enter <public_ip>:7755 to join |
 | Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Scrapland (Remastered) | **16 players** | 🟢 | |
 | Soldier of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Star Trek: Voyager - Elite Force (Holomatch) | **12 players** | 🟢 | |
+| Star Trek - Elite Force II | **32 players** | 🟢 | |
 | Star Wars - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars - Republic Commando | **8 players** | 🟢 | The host must start a game using "Create Internet Game", otherwise some remote peers may be auto-kicked with key validation errors (happens with the GOG version of the game) |
 | Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
 | Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer |
 | Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip> |
