@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.50
+@version: 2.51
 @date: 14/11/2022
 '''
 
@@ -468,6 +468,7 @@ if __name__=="__main__":
         keep_alive_section = configParser['KEEP-ALIVE']
     except:
         no_config_file = True
+        logging_section = None
         connection_section = None
         ports_section = None 
         ports_section = None
