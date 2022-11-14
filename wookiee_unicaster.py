@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.52
+@version: 2.54
 @date: 14/11/2022
 '''
 
+import os
+import sys
 import socket
 import logging
 import threading
@@ -25,7 +27,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 #constants
-CONF_FILE_PATH = 'wookiee_unicaster.cfg'
+CONF_FILE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'wookiee_unicaster.cfg')
 #allows send processes to end gracefully when no data is sent, 
 #based on the value of a corresponding exit process event
 SENDTO_QUEUE_TIMEOUT = 5 #seconds
@@ -470,8 +472,8 @@ if __name__=="__main__":
         no_config_file = True
         logging_section = None
         connection_section = None
-        ports_section = None 
         ports_section = None
+        keep_alive_section = None
         
     #parsing logging parameters
     try:
