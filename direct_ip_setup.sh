@@ -13,9 +13,9 @@ YELLOW="\033[1;33m"
 
 ############### SCRIPT PARAMETERS - MUST BE CONFIGURED PROPERLY #################
 #
-# name of the ethernet interface on which the public IP resides
+# name of the Ethernet interface on which the public IP resides
 REMOTE_INFT_NAME="eth0"
-# remote public IP - this host should be accesible using pre-configured ssh-keys,
+# remote public IP - this host should be accessible using pre-configured ssh-keys,
 # otherwise you will be prompted for a password during the connection setup stage
 REMOTE_PUBLIC_IP="216.58.212.164"
 # remote SSH user - using root is less of a hassle, otherwise passwordless sudo
@@ -29,7 +29,7 @@ REMOTE_WU_PATH="/root/wookiee_unicaster.py"
 LOCAL_WU_PATH="/home/username/wookiee_unicaster.py"
 # number of remote players to enable with the Wookiee Unicaster
 # some games that use a client-server Direct IP approach will
-# work with the full number of advertized players, while P2P
+# work with the full number of advertised players, while P2P
 # implementations will only support the default of one remote peer
 # -> leave the value blank in order to set up one remote peer only
 # -> use "-p 3" to enable 3 remote peers, for a total of 4 players

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.45
-@date: 11/11/2022
+@version: 2.50
+@date: 14/11/2022
 '''
 
 import socket
@@ -13,6 +13,7 @@ import argparse
 import subprocess
 import signal
 import queue
+from configparser import ConfigParser
 from time import sleep
 
 ##logging configuration block
@@ -20,36 +21,26 @@ logger_format = '%(asctime)s %(levelname)s >>> %(message)s'
 #logging level for other modules
 logging.basicConfig(format=logger_format, level=logging.ERROR) #DEBUG, INFO, WARNING, ERROR, CRITICAL
 logger = logging.getLogger(__name__)
-#logging level for current logger
-logger.setLevel(logging.INFO) #DEBUG, INFO, WARNING, ERROR, CRITICAL
+#logging level defaults to INFO, but can be later modified through config file values
+logger.setLevel(logging.INFO)
 
 #constants
-SERVER_PEER_UDP_CONNECTION_TIMEOUT = 40 #seconds
-SERVER_UDP_CONNECTION_TIMEOUT = 40 #seconds
-CLIENT_UDP_CONNECTION_TIMEOUT = 40 #seconds
-SENDTO_QUEUE_TIMEOUT = 10 #seconds
-UDP_KEEP_ALIVE_INTERVAL = 2 #seconds
-UDP_CLIENT_KEEP_ALIVE_PACKET = b'Hello there!'
-#the client will keep sending keep alive packets even if 
-#the server doesn't reply within this interval;
-#stacks up with UDP_KEEP_ALIVE_INTERVAL in case of no reply
-UDP_CLIENT_KEEP_ALIVE_TIMEOUT = 3 #seconds
-UDP_SERVER_KEEP_ALIVE_PACKET = b'General Kenobi!'
-UDP_SERVER_KEEP_ALIVE_HALT_PACKET = b'STOP! Hammer time!'
+CONF_FILE_PATH = 'wookiee_unicaster.cfg'
+#allows send processes to end gracefully when no data is sent, 
+#based on the value of a corresponding exit process event
+SENDTO_QUEUE_TIMEOUT = 5 #seconds
+#keep alive packet content (featuring bowcaster ASCII art guards)
+KEEP_ALIVE_CLIENT_PACKET = b'-=|- Hello there! -|=-'
+KEEP_ALIVE_SERVER_PACKET = b'-=|- General Kenobi! -|=-'
+KEEP_ALIVE_SERVER_HALT_PACKET = b'-=|- STOP! Hammer time! -|=-'
+#allow spawn threads to fully initialize their processes 
+#before the next spawn thread is started
 THREAD_SPAWN_WAIT_INTERVAL = 0.1 #seconds
-SERVER_RELAY_BASE_PORT = 23000
-CLIENT_RELAY_BASE_PORT = 23100
-#might need to be bumped in case applications use very large packet sizes,
-#but 2048/4096 seems like a resonable amount in most cases (i.e. gaming)
-RECV_BUFFER_SIZE = 2048
-#set an arbitrary small buffer size for queues, since packets shouldn't
-#stack up too much between processes (and large queues may increase latency)
-PACKET_QUEUE_SIZE = 8
 
 def sigterm_handler(signum, frame):
     #exceptions may happen here as well due to logger syncronization mayhem on shutdown
     try:
-        logger.debug('WU >>> Stopping Wookiee Unicaster process due to SIGTERM...')
+        logger.debug('WU >>> Stopping the Wookiee Unicaster process due to SIGTERM...')
     except:
         pass
             
@@ -85,8 +76,8 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
     while True:
         try:            
             if len(remote_peer_addr_dict) > 0:
-                isocket.settimeout(SERVER_PEER_UDP_CONNECTION_TIMEOUT)
-            idata, iaddr = isocket.recvfrom(RECV_BUFFER_SIZE)
+                isocket.settimeout(SERVER_PEER_CONNECTION_TIMEOUT)
+            idata, iaddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
             if len(remote_peer_addr_dict) > 0:
                 isocket.settimeout(None)
             packet_size = len(idata)
@@ -96,7 +87,7 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
             logger.debug(f'WU P{peer} {wookiee_mode} *** Packet size: {packet_size}')
             #unlikely, but this is an indicator that the buffer size should be bumped,
             #otherwise UDP packets will get truncated (which can be bad up to very bad)
-            if packet_size >= RECV_BUFFER_SIZE:
+            if packet_size >= RECEIVE_BUFFER_SIZE:
                 logger.error(f'WU P{peer} {wookiee_mode} *** Packet size is equal to receive buffer size!')
                 
             queue_index = remote_peer_addr_dict.get(iaddr, None)
@@ -182,15 +173,15 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
         
         while not remote_peer_event.is_set():
             logger.debug(f'WU P{peer} {wookiee_mode} +++ Sending a keep alive packet...')
-            isocket.sendto(UDP_CLIENT_KEEP_ALIVE_PACKET, (source_ip, source_port))
+            isocket.sendto(KEEP_ALIVE_CLIENT_PACKET, (source_ip, source_port))
             
-            sleep(UDP_KEEP_ALIVE_INTERVAL)
+            sleep(KEEP_ALIVE_PING_INTERVAL)
             
             logger.debug(f'WU P{peer} {wookiee_mode} +++ Listening for a keep alive packet...')
-            isocket.settimeout(UDP_CLIENT_KEEP_ALIVE_TIMEOUT)
+            isocket.settimeout(KEEP_ALIVE_CLIENT_TIMEOUT)
             
             try:
-                rdata, raddr = isocket.recvfrom(RECV_BUFFER_SIZE)
+                rdata, raddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
                  
                 logger.debug(f'WU P{peer} {wookiee_mode} +++ Received a keep alive packet.')
                 logger.debug(f'WU P{peer} {wookiee_mode} +++ {raddr[0]}:{raddr[1]} sent: {rdata}')
@@ -199,7 +190,7 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
                     logger.info(f'WU P{peer} {wookiee_mode} +++ Server connection confirmed!')
                     peer_connection_received = True
                     
-                if rdata == UDP_SERVER_KEEP_ALIVE_HALT_PACKET:
+                if rdata == KEEP_ALIVE_SERVER_HALT_PACKET:
                     logger.info(f'WU P{peer} {wookiee_mode} +++ Connection keep alive halted.')
                     remote_peer_event.set()
             
@@ -219,7 +210,7 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
         try:
             if remote_peer_event.is_set():
                 isocket.settimeout(socket_timeout)
-            idata, iaddr = isocket.recvfrom(RECV_BUFFER_SIZE)
+            idata, iaddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
             if remote_peer_event.is_set():
                 isocket.settimeout(None)
             packet_size = len(idata)
@@ -229,7 +220,7 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
             logger.debug(f'WU P{peer} {wookiee_mode} +++ Packet size: {packet_size}')
             #unlikely, but this is an indicator that the buffer size should be bumped,
             #otherwise UDP packets will get truncated (which can be bad up to very bad)
-            if packet_size >= RECV_BUFFER_SIZE:
+            if packet_size >= RECEIVE_BUFFER_SIZE:
                 logger.warning(f'WU P{peer} {wookiee_mode} +++ Packet size is equal to receive buffer size!')
             if wookiee_mode == 'client-source-receive' and packet_size > max_packet_size.value:
                 max_packet_size.value = packet_size
@@ -285,7 +276,7 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
         
         while not remote_peer_event.is_set():
             logger.debug(f'WU P{peer} {wookiee_mode} --- Listening for a keep alive packet...')
-            odata, oaddr = osocket.recvfrom(RECV_BUFFER_SIZE)
+            odata, oaddr = osocket.recvfrom(RECEIVE_BUFFER_SIZE)
             logger.debug(f'WU P{peer} {wookiee_mode} --- Received a keep alive packet.')
             logger.debug(f'WU P{peer} {wookiee_mode} --- {oaddr[0]}:{oaddr[1]} sent: {odata}')
             
@@ -293,14 +284,14 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
                 logger.info(f'WU P{peer} {wookiee_mode} --- Client connection confirmed!')
                 peer_connection_received = True
                 
-            sleep(UDP_KEEP_ALIVE_INTERVAL)
+            sleep(KEEP_ALIVE_PING_INTERVAL)
             
             if not remote_peer_event.is_set():
                 logger.debug(f'WU P{peer} {wookiee_mode} --- Sending a keep alive packet...')
-                osocket.sendto(UDP_SERVER_KEEP_ALIVE_PACKET, oaddr)
+                osocket.sendto(KEEP_ALIVE_SERVER_PACKET, oaddr)
             else:
                 logger.debug(f'WU P{peer} {wookiee_mode} --- Halting keep alive...')
-                osocket.sendto(UDP_SERVER_KEEP_ALIVE_HALT_PACKET, oaddr)
+                osocket.sendto(KEEP_ALIVE_SERVER_HALT_PACKET, oaddr)
                 logger.info(f'WU P{peer} {wookiee_mode} --- Connection keep alive halted.')
              
         ####################### UDP KEEP ALIVE LOGIC - SERVER #########################
@@ -359,7 +350,7 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
     logger.debug(f'WU P{peer} >>> destination_port: {destination_port}')
     logger.debug(f'WU P{peer} >>> relay_port: {relay_port}')
 
-    socket_timeout = SERVER_UDP_CONNECTION_TIMEOUT if wookiee_mode == 'server' else CLIENT_UDP_CONNECTION_TIMEOUT
+    socket_timeout = SERVER_CONNECTION_TIMEOUT if wookiee_mode == 'server' else CLIENT_CONNECTION_TIMEOUT
     reset_loop = True
     
     if wookiee_mode == 'server':
@@ -466,8 +457,93 @@ if __name__=="__main__":
     #catch SIGTERM and exit gracefully
     signal.signal(signal.SIGTERM, sigterm_handler)
     
-    parser = argparse.ArgumentParser(description=('*** The Wookiee Unicaster *** Replicates UDP packets between multiple private hosts using a public IP(v4) as relay. '
-                                                  'Useful for UDP based multiplayer/LAN games enjoyed using Direct IP connections over the internet.'), add_help=False)
+    configParser = ConfigParser()
+    no_config_file = False
+    
+    try:
+        configParser.read(CONF_FILE_PATH)
+        logging_section = configParser['LOGGING']
+        connection_section = configParser['CONNECTION']
+        ports_section = configParser['PORTS']
+        keep_alive_section = configParser['KEEP-ALIVE']
+    except:
+        no_config_file = True
+        connection_section = None
+        ports_section = None 
+        ports_section = None
+        
+    #parsing logging parameters
+    try:
+        LOGGING_LEVEL = logging_section.get('logging_level').upper()
+        
+        #DEBUG, INFO, WARNING, ERROR, CRITICAL
+        if LOGGING_LEVEL == 'DEBUG':
+            logger.setLevel(logging.DEBUG)
+        elif LOGGING_LEVEL == 'WARNING':
+            logger.setLevel(logging.WARNING)
+        elif LOGGING_LEVEL == 'ERROR':
+            logger.setLevel(logging.ERROR)
+        elif LOGGING_LEVEL == 'CRITICAL':
+            logger.setLevel(logging.CRITICAL)
+    except:
+        #will use the default level (INFO)
+        pass
+        
+    #parsing connection parameters
+    try:
+        RECEIVE_BUFFER_SIZE = connection_section.getint('receive_buffer_size')
+        logger.debug(f'WU >>> RECEIVE_BUFFER_SIZE: {RECEIVE_BUFFER_SIZE}')
+    except:
+        RECEIVE_BUFFER_SIZE = 2048 #bytes
+    try:
+        PACKET_QUEUE_SIZE = connection_section.getint('packet_queue_size')
+        logger.debug(f'WU >>> PACKET_QUEUE_SIZE: {PACKET_QUEUE_SIZE}')
+    except:
+        PACKET_QUEUE_SIZE = 8 #packets
+    try:
+        SERVER_PEER_CONNECTION_TIMEOUT = connection_section.getint('server_peer_connection_timeout')
+        logger.debug(f'WU >>> SERVER_PEER_CONNECTION_TIMEOUT: {SERVER_PEER_CONNECTION_TIMEOUT}')
+    except:
+        SERVER_PEER_CONNECTION_TIMEOUT = 30 #seconds
+    try:
+        SERVER_CONNECTION_TIMEOUT = connection_section.getint('server_connection_timeout')
+        logger.debug(f'WU >>> SERVER_CONNECTION_TIMEOUT: {SERVER_CONNECTION_TIMEOUT}')
+    except:
+        SERVER_CONNECTION_TIMEOUT = 15 #seconds
+    try:
+        CLIENT_CONNECTION_TIMEOUT = connection_section.getint('client_connection_timeout')
+        logger.debug(f'WU >>> CLIENT_CONNECTION_TIMEOUT: {CLIENT_CONNECTION_TIMEOUT}')
+    except:
+        CLIENT_CONNECTION_TIMEOUT = 15 #seconds
+    
+    #parsing ports parameters
+    try:
+        SERVER_RELAY_BASE_PORT = ports_section.getint('server_relay_base_port')
+        logger.debug(f'WU >>> SERVER_RELAY_BASE_PORT: {SERVER_RELAY_BASE_PORT}')
+    except:
+        SERVER_RELAY_BASE_PORT = 23000 #port number
+    try:
+        CLIENT_RELAY_BASE_PORT = ports_section.getint('client_relay_base_port')
+        logger.debug(f'WU >>> CLIENT_RELAY_BASE_PORT: {CLIENT_RELAY_BASE_PORT}')
+    except:
+        CLIENT_RELAY_BASE_PORT = 23100 #port number
+        
+    #parsing keep alive parameters
+    try:
+        KEEP_ALIVE_PING_INTERVAL = keep_alive_section.getint('ping_interval')
+        logger.debug(f'WU >>> KEEP_ALIVE_PING_INTERVAL: {KEEP_ALIVE_PING_INTERVAL}')
+    except:
+        KEEP_ALIVE_PING_INTERVAL = 2 #seconds
+    try:
+        KEEP_ALIVE_CLIENT_TIMEOUT = keep_alive_section.getint('client_timeout')
+        logger.debug(f'WU >>> KEEP_ALIVE_CLIENT_TIMEOUT: {KEEP_ALIVE_CLIENT_TIMEOUT}')
+    except:
+        KEEP_ALIVE_CLIENT_TIMEOUT = 3 #seconds
+    
+    parser = argparse.ArgumentParser(description=('-=|- The Wookiee Unicaster -|=- Relays UDP packets between a private host ' 
+                                                  'and multiple remote peers by leveraging a public IP(v4) address. '
+                                                  'Useful for UDP based multiplayer/LAN games enjoyed using '
+                                                  'Direct IP connections over the internet.'), add_help=False)
     
     required = parser.add_argument_group('required arguments')
     group = required.add_mutually_exclusive_group(required=True)
@@ -484,7 +560,7 @@ if __name__=="__main__":
     optional.add_argument('-d', '--destip', help='Destination IP address. Only needed in client mode.')
     optional.add_argument('-i', '--iport', help='Port on which the server will listen for incoming UDP packets from remote peers.')
     optional.add_argument('-o', '--oport', help='End relay port. Only needed in client mode.')
-          
+    
     args = parser.parse_args()
     
     #input validation
@@ -542,10 +618,13 @@ if __name__=="__main__":
     logger.debug(f'WU >>> relay_port: {relay_port}')
     
     if wookiee_mode == 'server':
-        logger.info(f'Starting Wookie Unicaster in SERVER mode, listening on {local_ip}:{source_port}.')
+        logger.info(f'Starting the Wookiee Unicaster in SERVER mode, listening on {local_ip}:{source_port}.')
     else:
-        logger.info((f'Starting Wookie Unicaster in CLIENT mode, connecting to the server on {source_ip} ' 
+        logger.info((f'Starting the Wookiee Unicaster in CLIENT mode, connecting to the server on {source_ip} ' 
                      f'and forwarding to {destination_ip}:{destination_port}.'))
+        
+    if no_config_file:
+        logger.info('WU >>> The Wookiee Unicaster configuration file is absent. Built-in defaults will be used.')
     
     link_event_list = [multiprocessing.Event() for i in range(peers)]
     exit_event_list = [multiprocessing.Event() for i in range(peers)]
@@ -626,13 +705,13 @@ if __name__=="__main__":
         #not sure why a second KeyboardInterrupt gets thrown here on shutdown at times
         try:
             process_loop_event.clear()
-            logger.info('WU >>> Stopping the Wookie Unicaster...')
+            logger.info('WU >>> Stopping the Wookiee Unicaster...')
         except KeyboardInterrupt:
             process_loop_event.clear()
             
     except:
         process_loop_event.clear()
-        logger.info('WU >>> Stopping the Wookie Unicaster...')
+        logger.info('WU >>> Stopping the Wookiee Unicaster...')
             
     finally:
         logger.info('WU >>> *********************** STATS ***********************')
@@ -652,4 +731,3 @@ if __name__=="__main__":
                 pass
     
     logger.info('WU >>> Ruow! (Goodbye)')
-    
