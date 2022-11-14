@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.51
+@version: 2.52
 @date: 14/11/2022
 '''
 
@@ -56,8 +56,8 @@ def sigint_handler(signum, frame):
     raise SystemExit(0)
 
 def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_queue_list, 
-                               remote_peer_addr_reverse_dict, max_packet_size, 
-                               source_packet_count, child_proc_started_event):
+                               server_peer_process_loop_event, remote_peer_addr_reverse_dict, 
+                               max_packet_size, source_packet_count, child_proc_started_event):
     #catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
     
@@ -73,8 +73,8 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
     
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread started.')
     
-    while True:
-        try:            
+    while server_peer_process_loop_event.is_set():
+        try:
             if len(remote_peer_addr_dict) > 0:
                 isocket.settimeout(SERVER_PEER_CONNECTION_TIMEOUT)
             idata, iaddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
@@ -148,7 +148,7 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
                 
         #this is only raised on Windows, apparently
         except ConnectionResetError:
-            logger.warning(f'WU P{peer} {wookiee_mode} +++ Packet transmission was forcibly halted.')
+            logger.warning(f'WU P{peer} {wookiee_mode} *** Packet transmission was forcibly halted.')
                 
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread stopped.')
     
@@ -333,12 +333,12 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
     except:
         pass
             
-    logger.info(f'WU P{peer} {wookiee_mode} +++ Worker thread stopped.')
+    logger.info(f'WU P{peer} {wookiee_mode} --- Worker thread stopped.')
     
-def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,  
+def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip, 
                         destination_ip, source_port, destination_port, relay_port, 
                         source_queue, destination_queue, link_event, exit_event,
-                        remote_peer_event, process_loop_event, remote_peer_addr_reverse_dict,
+                        remote_peer_event, process_loop_event, remote_peer_addr_reverse_dict, 
                         main_remote_peer_socket, max_packet_size, 
                         source_packet_count, destination_packet_count):
     
@@ -351,7 +351,6 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
     logger.debug(f'WU P{peer} >>> relay_port: {relay_port}')
 
     socket_timeout = SERVER_CONNECTION_TIMEOUT if wookiee_mode == 'server' else CLIENT_CONNECTION_TIMEOUT
-    reset_loop = True
     
     if wookiee_mode == 'server':
         source = main_remote_peer_socket
@@ -386,8 +385,8 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
         logger.critical(f'WU P{peer} >>> Interface unavailable or port {relay_port} is in use.')
         raise SystemExit(11)
     
-    while reset_loop and process_loop_event.is_set():    
-        try:
+    try:
+        while process_loop_event.is_set():
             logger.info(f'WU P{peer} >>> Starting Wookiee Unicaster child processes...')
             #reset all shared process events
             link_event.clear()
@@ -434,9 +433,8 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
             
             logger.info(f'WU P{peer} >>> Stopped all Wookiee Unicaster child processes.')
             
-        except:
-            reset_loop = False
-            logger.info(f'WU P{peer} >>> Stopping Wookiee Unicaster spawn thread...')
+    except:
+        pass
          
     if wookiee_mode != 'server':
         try:
@@ -452,6 +450,8 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
         logger.debug(f'WU P{peer} >>> Destination socket closed.')
     except:
         pass
+    
+    logger.info(f'WU P{peer} >>> Stopping Wookiee Unicaster spawn thread...')
 
 if __name__=="__main__":
     #catch SIGTERM and exit gracefully
@@ -646,6 +646,9 @@ if __name__=="__main__":
     main_remote_peer_socket = None
     
     if wookiee_mode == 'server':
+        server_peer_process_loop_event = multiprocessing.Event()
+        server_peer_process_loop_event.set()
+        
         child_proc_started_event = multiprocessing.Event()
         child_proc_started_event.clear()
         
@@ -665,8 +668,9 @@ if __name__=="__main__":
         
         main_remote_peer_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
                                                         args=(peers, main_remote_peer_socket, remote_peer_event_list,
-                                                              source_queue_list, remote_peer_addr_reverse_dict,
-                                                              max_packet_size, source_packet_count, child_proc_started_event), 
+                                                              source_queue_list, server_peer_process_loop_event, 
+                                                              remote_peer_addr_reverse_dict, max_packet_size, 
+                                                              source_packet_count, child_proc_started_event), 
                                                         daemon=True)
         main_remote_peer_proc.start()
         
@@ -705,12 +709,18 @@ if __name__=="__main__":
     except KeyboardInterrupt:
         #not sure why a second KeyboardInterrupt gets thrown here on shutdown at times
         try:
+            if wookiee_mode == 'server':
+                server_peer_process_loop_event.clear()
             process_loop_event.clear()
             logger.info('WU >>> Stopping the Wookiee Unicaster...')
         except KeyboardInterrupt:
+            if wookiee_mode == 'server':
+                server_peer_process_loop_event.clear()
             process_loop_event.clear()
             
     except:
+        if wookiee_mode == 'server':
+            server_peer_process_loop_event.clear()
         process_loop_event.clear()
         logger.info('WU >>> Stopping the Wookiee Unicaster...')
             
