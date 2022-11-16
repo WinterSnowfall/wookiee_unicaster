@@ -193,9 +193,13 @@ python wookiee_unicaster.py -m client -l 10.0.0.1 -s 216.58.212.164 -d 10.0.0.1 
 
 can be used on Windows to start a client with the same configuration as in the example provided for Linux.
 
-### The Wookiee Unicaster handles a single port, but what if a game uses/needs multiple ports?
+### The Wookiee Unicaster handles a single port, but what if a game needs multiple ports?
 
-For Direct IP multiplayer? That's very, very rare from what I've seen so far, but in case you run across any such cases, it is now possible to start multiple instances of the Wookiee Unicaster in parallel without running into any conflicts by specifying your own (non-overlapping) **--server-relay-base-port** and **--client-relay-base-port** along with different **-i** and **-o** values for any additional ports you want to relay. Even though peer handling and connection management will be entirely independent between concurrent instances of the Wookiee Unicaster, and therefore between multiple relayed ports used by the same game, this will not pose a problem since UDP is a stateless protocol anyway. If anything it should be faster and more reliable, at least in theory. Please remember to specify the same number of peers (**-p**) for all instances, otherwise you will most certainly run into issues.
+For Direct IP multiplayer? That's very, very rare from what I've seen so far, but should you run across any such cases, it is now possible to start multiple instances of the Wookiee Unicaster in parallel without running into any conflicts by specifying your own (non-overlapping) **--server-relay-base-port** and **--client-relay-base-port** along with different **-i** and **-o** values for any additional ports you want to relay. 
+
+Even though peer handling and connection management will be entirely independent between concurrent instances of the Wookiee Unicaster, and therefore between multiple relayed ports used by the same game, this will not pose a problem since UDP is a stateless protocol anyway. If anything it should be faster and more reliable, at least in theory. 
+
+Please remember to specify the same number of peers (**-p**) for all instances, otherwise you will most certainly run into issues.
 
 ### Build scripts? What are those for? Isn't Python an interpreted language?
 
