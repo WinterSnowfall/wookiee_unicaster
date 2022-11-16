@@ -11,10 +11,15 @@ I've developed Wookiee Unicaster primarily for Supreme Commander, but there are 
 Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Age of Mythology (+ The Titans)
 * Anno 1701 (+ The Sunken Dragon)
+* ARMA: Cold War Assault (Operation Flashpoint)
+* ARMA: Armed Assault (+ Queen's Gambit)
+* ARMA 2 (& Addons)
 * Baldur's Gate - Enhanced Edition
 * Baldur's Gate II - Enhanced Edition
 * Civilization IV (& Addons, including "Colonization")
+* Deus Ex
 * Divinity Original Sin - Enhanced Edition
+* Empire Earth II
 * Factorio
 * Hammerwatch
 * Icewind Dale - Enhanced Edition 
@@ -33,6 +38,9 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Star Wars - Jedi Knight II
 * Star Wars - Republic Commando
 * Supreme Commander (+ Forged Alliance)
+* SWAT 4 (+ The Stetchkov Syndicate)
+* The Wheel of Time
+* Unreal (+ Return to Na Pali)
 * Unreal Tournament '99
 * Unreal Tournament 2004
 * War for the Overworld
@@ -73,11 +81,16 @@ To be more specific, based on the game list above, here is how things stand:
 | --- | :-: | :-: | --- |
 | Age of Mythology (+ The Titans) | **12 players** | 🟢 | |
 | Anno 1701 (+The Sunken Dragon) | **4 players** | 🟢 | |
+| ARMA: Cold War Assault (Operation Flashpoint) | **16 players** | 🟢 | |
+| ARMA: Armed Assault (+ Queen's Gambit) | **60+ players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| ARMA 2 (& Addons) | **60+ players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
 | Baldur's Gate - Enhanced Edition | **6 players** | 🟢 | |
 | Baldur's Gate II - Enhanced Edition | **6 players** | 🟢 | |
 | Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
+| Deus Ex | **16 players** | 🟢 | |
 | Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
-| Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **16** or so |
+| Empire Earth II  | **10** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **32** or so |
 | Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
 | Icewind Dale - Enhanced Edition | **6 players** | 🟢 | |
 | Kohan - Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
@@ -95,7 +108,10 @@ To be more specific, based on the game list above, here is how things stand:
 | Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Republic Commando | **8 players** | 🟢 | The host must start a game using "Create Internet Game", otherwise some remote peers may be auto-kicked with key validation errors (happens with the GOG version of the game) |
 | Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
-| Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer |
+| SWAT 4 (+ The Stetchkov Syndicate) | **16 players** | 🟢 | |
+| The Wheel of Time | **16 players** | 🟢 | The host will need to launch a dedicated server first. All peers, including the host, must use "Favorites", then right click anywhere on the screen, select "New Favorite", enter the <public_ip> and a description, then double click on the created item to connect (ping being shown as 9999 and players as 0/0 is irrelevant, the connection should work).  |
+| Unreal (+ Return to Na Pali) | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
+| Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
 | Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip> |
 | War for the Overworld | **4 players** | 🟢 | |
 
@@ -146,13 +162,15 @@ You'll need a **python 3.6+** environment on the machine you plan to run it on. 
 You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'll need to specify:
 
 * -m <mode> = enables "server" or "client" mode
-* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client (is set to **1** if unspecified)
+* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client (defaults to **1** if unspecified)
 * -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen to perform the relaying of UDP packets - to be used on Linux
 * -l <localip> = directly specify the local IP address - this is only explicitly needed on Windows and replaces -e
 * -s <sourceip> = source IP address - only needed in client mode, where it represents the relay server's public IP
 * -d <destip> = destination IP address - only needed in client mode, where is represents the end IP of the game server
 * -i <iport> = port on which the server will listen for incoming UDP packets from remote peers - only needed in server mode, where it will need to be set to the port that the game server uses for listening to incoming connections
 * -o <oport> = end relay port - only needed in client mode, where it represents the port that the game server is using to listen for incoming connections (typically the same as <iport> on the server)
+* --server-relay-base-port <server_relay_base_port> = base port in the range used for packet relaying on both server and client (defaults to **23000** if unspecified)
+* --client-relay-base-port <client_relay_base_port> = base port in the range used as source for endpoint relaying on the client (defaults to **23100** if unspecified)
 
 To give you an example, you can run the following command on the Linux server (216.58.212.164 in the diagram above):
 
@@ -174,6 +192,10 @@ python wookiee_unicaster.py -m client -l 10.0.0.1 -s 216.58.212.164 -d 10.0.0.1 
 ```
 
 can be used on Windows to start a client with the same configuration as in the example provided for Linux.
+
+### The Wookiee Unicaster handles a single port, but what if a game uses/needs multiple ports?
+
+For Direct IP multiplayer? That's very, very rare from what I've seen so far, but in case you run across any such cases, it is now possible to start multiple instances of the Wookiee Unicaster in parallel without running into any conflicts by specifying your own (non-overlapping) **--server-relay-base-port** and **--client-relay-base-port** along with different **-i** and **-o** values for any additional ports you want to relay. Even though peer handling and connection management will be entirely independent between concurrent instances of the Wookiee Unicaster, and therefore between multiple relayed ports used by the same game, this will not pose a problem since UDP is a stateless protocol anyway. If anything it should be faster and more reliable, at least in theory. Please remember to specify the same number of peers (**-p**) for all instances, otherwise you will most certainly run into issues.
 
 ### Build scripts? What are those for? Isn't Python an interpreted language?
 

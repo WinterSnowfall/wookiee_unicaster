@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.54
-@date: 14/11/2022
+@version: 2.60
+@date: 16/11/2022
 '''
 
 import os
@@ -31,6 +31,11 @@ CONF_FILE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'wookiee_unicaster.c
 #allows send processes to end gracefully when no data is sent, 
 #based on the value of a corresponding exit process event
 SENDTO_QUEUE_TIMEOUT = 5 #seconds
+#default number of supported remote peers
+REMOTE_PEERS_DEFAULT = '1'
+#default relay port base values, to be used if otherwise unspecified
+SERVER_RELAY_BASE_PORT_DEFAULT = '23000'
+CLIENT_RELAY_BASE_PORT_DEFAULT = '23100'
 #keep alive packet content (featuring bowcaster ASCII art guards)
 KEEP_ALIVE_CLIENT_PACKET = b'-=|- Hello there! -|=-'
 KEEP_ALIVE_SERVER_PACKET = b'-=|- General Kenobi! -|=-'
@@ -466,13 +471,11 @@ if __name__=="__main__":
         configParser.read(CONF_FILE_PATH)
         logging_section = configParser['LOGGING']
         connection_section = configParser['CONNECTION']
-        ports_section = configParser['PORTS']
         keep_alive_section = configParser['KEEP-ALIVE']
     except:
         no_config_file = True
         logging_section = None
         connection_section = None
-        ports_section = None
         keep_alive_section = None
         
     #parsing logging parameters
@@ -518,18 +521,6 @@ if __name__=="__main__":
         logger.debug(f'WU >>> CLIENT_CONNECTION_TIMEOUT: {CLIENT_CONNECTION_TIMEOUT}')
     except:
         CLIENT_CONNECTION_TIMEOUT = 15 #seconds
-    
-    #parsing ports parameters
-    try:
-        SERVER_RELAY_BASE_PORT = ports_section.getint('server_relay_base_port')
-        logger.debug(f'WU >>> SERVER_RELAY_BASE_PORT: {SERVER_RELAY_BASE_PORT}')
-    except:
-        SERVER_RELAY_BASE_PORT = 23000 #port number
-    try:
-        CLIENT_RELAY_BASE_PORT = ports_section.getint('client_relay_base_port')
-        logger.debug(f'WU >>> CLIENT_RELAY_BASE_PORT: {CLIENT_RELAY_BASE_PORT}')
-    except:
-        CLIENT_RELAY_BASE_PORT = 23100 #port number
         
     #parsing keep alive parameters
     try:
@@ -558,11 +549,18 @@ if __name__=="__main__":
                                                'Can be identical to destination IP in client mode. Only needed on Windows.'))
     
     optional.add_argument('-h', '--help', action='help', help='show this help message and exit')
-    optional.add_argument('-p', '--peers', help='Number of remote peers. Is only useful for client-server UDP implementations.')
+    optional.add_argument('-p', '--peers', help='Number of remote peers. Is only useful for client-server UDP implementations.', 
+                          default=REMOTE_PEERS_DEFAULT)
     optional.add_argument('-s', '--sourceip', help='Source IP address. Only needed in client mode.')
     optional.add_argument('-d', '--destip', help='Destination IP address. Only needed in client mode.')
     optional.add_argument('-i', '--iport', help='Port on which the server will listen for incoming UDP packets from remote peers.')
     optional.add_argument('-o', '--oport', help='End relay port. Only needed in client mode.')
+    optional.add_argument('--server-relay-base-port', help=('Base port in the range used for packet relaying on both server and client. '
+                                                          f'Defaults to {SERVER_RELAY_BASE_PORT_DEFAULT} if unspecified.'),
+                          default=SERVER_RELAY_BASE_PORT_DEFAULT)
+    optional.add_argument('--client-relay-base-port', help=('Base port in the range used as source for endpoint relaying on the client. ' 
+                                                          f'Defaults to {CLIENT_RELAY_BASE_PORT_DEFAULT} if unspecified.'),
+                          default=CLIENT_RELAY_BASE_PORT_DEFAULT)
     
     args = parser.parse_args()
     
@@ -602,15 +600,22 @@ if __name__=="__main__":
         local_ip = args.localip
     
     logger.debug(f'WU >>> Local IP address is: {local_ip}')
-    #the number of remote peers defaults to 1 if unspecified otherwise
-    peers = 1 if args.peers is None else int(args.peers)
+    #the number of remote peers (defaults to 1 if otherwise unspecified)
+    peers = int(args.peers)
+    logger.debug(f'WU >>> peers: {peers}')
     #the actual source_ip will be determined dynamically by the server
     source_ip = None if wookiee_mode == 'server' else args.sourceip
     logger.debug(f'WU >>> source_ip: {source_ip}')
     #the destination ip will be determined dynamically by the server
     destination_ip = None if wookiee_mode == 'server' else args.destip
     logger.debug(f'WU >>> destination_ip: {destination_ip}')
-    #the client will use the SERVER_RELAY_PORT as source
+    #determine the value of the server relay port (can be passed as a parameter)
+    SERVER_RELAY_BASE_PORT = int(args.server_relay_base_port)
+    logger.debug(f'WU >>> SERVER_RELAY_BASE_PORT: {SERVER_RELAY_BASE_PORT}')
+    #determine the value of the server relay port (can be passed as a parameter)
+    CLIENT_RELAY_BASE_PORT = int(args.client_relay_base_port)
+    logger.debug(f'WU >>> CLIENT_RELAY_BASE_PORT: {CLIENT_RELAY_BASE_PORT}')
+    #the client will use the SERVER_RELAY_BASE_PORT as source
     source_port = int(args.iport) if wookiee_mode == 'server' else SERVER_RELAY_BASE_PORT
     logger.debug(f'WU >>> source_port: {source_port}')
     #the server will not need a destination port (its "destination" will be the relay port)
