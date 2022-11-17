@@ -173,6 +173,7 @@ You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'l
 * -o <oport> = end relay port - only needed in client mode, where it represents the port that the game server is using to listen for incoming connections (typically the same as <iport> on the server)
 * --server-relay-base-port <server_relay_base_port> = base port in the range used for packet relaying on both server and client (defaults to **23000** if unspecified)
 * --client-relay-base-port <client_relay_base_port> = base port in the range used as source for endpoint relaying on the client (defaults to **23100** if unspecified)
+* -q = quiet mode - suppresses all logging messages
 
 To give you an example, you can run the following command on the Linux server (216.58.212.164 in the diagram above):
 
