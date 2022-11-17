@@ -105,14 +105,16 @@ echo "#  (25)  Star Trek - Elite Force II                          #"
 echo "#  (26)  Star Wars - Jedi Academy                            #"
 echo "#  (27)  Star Wars - Jedi Knight II                          #"
 echo "#  (28)  Star Wars - Republic Commando                       #"
-echo "#  (29)  Supreme Commander (+ Forged Alliance)               #"
-echo "#  (30)  SWAT 4 (+ The Stetchkov Syndicate)                  #"
-echo "#  (31)  The Wheel of Time                                   #"
-echo "#  (32)  Unreal / Unreal Tournament '99 / 2004               #"
-echo "#  (33)  War for the Overworld                               #"
-echo "#  (34)  Warhammer 40,000 Gladius - Relics of War            #"
-echo "#  (35)  Windward                                            #"
-echo "#  (36)  Worms Armageddon                                    #"
+echo "#  (29)  Stardew Valley                                      #"
+echo "#  (30)  Supreme Commander (+ Forged Alliance)               #"
+echo "#  (31)  SWAT 4 (+ The Stetchkov Syndicate)                  #"
+echo "#  (32)  The Wheel of Time                                   #"
+echo "#  (33)  Unreal / Unreal Tournament '99 / 2004               #"
+echo "#  (34)  War for the Overworld                               #"
+echo "#  (35)  Warhammer 40,000 Gladius - Relics of War            #"
+echo "#  (36)  Windward                                            #"
+echo "#  (37)  World in Conflict (+ Soviet Assault)                #"
+echo "#  (38)  Worms Armageddon                                    #"
 echo "#                                                            #"
 echo "##############################################################"
 echo ""
@@ -260,41 +262,51 @@ case $GAME in
         GAME_PORT="7777"
         ;;
     29)
+        #Stardew Valley
+        GAME_PROTOCOL="UDP"
+        GAME_PORT="24642"
+        ;;
+    30)
         #Supreme Commander (+ Forged Alliance)
         GAME_PROTOCOL="UDP"
         GAME_PORT="16010"
         ;;
-    30)
+    31)
         #SWAT 4 (+ The Stetchkov Syndicate)
         GAME_PROTOCOL="UDP"
         GAME_PORT="10480"
         ;;
-    31)
+    32)
         #The Wheel of Time
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
-    32)
+    33)
         #Unreal / Unreal Tournament '99 / 2004
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
-    33)
+    34)
         #War for the Overworld
         GAME_PROTOCOL="UDP"
         GAME_PORT="27015"
         ;;
-    34)
+    35)
         #Warhammer 40,000 Gladius - Relics of War
         GAME_PROTOCOL="TCP"
         GAME_PORT="6120"
         ;;
-    35)
+    36)
         #Windward
         GAME_PROTOCOL="TCP"
         GAME_PORT="5127"
         ;;
-    36)
+    37)
+        #World in Conflict (+ Soviet Assault)
+        GAME_PROTOCOL="TCP"
+        GAME_PORT="48000"
+        ;;
+    38)
         #Worms Armageddon
         GAME_PROTOCOL="TCP"
         GAME_PORT="17011"

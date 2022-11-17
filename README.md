@@ -37,6 +37,7 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Star Wars - Jedi Academy
 * Star Wars - Jedi Knight II
 * Star Wars - Republic Commando
+* Stardew Valley
 * Supreme Commander (+ Forged Alliance)
 * SWAT 4 (+ The Stetchkov Syndicate)
 * The Wheel of Time
@@ -107,6 +108,7 @@ To be more specific, based on the game list above, here is how things stand:
 | Star Wars - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars - Republic Commando | **8 players** | 🟢 | The host must start a game using "Create Internet Game", otherwise some remote peers may be auto-kicked with key validation errors (happens with the GOG version of the game) |
+| Stardew Valley | **4 players** | 🟢 | |
 | Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
 | SWAT 4 (+ The Stetchkov Syndicate) | **16 players** | 🟢 | |
 | The Wheel of Time | **16 players** | 🟢 | The host will need to launch a dedicated server first. All peers, including the host, must use "Favorites", then right click anywhere on the screen, select "New Favorite", enter the <public_ip> and a description, then double click on the created item to connect (ping being shown as 9999 and players as 0/0 is irrelevant, the connection should work).  |

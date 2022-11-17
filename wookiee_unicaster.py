@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.60
-@date: 16/11/2022
+@version: 2.62
+@date: 18/11/2022
 '''
 
 import os
@@ -561,8 +561,13 @@ if __name__=="__main__":
     optional.add_argument('--client-relay-base-port', help=('Base port in the range used as source for endpoint relaying on the client. ' 
                                                           f'Defaults to {CLIENT_RELAY_BASE_PORT_DEFAULT} if unspecified.'),
                           default=CLIENT_RELAY_BASE_PORT_DEFAULT)
+    optional.add_argument('-q', '--quiet', help='Disable all logging output.', action='store_true')
     
     args = parser.parse_args()
+    
+    #disable all logging in quiet mode
+    if args.quiet:
+        logging.disable(logging.CRITICAL)
     
     #input validation
     if args.mode == 'server':
