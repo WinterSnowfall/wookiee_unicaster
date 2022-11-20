@@ -75,48 +75,50 @@ echo ""
 echo -e ">>> Configured remote IP : "$YELLOW$REMOTE_PUBLIC_IP$DEFAULT
 echo -e ">>> Detected local IP : "$GREEN$LOCAL_PRIVATE_IP$DEFAULT
 echo ""
-echo "##############################################################"
-echo "#                                                            #"
-echo "#  (1)   Age of Mythology (+ The Titans)                     #"
-echo "#  (2)   Anno 1701 (+ The Sunken Dragon)                     #"
-echo "#  (3)   ARMA - Cold War Assault / ARMA / ARMA 2 (& Addons)  #"
-echo "#  (4)   Baldur's Gate / II - Enhanced Edition               #"
-echo "#  (5)   Civilization IV (& Addons)                          #"
-echo "#  (6)   Deus Ex                                             #"
-echo "#  (7)   Divinity Original Sin - Enhanced Edition            #"
-echo "#  (8)   Empire Earth II                                     #"
-echo "#  (9)   Factorio                                            #"
-echo "#  (10)  Hammerwatch                                         #"
-echo "#  (11)  Icewind Dale - Enhanced Edition                     #"
-echo "#  (12)  Kohan - Immortal Sovereigns / Ahriman's Gift        #"
-echo "#  (13)  Kohan II - Kings of War                             #"
-echo "#  (14)  Medal of Honor - Allied Assault (& Addons)          #"
-echo "#  (15)  Mobile Forces                                       #"
-echo "#  (16)  Neverwinter Nights - Enhanced Edition               #"
-echo "#  (17)  OpenTTD                                             #"
-echo "#  (18)  Quake III - Arena (+ Team Arena)                    #"
-echo "#  (19)  Red Faction                                         #"
-echo "#  (20)  Return to Castle Wolfenstein                        #"
-echo "#  (21)  Scrapland (Remastered)                              #"
-echo "#  (22)  Sins of a Solar Empire - Rebellion                  #"
-echo "#  (23)  Soldier of Fortune 2                                #"
-echo "#  (24)  Star Trek: Voyager - Elite Force (Holomatch)        #"
-echo "#  (25)  Star Trek - Elite Force II                          #"
-echo "#  (26)  Star Wars - Jedi Academy                            #"
-echo "#  (27)  Star Wars - Jedi Knight II                          #"
-echo "#  (28)  Star Wars - Republic Commando                       #"
-echo "#  (29)  Stardew Valley                                      #"
-echo "#  (30)  Supreme Commander (+ Forged Alliance)               #"
-echo "#  (31)  SWAT 4 (+ The Stetchkov Syndicate)                  #"
-echo "#  (32)  The Wheel of Time                                   #"
-echo "#  (33)  Unreal / Unreal Tournament '99 / 2004               #"
-echo "#  (34)  War for the Overworld                               #"
-echo "#  (35)  Warhammer 40,000 Gladius - Relics of War            #"
-echo "#  (36)  Windward                                            #"
-echo "#  (37)  World in Conflict (+ Soviet Assault)                #"
-echo "#  (38)  Worms Armageddon                                    #"
-echo "#                                                            #"
-echo "##############################################################"
+echo "#############################################################"
+echo "#                                                           #"
+echo "#  (1)   Age of Mythology (+ The Titans)                    #"
+echo "#  (2)   Anno 1701 (+ The Sunken Dragon)                    #"
+echo "#  (3)   ARMA: Cold War Assault / ARMA / ARMA 2 (& Addons)  #"
+echo "#  (4)   Baldur's Gate / II - Enhanced Edition              #"
+echo "#  (5)   Civilization IV (& Addons)                         #"
+echo "#  (6)   Deus Ex                                            #"
+echo "#  (7)   Divinity Original Sin - Enhanced Edition           #"
+echo "#  (8)   Empire Earth II                                    #"
+echo "#  (9)   Factorio                                           #"
+echo "#  (10)  Hammerwatch                                        #"
+echo "#  (11)  Icewind Dale - Enhanced Edition                    #"
+echo "#  (12)  Kohan: Immortal Sovereigns / Ahriman's Gift        #"
+echo "#  (13)  Kohan II: Kings of War                             #"
+echo "#  (14)  Medal of Honor: Allied Assault (& Addons)          #"
+echo "#  (15)  Mobile Forces                                      #"
+echo "#  (16)  Neverwinter Nights - Enhanced Edition              #"
+echo "#  (17)  OpenTTD                                            #"
+echo "#  (18)  Pandora: First Contact (+ Eclipse of Nashira)      #"
+echo "#  (19)  Quake III Arena (+ Team Arena)                     #"
+echo "#  (20)  Red Faction                                        #"
+echo "#  (21)  Return to Castle Wolfenstein                       #"
+echo "#  (22)  Scrapland (Remastered)                             #"
+echo "#  (23)  Sins of a Solar Empire: Rebellion                  #"
+echo "#  (24)  Soldier of Fortune 2                               #"
+echo "#  (25)  Star Trek: Voyager - Elite Force (Holomatch)       #"
+echo "#  (26)  Star Trek: Elite Force II                          #"
+echo "#  (27)  Star Wars: Jedi Knight - Jedi Academy              #"
+echo "#  (28)  Star Wars: Jedi Knight II                          #"
+echo "#  (29)  Star Wars: Republic Commando                       #"
+echo "#  (30)  Stardew Valley                                     #"
+echo "#  (31)  Supreme Commander (+ Forged Alliance)              #"
+echo "#  (32)  SWAT 4 (+ The Stetchkov Syndicate)                 #"
+echo "#  (33)  The Wheel of Time                                  #"
+echo "#  (34)  Tom Clancy's Ghost Recon                           #"
+echo "#  (35)  Unreal / Unreal Tournament '99 / 2004              #"
+echo "#  (36)  War for the Overworld                              #"
+echo "#  (37)  Warhammer 40,000 Gladius - Relics of War           #"
+echo "#  (38)  Windward                                           #"
+echo "#  (39)  World in Conflict (+ Soviet Assault)               #"
+echo "#  (40)  Worms Armageddon                                   #"
+echo "#                                                           #"
+echo "#############################################################"
 echo ""
 read -p ">>> Pick a game for Direct IP play or press ENTER: " GAME
 
@@ -132,7 +134,7 @@ case $GAME in
         GAME_PORT="21701"
         ;;
     3)
-        #ARMA - Cold War Assault / ARMA / ARMA 2 (& Addons)
+        #ARMA: Cold War Assault / ARMA / ARMA 2 (& Addons)
         GAME_PROTOCOL="UDP"
         GAME_PORT="2302"
         ;;
@@ -177,17 +179,17 @@ case $GAME in
         GAME_PORT="47630"
         ;;
     12)
-        #Kohan - Immortal Sovereigns / Ahriman's Gift
+        #Kohan: Immortal Sovereigns / Ahriman's Gift
         GAME_PROTOCOL="UDP"
         GAME_PORT="17437"
         ;;
     13)
-        #Kohan II - Kings of War
+        #Kohan II: Kings of War
         GAME_PROTOCOL="UDP"
         GAME_PORT="5860"
         ;;
     14)
-        #Medal of Honor - Allied Assault (& Addons)
+        #Medal of Honor: Allied Assault (& Addons)
         GAME_PROTOCOL="UDP"
         GAME_PORT="12203"
         ;;
@@ -207,106 +209,116 @@ case $GAME in
         GAME_PORT="3979"
         ;;
     18)
-        #Quake III - Arena (+ Team Arena)
+        #Pandora: First Contact (+ Eclipse of Nashira)
+        GAME_PROTOCOL="TCP"
+        GAME_PORT="6121"
+        ;;
+    19)
+        #Quake III Arena (+ Team Arena)
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
-    19)
+    20)
         #Red Faction
         GAME_PROTOCOL="UDP"
         GAME_PORT="7755"
         ;;
-    20)
+    21)
         #Return to Castle Wolfenstein
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
-    21)
+    22)
         #Scrapland (Remastered)
         GAME_PROTOCOL="UDP"
         GAME_PORT="28086"
         ;;
-    22)
-        #Sins of a Solar Empire - Rebellion
+    23)
+        #Sins of a Solar Empire: Rebellion
         GAME_PROTOCOL="TCP"
         GAME_PORT="6112"
         ;;
-    23)
+    24)
         #Soldier of Fortune 2
         GAME_PROTOCOL="UDP"
         GAME_PORT="20100"
         ;;
-    24)
+    25)
         #Star Trek: Voyager - Elite Force (Holomatch)
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
-    25)
-        #Star Trek - Elite Force II
+    26)
+        #Star Trek: Elite Force II
         GAME_PROTOCOL="UDP"
         GAME_PORT="29253"
         ;;
-    26)
-        #Star Wars - Jedi Academy
+    27)
+        #Star Wars: Jedi Knight - Jedi Academy
         GAME_PROTOCOL="UDP"
         GAME_PORT="29070"
         ;;
-    27)
-        #Star Wars - Jedi Knight II
+    28)
+        #Star Wars: Jedi Knight II
         GAME_PROTOCOL="UDP"
         GAME_PORT="28070"
         ;;
-    28)
-        #Star Wars - Republic Commando
+    29)
+        #Star Wars: Republic Commando
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
-    29)
+    30)
         #Stardew Valley
         GAME_PROTOCOL="UDP"
         GAME_PORT="24642"
         ;;
-    30)
+    31)
         #Supreme Commander (+ Forged Alliance)
         GAME_PROTOCOL="UDP"
         GAME_PORT="16010"
         ;;
-    31)
+    32)
         #SWAT 4 (+ The Stetchkov Syndicate)
         GAME_PROTOCOL="UDP"
         GAME_PORT="10480"
         ;;
-    32)
+    33)
         #The Wheel of Time
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
-    33)
+    34)
+        #Tom Clancy's Ghost Recon
+        GAME_PROTOCOL="TCP"
+        GAME_PORT="2346"
+        ;;
+    35)
         #Unreal / Unreal Tournament '99 / 2004
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
-    34)
+    36)
         #War for the Overworld
         GAME_PROTOCOL="UDP"
         GAME_PORT="27015"
         ;;
-    35)
+    37)
         #Warhammer 40,000 Gladius - Relics of War
         GAME_PROTOCOL="TCP"
         GAME_PORT="6120"
         ;;
-    36)
+    38)
         #Windward
         GAME_PROTOCOL="TCP"
         GAME_PORT="5127"
         ;;
-    37)
+    39)
         #World in Conflict (+ Soviet Assault)
         GAME_PROTOCOL="TCP"
         GAME_PORT="48000"
         ;;
-    38)
+    40)
         #Worms Armageddon
         GAME_PROTOCOL="TCP"
         GAME_PORT="17011"
