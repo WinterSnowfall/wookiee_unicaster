@@ -164,16 +164,19 @@ You'll need a **python 3.6+** environment on the machine you plan to run it on. 
 You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'll need to specify:
 
 * -m <mode> = enables "server" or "client" mode
-* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client (defaults to **1** if unspecified)
 * -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen to perform the relaying of UDP packets - to be used on Linux
 * -l <localip> = directly specify the local IP address - this is only explicitly needed on Windows and replaces -e
 * -s <sourceip> = source IP address - only needed in client mode, where it represents the relay server's public IP
 * -d <destip> = destination IP address - only needed in client mode, where is represents the end IP of the game server
 * -i <iport> = port on which the server will listen for incoming UDP packets from remote peers - only needed in server mode, where it will need to be set to the port that the game server uses for listening to incoming connections
 * -o <oport> = end relay port - only needed in client mode, where it represents the port that the game server is using to listen for incoming connections (typically the same as <iport> on the server)
+
+There are also a few optional command line arguments:
+
+* -p <peers> = number of remote peers you want to relay - must be set identically on both server and client (defaults to **1** if unspecified)
 * --server-relay-base-port <server_relay_base_port> = base port in the range used for packet relaying on both server and client (defaults to **23000** if unspecified)
 * --client-relay-base-port <client_relay_base_port> = base port in the range used as source for endpoint relaying on the client (defaults to **23100** if unspecified)
-* -q = quiet mode - suppresses all logging messages
+* -q = quiet mode - suppresses all logging messages (defaults to **False** if unspecified)
 
 To give you an example, you can run the following command on the Linux server (216.58.212.164 in the diagram above):
 
