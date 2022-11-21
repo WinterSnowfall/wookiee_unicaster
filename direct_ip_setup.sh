@@ -327,7 +327,7 @@ case $GAME in
         read -p ">>> Select forwarding protcol (TCP or UDP): " GAME_PROTOCOL
         read -p ">>> Select forwarding port: " GAME_PORT
 
-        if ! [[ "$GAME_PORT" =~ ^[0-9]+$ ]] || [ "$GAME_PORT" -lt 1000 -o "$GAME_PORT" -gt 65535 ]
+        if ! [[ "$GAME_PORT" =~ ^[0-9]+$ ]] || [ "$GAME_PORT" -lt 1025 -o "$GAME_PORT" -gt 65535 ]
         then
             echo ">>> Invalid port selection!"
             exit 2
