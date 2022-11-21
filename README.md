@@ -178,6 +178,8 @@ There are also a few optional command line arguments:
 * --client-relay-base-port <client_relay_base_port> = base port in the range used as source for endpoint relaying on the client (defaults to **23100** if unspecified)
 * -q = quiet mode - suppresses all logging messages (defaults to **False** if unspecified)
 
+**Note**: All port values must be specified in the bindable, non-protected range of **1024:65535**.
+
 To give you an example, you can run the following command on the Linux server (216.58.212.164 in the diagram above):
 
 ```

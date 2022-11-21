@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.62
-@date: 18/11/2022
+@version: 2.70
+@date: 22/11/2022
 '''
 
 import os
@@ -15,6 +15,7 @@ import argparse
 import subprocess
 import signal
 import queue
+import ipaddress
 from configparser import ConfigParser
 from time import sleep
 
@@ -28,6 +29,9 @@ logger.setLevel(logging.INFO)
 
 #constants
 CONF_FILE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'wookiee_unicaster.cfg')
+#valid (and bindable) port range boundaries
+PORTS_RANGE_LOW_BOUND = 1024
+PORTS_RANGE_HIGH_BOUND = 65535
 #allows send processes to end gracefully when no data is sent, 
 #based on the value of a corresponding exit process event
 SENDTO_QUEUE_TIMEOUT = 5 #seconds
@@ -365,32 +369,42 @@ def wookie_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip,
         source = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         try:
             source.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
+        except TypeError:
+            logger.debug(f'WU P{peer} >>> Using manually specified local IP value on Linux.')
         except AttributeError:
             logger.warning(f'WU P{peer} >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
         except OSError:
             logger.critical(f'WU P{peer} >>> Interface not found or unavailable.')
-            raise SystemExit(8)
+            raise SystemExit(17)
         logger.debug(f'WU P{peer} >>> Binding source to: {local_ip}:{source_port}')
         try:
             source.bind((local_ip, source_port))
         except OSError:
-            logger.critical(f'WU P{peer} >>> Interface unavailable or port {source_port} is in use.')
-            raise SystemExit(9)
+            if intf is None:
+                logger.critical(f'WU P{peer} >>> Invalid local IP {local_ip} or port {source_port} is in use.')
+            else:
+                logger.critical(f'WU P{peer} >>> Interface unavailable or port {source_port} is in use.')
+            raise SystemExit(18)
         
     destination = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     try:
         destination.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
+    except TypeError:
+        logger.debug(f'WU P{peer} >>> Using manually specified local IP value on Linux.')
     except AttributeError:
         logger.warning(f'WU P{peer} >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
     except OSError:
         logger.critical(f'WU P{peer} >>> Interface not found or unavailable.')
-        raise SystemExit(10)
+        raise SystemExit(19)
     logger.debug(f'WU P{peer} >>> Binding destination to: {local_ip}:{relay_port}')
     try:
         destination.bind((local_ip, relay_port))
     except OSError:
-        logger.critical(f'WU P{peer} >>> Interface unavailable or port {relay_port} is in use.')
-        raise SystemExit(11)
+        if intf is None:
+            logger.critical(f'WU P{peer} >>> Invalid local IP {local_ip} or port {relay_port} is in use.')
+        else:
+            logger.critical(f'WU P{peer} >>> Interface unavailable or port {relay_port} is in use.')
+        raise SystemExit(20)
     
     try:
         while process_loop_event.is_set():
@@ -600,32 +614,99 @@ if __name__=="__main__":
         local_ip_query_subprocess = subprocess.Popen(''.join(('ifconfig ', args.interface, ' | grep -w inet | awk \'{print $2;}\'')), 
                                                      shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         local_ip = local_ip_query_subprocess.communicate()[0].decode('utf-8').strip()
+        
+        if local_ip == '':
+            logger.critical(f'Invalid interface {args.interface}. Please retry with a valid interface name.')
+            raise SystemExit(6)
     else:
         intf = None
-        local_ip = args.localip
+        
+        try:
+            #test to see if the provided string is a valid IP address
+            ipaddress.ip_address(args.localip)
+            local_ip = args.localip
+        except ValueError:
+            logger.critical(f'Invalid local IP {args.localip}. Please retry with a valid IP address.')
+            raise SystemExit(7)
     
     logger.debug(f'WU >>> Local IP address is: {local_ip}')
     #the number of remote peers (defaults to 1 if otherwise unspecified)
-    peers = int(args.peers)
-    logger.debug(f'WU >>> peers: {peers}')
+    try:
+        peers = int(args.peers)
+        logger.debug(f'WU >>> peers: {peers}')
+    except ValueError:
+        logger.critical('WU >>> Invalid number of peers specified.')
+        raise SystemExit(8)
     #the actual source_ip will be determined dynamically by the server
-    source_ip = None if wookiee_mode == 'server' else args.sourceip
-    logger.debug(f'WU >>> source_ip: {source_ip}')
+    try:
+        if wookiee_mode == 'server':
+            source_ip = None
+        else:
+            #test to see if the provided string is a valid IP address
+            ipaddress.ip_address(args.sourceip)
+            source_ip = args.sourceip
+            
+        logger.debug(f'WU >>> source_ip: {source_ip}')
+    except ValueError:
+        logger.critical(f'Invalid source IP {args.sourceip}. Please retry with a valid IP address.')
+        raise SystemExit(9)
     #the destination ip will be determined dynamically by the server
-    destination_ip = None if wookiee_mode == 'server' else args.destip
-    logger.debug(f'WU >>> destination_ip: {destination_ip}')
+    try:
+        if wookiee_mode == 'server':
+            destination_ip = None  
+        else:
+            #test to see if the provided string is a valid IP address
+            ipaddress.ip_address(args.destip)
+            source_ip = args.destip
+        
+        logger.debug(f'WU >>> destination_ip: {destination_ip}')
+    except ValueError:
+        logger.critical(f'Invalid destination IP {args.destip}. Please retry with a valid IP address.')
+        raise SystemExit(10)
     #determine the value of the server relay port (can be passed as a parameter)
-    SERVER_RELAY_BASE_PORT = int(args.server_relay_base_port)
-    logger.debug(f'WU >>> SERVER_RELAY_BASE_PORT: {SERVER_RELAY_BASE_PORT}')
+    try:
+        SERVER_RELAY_BASE_PORT = int(args.server_relay_base_port)
+        logger.debug(f'WU >>> SERVER_RELAY_BASE_PORT: {SERVER_RELAY_BASE_PORT}')
+        
+        if SERVER_RELAY_BASE_PORT < PORTS_RANGE_LOW_BOUND or SERVER_RELAY_BASE_PORT > PORTS_RANGE_HIGH_BOUND - peers:
+            logger.critical('WU >>> Invalid server relay base port specified.')
+            raise SystemExit(11)
+    except ValueError:
+        logger.critical('WU >>> Invalid server relay base port specified.')
+        raise SystemExit(11)
     #determine the value of the server relay port (can be passed as a parameter)
-    CLIENT_RELAY_BASE_PORT = int(args.client_relay_base_port)
-    logger.debug(f'WU >>> CLIENT_RELAY_BASE_PORT: {CLIENT_RELAY_BASE_PORT}')
+    try:
+        CLIENT_RELAY_BASE_PORT = int(args.client_relay_base_port)
+        logger.debug(f'WU >>> CLIENT_RELAY_BASE_PORT: {CLIENT_RELAY_BASE_PORT}')
+        
+        if CLIENT_RELAY_BASE_PORT < PORTS_RANGE_LOW_BOUND or CLIENT_RELAY_BASE_PORT > PORTS_RANGE_HIGH_BOUND - peers:
+            logger.critical('WU >>> Invalid client relay base port specified.')
+            raise SystemExit(12)
+    except ValueError:
+        logger.critical('WU >>> Invalid client relay base port specified.')
+        raise SystemExit(12)
     #the client will use the SERVER_RELAY_BASE_PORT as source
-    source_port = int(args.iport) if wookiee_mode == 'server' else SERVER_RELAY_BASE_PORT
-    logger.debug(f'WU >>> source_port: {source_port}')
+    try:
+        source_port = int(args.iport) if wookiee_mode == 'server' else SERVER_RELAY_BASE_PORT
+        logger.debug(f'WU >>> source_port: {source_port}')
+        
+        if source_port < PORTS_RANGE_LOW_BOUND or source_port > PORTS_RANGE_HIGH_BOUND:
+            logger.critical('WU >>> Invalid source port specified.')
+            raise SystemExit(13)
+    except ValueError:
+        logger.critical('WU >>> Invalid source port specified.')
+        raise SystemExit(13)
     #the server will not need a destination port (its "destination" will be the relay port)
-    destination_port = CLIENT_RELAY_BASE_PORT if wookiee_mode == 'server' else int(args.oport)
-    logger.debug(f'WU >>> destination_port: {destination_port}')
+    try:
+        destination_port = CLIENT_RELAY_BASE_PORT if wookiee_mode == 'server' else int(args.oport)
+        logger.debug(f'WU >>> destination_port: {destination_port}')
+        
+        if destination_port < PORTS_RANGE_LOW_BOUND or destination_port > PORTS_RANGE_HIGH_BOUND:
+            logger.critical('WU >>> Invalid destination port specified.')
+            raise SystemExit(14)
+    except ValueError:
+        logger.critical('WU >>> Invalid destination port specified.')
+        raise SystemExit(14)
     #the relay port will be used internally for UDP packet forwarding
     relay_port = SERVER_RELAY_BASE_PORT if wookiee_mode == 'server' else CLIENT_RELAY_BASE_PORT
     logger.debug(f'WU >>> relay_port: {relay_port}')
@@ -667,16 +748,21 @@ if __name__=="__main__":
         main_remote_peer_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         try:
             main_remote_peer_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
+        except TypeError:
+            logger.debug(f'WU >>> Using manually specified local IP value on Linux.')
         except AttributeError:
             logger.warning('WU >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
         except OSError:
             logger.critical('WU >>> Interface not found or unavailable.')
-            raise SystemExit(6)
+            raise SystemExit(15)
         try:
             main_remote_peer_socket.bind((local_ip, source_port))
         except OSError:
-            logger.critical(f'WU >>> Interface unavailable or port {source_port} is in use.')
-            raise SystemExit(7)
+            if intf is None:
+                logger.critical(f'WU >>> Invalid local IP {local_ip} or port {source_port} is in use.')
+            else:
+                logger.critical(f'WU >>> Interface unavailable or port {source_port} is in use.')
+            raise SystemExit(16)
         
         main_remote_peer_proc = multiprocessing.Process(target=wookiee_remote_peer_worker, 
                                                         args=(peers, main_remote_peer_socket, remote_peer_event_list,
