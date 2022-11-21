@@ -335,7 +335,7 @@ case $GAME in
         ;;
 esac
 
-case $GAME_PROTOCOL in
+case ${GAME_PROTOCOL^^} in
     TCP)
         # forward/tunnel ports through SSH based on the selected option
         echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORT$DEFAULT
