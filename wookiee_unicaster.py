@@ -43,7 +43,7 @@ CLIENT_RELAY_BASE_PORT_DEFAULT = '23100'
 #keep alive packet content (featuring bowcaster ASCII art guards)
 KEEP_ALIVE_CLIENT_PACKET = b'-=|- Hello there! -|=-'
 KEEP_ALIVE_SERVER_PACKET = b'-=|- General Kenobi! -|=-'
-KEEP_ALIVE_SERVER_HALT_PACKET = b'-=|- STOP! Hammer time! -|=-'
+KEEP_ALIVE_SERVER_HALT_PACKET = b'-=|- You are a bold one! -|=-'
 #allow spawn threads to fully initialize their processes 
 #before the next spawn thread is started
 THREAD_SPAWN_WAIT_INTERVAL = 0.1 #seconds
@@ -634,6 +634,11 @@ if __name__=="__main__":
     try:
         peers = int(args.peers)
         logger.debug(f'WU >>> peers: {peers}')
+        
+        if peers < 1:
+            logger.critical('WU >>> These are not the peers you are looking for.')
+            raise SystemExit(8)
+        
     except ValueError:
         logger.critical('WU >>> Invalid number of peers specified.')
         raise SystemExit(8)
