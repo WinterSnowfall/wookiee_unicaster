@@ -90,8 +90,8 @@ To be more specific, based on the game list above, here is how things stand:
 | Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
 | Deus Ex | **16 players** | 🟢 | |
 | Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
-| Empire Earth II  | **10** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
-| Factorio | **"Unlimited"** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **32** or so |
+| Empire Earth II  | **10 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Factorio | **"Unlimited" players** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **32** or so |
 | Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
 | Icewind Dale - Enhanced Edition | **6 players** | 🟢 | |
 | Kohan: Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
@@ -119,13 +119,13 @@ To be more specific, based on the game list above, here is how things stand:
 
 ### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
 
-Any IaaS vendor out there will typically provide a public IP with a Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
+Any IaaS vendor out there will provide a public IP with a Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
 
 ### What about Direct IP games that support TCP?
 
-It is fortunate some games provide support for Direct IP through TCP. Such games won't need "tricks" like the Wookiee Unicaster, because you can simply sort them out by using remote port forwarding with SSH/Putty. More details here: https://phoenixnap.com/kb/ssh-port-forwarding
+Such games won't need "tricks" like the Wookiee Unicaster, because you can simply sort them out by using remote port forwarding with SSH/Putty. More details here: https://phoenixnap.com/kb/ssh-port-forwarding
 
-UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experienced this firsthand, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP. I've even tried to disable TCP's Nagle algorithm by setting the SCTP_NODELAY to 0, but that hasn't helped much. In case you want to try it for yourself, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel
+UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experienced this firsthand, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP. I've even tried to disable TCP's Nagle algorithm by setting the SCTP_NODELAY to 0, but that hasn't helped much. In case you want to try encapsulating for yourself, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel
 
 ### I still don't get it... can you draw it out for me?
 
@@ -159,7 +159,7 @@ Also, please don't use wireless networks in these situations and expect good per
 
 ### How does it work?
 
-You'll need a **python 3.6+** environment on the machine you plan to run it on. Or you can build your own portable executable as explained below. Since I've only used the standard sockets library, no external/additional dependencies are required.
+You'll need a **python 3.6+** environment on the machine you plan to run it on. Or you could use the latest release binaries I provide for convenience (building your own is also possible, as explained below). Since I've only used the standard sockets library, no external/additional dependencies are required.
 
 You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'll need to specify:
 
@@ -211,5 +211,5 @@ Please remember to specify the same number of peers (**-p**) for all instances, 
 
 ### Build scripts? What are those for? Isn't Python an interpreted language?
 
-Yes, it is interpreted - you're not going crazy. The scripts use [Nuitka](https://nuitka.net/doc/user-manual.html), which optimizes then compiles Python code down to C, packing it, along with dependent libraries, in a portable executable. Based on my testing the improvements are only marginal when a small number of remote peers are involved, however it will help provide some extra performance when things get crowded. If you're aiming to shave every nanosecond off of your overall latency, then you should probably consider getting Nuitka and using either the .bat or .sh build script to generate a portable executable for your platform of choice.
+Yes, it is interpreted - you're not going crazy. The scripts use [Nuitka](https://nuitka.net/doc/user-manual.html), which optimizes then compiles Python code down to C, packing it, along with dependent libraries, in a portable executable. Based on my testing the improvements are only marginal when a small number of remote peers are involved, however it will help provide some extra performance when things get crowded. If you're aiming to shave every nanosecond off of your overall latency, then you should probably get the release binaries or consider getting Nuitka and using either the .bat or .sh build script to generate a portable executable for your platform/architecture of choice.
 
