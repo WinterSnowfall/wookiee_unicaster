@@ -4,7 +4,7 @@
 # all of the required ports. Please make sure ufw is installed and enabled on
 # target system and that the ufw command can be run by the REMOTE_SSH_USER.
 
-#bash output styles and colors
+# bash output styles and colors
 DEFAULT="\033[0m"
 BOLD="\033[1m"
 BLINK="\033[5m"
@@ -124,202 +124,202 @@ read -p ">>> Pick a game for Direct IP play or press ENTER: " GAME
 
 case $GAME in
     1)
-        #Age of Mythology (+ The Titans)
+        # Age of Mythology (+ The Titans)
         GAME_PROTOCOL="UDP"
         GAME_PORT="2299"
         ;;
     2)
-        #Anno 1701 (+ The Sunken Dragon)
+        # Anno 1701 (+ The Sunken Dragon)
         GAME_PROTOCOL="UDP"
         GAME_PORT="21701"
         ;;
     3)
-        #ARMA: Cold War Assault / ARMA / ARMA 2 (& Addons)
+        # ARMA: Cold War Assault / ARMA / ARMA 2 (& Addons)
         GAME_PROTOCOL="UDP"
         GAME_PORT="2302"
         ;;
     4)
-        #Baldur's Gate / II - Enhanced Edition
+        # Baldur's Gate / II - Enhanced Edition
         GAME_PROTOCOL="UDP"
         GAME_PORT="47630"
         ;;
     5)
-        #Civilization IV (& Addons)
+        # Civilization IV (& Addons)
         GAME_PROTOCOL="UDP"
         GAME_PORT="2056"
         ;;
     6)
-        #Deus Ex
+        # Deus Ex
         GAME_PROTOCOL="UDP"
         GAME_PORT="7790"
         ;;
     7)
-        #Divinity Original Sin - Enhanced Edition
+        # Divinity Original Sin - Enhanced Edition
         GAME_PROTOCOL="UDP"
         GAME_PORT="23253"
         ;;
     8)
-        #Empire Earth II
+        # Empire Earth II
         GAME_PROTOCOL="UDP"
         GAME_PORT="26000"
         ;;
     9)
-        #Factorio
+        # Factorio
         GAME_PROTOCOL="UDP"
         GAME_PORT="34197"
         ;;
     10)
-        #Hammerwatch
+        # Hammerwatch
         GAME_PROTOCOL="UDP"
         GAME_PORT="9995"
         ;;
     11)
-        #Icewind Dale - Enhanced Edition
+        # Icewind Dale - Enhanced Edition
         GAME_PROTOCOL="UDP"
         GAME_PORT="47630"
         ;;
     12)
-        #Kohan: Immortal Sovereigns / Ahriman's Gift
+        # Kohan: Immortal Sovereigns / Ahriman's Gift
         GAME_PROTOCOL="UDP"
         GAME_PORT="17437"
         ;;
     13)
-        #Kohan II: Kings of War
+        # Kohan II: Kings of War
         GAME_PROTOCOL="UDP"
         GAME_PORT="5860"
         ;;
     14)
-        #Medal of Honor: Allied Assault (& Addons)
+        # Medal of Honor: Allied Assault (& Addons)
         GAME_PROTOCOL="UDP"
         GAME_PORT="12203"
         ;;
     15)
-        #Mobile Forces
+        # Mobile Forces
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
     16)
-        #Neverwinter Nights - Enhanced Edition
+        # Neverwinter Nights - Enhanced Edition
         GAME_PROTOCOL="UDP"
         GAME_PORT="5121"
         ;;
     17)
-        #OpenTTD
+        # OpenTTD
         GAME_PROTOCOL="TCP"
         GAME_PORT="3979"
         ;;
     18)
-        #Pandora: First Contact (+ Eclipse of Nashira)
+        # Pandora: First Contact (+ Eclipse of Nashira)
         GAME_PROTOCOL="TCP"
         GAME_PORT="6121"
         ;;
     19)
-        #Quake III Arena (+ Team Arena)
+        # Quake III Arena (+ Team Arena)
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
     20)
-        #Red Faction
+        # Red Faction
         GAME_PROTOCOL="UDP"
         GAME_PORT="7755"
         ;;
     21)
-        #Return to Castle Wolfenstein
+        # Return to Castle Wolfenstein
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
     22)
-        #Scrapland (Remastered)
+        # Scrapland (Remastered)
         GAME_PROTOCOL="UDP"
         GAME_PORT="28086"
         ;;
     23)
-        #Sins of a Solar Empire: Rebellion
+        # Sins of a Solar Empire: Rebellion
         GAME_PROTOCOL="TCP"
         GAME_PORT="6112"
         ;;
     24)
-        #Soldier of Fortune 2
+        # Soldier of Fortune 2
         GAME_PROTOCOL="UDP"
         GAME_PORT="20100"
         ;;
     25)
-        #Star Trek: Voyager - Elite Force (Holomatch)
+        # Star Trek: Voyager - Elite Force (Holomatch)
         GAME_PROTOCOL="UDP"
         GAME_PORT="27960"
         ;;
     26)
-        #Star Trek: Elite Force II
+        # Star Trek: Elite Force II
         GAME_PROTOCOL="UDP"
         GAME_PORT="29253"
         ;;
     27)
-        #Star Wars: Jedi Knight - Jedi Academy
+        # Star Wars: Jedi Knight - Jedi Academy
         GAME_PROTOCOL="UDP"
         GAME_PORT="29070"
         ;;
     28)
-        #Star Wars: Jedi Knight II
+        # Star Wars: Jedi Knight II
         GAME_PROTOCOL="UDP"
         GAME_PORT="28070"
         ;;
     29)
-        #Star Wars: Republic Commando
+        # Star Wars: Republic Commando
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
     30)
-        #Stardew Valley
+        # Stardew Valley
         GAME_PROTOCOL="UDP"
         GAME_PORT="24642"
         ;;
     31)
-        #Supreme Commander (+ Forged Alliance)
+        # Supreme Commander (+ Forged Alliance)
         GAME_PROTOCOL="UDP"
         GAME_PORT="16010"
         ;;
     32)
-        #SWAT 4 (+ The Stetchkov Syndicate)
+        # SWAT 4 (+ The Stetchkov Syndicate)
         GAME_PROTOCOL="UDP"
         GAME_PORT="10480"
         ;;
     33)
-        #The Wheel of Time
+        # The Wheel of Time
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
     34)
-        #Tom Clancy's Ghost Recon
+        # Tom Clancy's Ghost Recon
         GAME_PROTOCOL="TCP"
         GAME_PORT="2346"
         ;;
     35)
-        #Unreal / Unreal Tournament '99 / 2004
+        # Unreal / Unreal Tournament '99 / 2004
         GAME_PROTOCOL="UDP"
         GAME_PORT="7777"
         ;;
     36)
-        #War for the Overworld
+        # War for the Overworld
         GAME_PROTOCOL="UDP"
         GAME_PORT="27015"
         ;;
     37)
-        #Warhammer 40,000 Gladius - Relics of War
+        # Warhammer 40,000 Gladius - Relics of War
         GAME_PROTOCOL="TCP"
         GAME_PORT="6120"
         ;;
     38)
-        #Windward
+        # Windward
         GAME_PROTOCOL="TCP"
         GAME_PORT="5127"
         ;;
     39)
-        #World in Conflict (+ Soviet Assault)
+        # World in Conflict (+ Soviet Assault)
         GAME_PROTOCOL="TCP"
         GAME_PORT="48000"
         ;;
     40)
-        #Worms Armageddon
+        # Worms Armageddon
         GAME_PROTOCOL="TCP"
         GAME_PORT="17011"
         ;;
