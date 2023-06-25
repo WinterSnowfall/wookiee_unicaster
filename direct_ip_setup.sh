@@ -25,8 +25,12 @@ REMOTE_SSH_USER="root"
 REMOTE_SSH_SUDO=""
 # path to the Wookiee Unicaster script on the remote server
 REMOTE_WU_PATH="/root/wookiee_unicaster.py"
+# Wookiee Unicaster script of binary name on the remote server
+REMOTE_WU_NAME=$(basename $REMOTE_WU_PATH)
 # path to the Wookiee Unicaster script on the local host
 LOCAL_WU_PATH="/home/username/wookiee_unicaster.py"
+# Wookiee Unicaster script of binary name on the local host
+LOCAL_WU_NAME=$(basename $LOCAL_WU_PATH)
 # number of remote players to enable with the Wookiee Unicaster
 # some games that use a client-server Direct IP approach will
 # work with the full number of advertised players, while P2P
@@ -42,7 +46,7 @@ WU_RELAY_PORT_RANGE="23001"
 LAN_INTF_NAME="enp1s0"
 # local IP - this is where the game server needs to run, as all remote peers
 # connecting via the public IP will be forwarded to this address
-LOCAL_PRIVATE_IP=$(ifconfig $LAN_INTF_NAME | grep -w inet | awk '{print $2;}')
+LOCAL_PRIVATE_IP=$(ifconfig $LAN_INTF_NAME | grep -w inet | awk '{print $2}')
 #
 #################################################################################
 
@@ -60,14 +64,14 @@ start_udp_forwarding () {
 
 stop_tcp_forwarding () {
     ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw delete allow $1/tcp" > /dev/null 2>&1
-    kill $(ps -ef | grep "ssh -fNT" | grep -v grep | awk '{print $2;}') 
+    pkill -f "ssh -fNT" > /dev/null 2>&1
 }
 
 stop_udp_forwarding () {
     ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw delete allow $1/udp" > /dev/null 2>&1
     ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw delete allow $WU_RELAY_PORT_RANGE/udp" > /dev/null 2>&1
-    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "killall wookiee_unicaster" > /dev/null 2>&1
-    killall wookiee_unicaster > /dev/null 2>&1
+    ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "pkill -f $REMOTE_WU_NAME" > /dev/null 2>&1
+    pkill -f $LOCAL_WU_NAME > /dev/null 2>&1
 }
 
 echo "*** WinterSnowfall's port forwarding script for Linux ***"
