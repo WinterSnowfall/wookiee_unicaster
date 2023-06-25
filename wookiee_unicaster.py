@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 2.80
-@date: 26/11/2022
+@version: 2.82
+@date: 24/06/2023
 '''
 
 import os
@@ -19,37 +19,36 @@ import ipaddress
 from configparser import ConfigParser
 from time import sleep
 
-##logging configuration block
-logger_format = '%(asctime)s %(levelname)s >>> %(message)s'
-#logging level for other modules
-logging.basicConfig(format=logger_format, level=logging.ERROR) #DEBUG, INFO, WARNING, ERROR, CRITICAL
+# logging configuration block
+LOGGER_FORMAT = '%(asctime)s %(levelname)s >>> %(message)s'
+# logging level for other modules
+logging.basicConfig(format=LOGGER_FORMAT, level=logging.ERROR)
 logger = logging.getLogger(__name__)
-#logging level defaults to INFO, but can be later modified through config file values
-logger.setLevel(logging.INFO)
+# logging level defaults to INFO, but can be later modified through config file values
+logger.setLevel(logging.INFO) # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
-#constants
+# constants
 CONF_FILE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'wookiee_unicaster.cfg')
-#valid (and bindable) port range boundaries
-PORTS_RANGE_LOW_BOUND = 1024
-PORTS_RANGE_HIGH_BOUND = 65535
-#allows send processes to end gracefully when no data is sent, 
-#based on the value of a corresponding exit process event
+# valid (and bindable) port range boundaries
+PORTS_RANGE = (1024, 65535)
+# allows send processes to end gracefully when no data is sent, 
+# based on the value of a corresponding exit process event
 SENDTO_QUEUE_TIMEOUT = 5 #seconds
-#default number of supported remote peers
-REMOTE_PEERS_DEFAULT = '1'
-#default relay port base values, to be used if otherwise unspecified
-SERVER_RELAY_BASE_PORT_DEFAULT = '23000'
-CLIENT_RELAY_BASE_PORT_DEFAULT = '23100'
-#keep alive packet content (featuring bowcaster ASCII art guards)
+# default number of supported remote peers
+REMOTE_PEERS_DEFAULT = 1
+# default relay port base values, to be used if otherwise unspecified
+SERVER_RELAY_BASE_PORT_DEFAULT = 23000
+CLIENT_RELAY_BASE_PORT_DEFAULT = 23100
+# keep alive packet content (featuring bowcaster ASCII art guards)
 KEEP_ALIVE_CLIENT_PACKET = b'-=|- Hello there! -|=-'
 KEEP_ALIVE_SERVER_PACKET = b'-=|- General Kenobi! -|=-'
 KEEP_ALIVE_SERVER_HALT_PACKET = b'-=|- You are a bold one! -|=-'
-#allow spawn threads to fully initialize their processes 
-#before the next spawn thread is started
-THREAD_SPAWN_WAIT_INTERVAL = 0.1 #seconds
+# allow spawn threads to fully initialize their processes 
+# before the next spawn thread is started
+THREAD_SPAWN_WAIT_INTERVAL = 0.1 # seconds
 
 def sigterm_handler(signum, frame):
-    #exceptions may happen here as well due to logger syncronization mayhem on shutdown
+    # exceptions may happen here as well due to logger syncronization mayhem on shutdown
     try:
         logger.debug('WU >>> Stopping Wookiee Unicaster process due to SIGTERM...')
     except:
@@ -58,7 +57,7 @@ def sigterm_handler(signum, frame):
     raise SystemExit(0)
 
 def sigint_handler(signum, frame):
-    #exceptions may happen here as well due to logger syncronization mayhem on shutdown
+    # exceptions may happen here as well due to logger syncronization mayhem on shutdown
     try:
         logger.debug('WU >>> Stopping Wookiee Unicaster process due to SIGINT...')
     except:
@@ -69,12 +68,13 @@ def sigint_handler(signum, frame):
 def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_queue_list, 
                                remote_peer_worker_exit_event, remote_peer_addr_reverse_dict, 
                                max_packet_size, source_packet_count, child_proc_started_event):
-    #catch SIGTERM and exit gracefully
+    # catch SIGTERM and exit gracefully
     signal.signal(signal.SIGTERM, sigterm_handler)
-    #catch SIGINT and exit gracefully
+    # catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
     
-    peer = 0 #the server will have a single source-receive queue worker process
+    # the server will have a single source-receive queue worker process
+    peer = 0
     wookiee_mode = 'server-source-receive'
     
     logger.info(f'WU P{peer} {wookiee_mode} *** Worker thread started.')
@@ -84,7 +84,7 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
         queue_vacancy = [True] * peers
         vacant_queue_index = None
         
-        #allow the other server processes to spin up before accepting remote peers
+        # allow the other server processes to spin up before accepting remote peers
         child_proc_started_event.wait()
         
         while not remote_peer_worker_exit_event.is_set():
@@ -99,8 +99,8 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
                 logger.debug(f'WU P{peer} {wookiee_mode} *** Received a packet from {iaddr[0]}:{iaddr[1]}...')
                 #logger.debug(f'WU P{peer} {wookiee_mode} *** {iaddr[0]}:{iaddr[1]} sent: {idata}')
                 logger.debug(f'WU P{peer} {wookiee_mode} *** Packet size: {packet_size}')
-                #unlikely, but this is an indicator that the buffer size should be bumped,
-                #otherwise UDP packets will get truncated (which can be bad up to very bad)
+                # unlikely, but this is an indicator that the buffer size should be bumped,
+                # otherwise UDP packets will get truncated (which can be bad up to very bad)
                 if packet_size >= RECEIVE_BUFFER_SIZE:
                     logger.error(f'WU P{peer} {wookiee_mode} *** Packet size is equal to receive buffer size!')
                 
@@ -110,24 +110,24 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
                     if queue_index is None:
                         logger.info(f'WU P{peer} {wookiee_mode} *** Detected new remote peer: {iaddr[0]}:{iaddr[1]}')
                         
-                        #try to free up any dropped peers if there are no vacancies
+                        # try to free up any dropped peers if there are no vacancies
                         if True not in queue_vacancy:
                             for i in range(peers):
                                 if not remote_peer_event_list[i].is_set():
                                     logger.debug(f'WU P{peer} {wookiee_mode} *** Vacating queue {i}...')
                                     vaddr = remote_peer_addr_reverse_dict.get(i, None)
-                                    #remove the cleared element from the mapping dictionary
-                                    #(the reverse dictionary key will be updated anyway on reassignment)
+                                    # remove the cleared element from the mapping dictionary
+                                    # (the reverse dictionary key will be updated anyway on reassignment)
                                     if vaddr is not None:
                                         remote_peer_addr_dict.pop(vaddr)
                                     queue_vacancy[i] = True
                                     logger.debug(f'WU P{peer} {wookiee_mode} *** Queue marked as vacant.')
                         
-                        #determine the lowest available queue index
+                        # determine the lowest available queue index
                         vacant_queue_index = queue_vacancy.index(True)
                         logger.debug(f'WU P{peer} {wookiee_mode} *** vacant_queue_index: {vacant_queue_index}')
                         
-                        #set the inbound address in the dictionary lookups
+                        # set the inbound address in the dictionary lookups
                         queue_index = vacant_queue_index
                         remote_peer_addr_dict.update({iaddr: queue_index})
                         remote_peer_addr_reverse_dict.update({queue_index: iaddr})
@@ -138,16 +138,16 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
                     source_queue_list[queue_index].put(idata)
                     source_packet_count.value += 1
                     
-                    #only consider the max_size of received & accepted packages
+                    # only consider the max_size of received & accepted packages
                     if packet_size > max_packet_size.value:
                         max_packet_size.value = packet_size
                         logger.debug(f'WU P{peer} {wookiee_mode} *** Max packet size now set to: {max_packet_size.value}')
                     
                     logger.debug(f'WU P{peer} {wookiee_mode} *** Packet queued for replication on queue {queue_index}...')
                 
-                #will happen if more peers than are supported attempt to connect
+                # will happen if more peers than are supported attempt to connect
                 except ValueError:
-                    #simply ignore the packets received from the new peers in this case
+                    # simply ignore the packets received from the new peers in this case
                     logger.error(f'WU P{peer} {wookiee_mode} *** Number of peers exceeds current configurations!')
             
             except socket.timeout:
@@ -160,7 +160,7 @@ def wookiee_remote_peer_worker(peers, isocket, remote_peer_event_list, source_qu
                     queue_vacancy = [True] * peers
                     vacant_queue_index = None
             
-            #this is only raised on Windows, apparently
+            # this is only raised on Windows, apparently
             except ConnectionResetError:
                 logger.warning(f'WU P{peer} {wookiee_mode} *** Packet transmission was forcibly halted.')
     
@@ -173,15 +173,15 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
                            socket_timeout, link_event, remote_peer_event, exit_event, 
                            source_queue, destination_queue, 
                            max_packet_size, source_packet_count):
-    #catch SIGTERM and exit gracefully
+    # catch SIGTERM and exit gracefully
     signal.signal(signal.SIGTERM, sigterm_handler)
-    #catch SIGINT and exit gracefully
+    # catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
     
     logger.info(f'WU P{peer} {wookiee_mode} +++ Worker thread started.')
     
     try:
-        #ensure no timeout is actively enforced on the socket
+        # ensure no timeout is actively enforced on the socket
         isocket.settimeout(None)
         
         if wookiee_mode == 'client-source-receive':
@@ -238,15 +238,15 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
                 logger.debug(f'WU P{peer} {wookiee_mode} +++ Received a packet from {iaddr[0]}:{iaddr[1]}...')
                 #logger.debug(f'WU P{peer} {wookiee_mode} +++ {iaddr[0]}:{iaddr[1]} sent: {idata}')
                 logger.debug(f'WU P{peer} {wookiee_mode} +++ Packet size: {packet_size}')
-                #unlikely, but this is an indicator that the buffer size should be bumped,
-                #otherwise UDP packets will get truncated (which can be bad up to very bad)
+                # unlikely, but this is an indicator that the buffer size should be bumped,
+                # otherwise UDP packets will get truncated (which can be bad up to very bad)
                 if packet_size >= RECEIVE_BUFFER_SIZE:
                     logger.warning(f'WU P{peer} {wookiee_mode} +++ Packet size is equal to receive buffer size!')
                 if wookiee_mode == 'client-source-receive' and packet_size > max_packet_size.value:
                     max_packet_size.value = packet_size
                     logger.debug(f'WU P{peer} {wookiee_mode} +++ New max_packet_size is: {max_packet_size.value}')
                 
-                #count the total number of received UDP packets
+                # count the total number of received UDP packets
                 if wookiee_mode.endswith('-source-receive'):
                     source_queue.put(idata)
                     source_packet_count.value += 1
@@ -262,7 +262,7 @@ def wookiee_receive_worker(peer, wookiee_mode, isocket, source_ip, source_port,
                 else:
                     logger.debug(f'WU P{peer} {wookiee_mode} +++ Timed out while waiting to receive packet...')
             
-            #this is only raised on Windows, apparently
+            # this is only raised on Windows, apparently
             except ConnectionResetError:
                 logger.warning(f'WU P{peer} {wookiee_mode} +++ Packet transmission was forcibly halted.')
     
@@ -282,15 +282,15 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
                          link_event, remote_peer_event, exit_event, source_queue, 
                          destination_queue, remote_peer_addr_reverse_dict, 
                          destination_packet_count):
-    #catch SIGTERM and exit gracefully
+    # catch SIGTERM and exit gracefully
     signal.signal(signal.SIGTERM, sigterm_handler)
-    #catch SIGINT and exit gracefully
+    # catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
     
     logger.info(f'WU P{peer} {wookiee_mode} --- Worker thread started.')
     
     try:
-        #ensure no timeout is actively enforced on the socket
+        # ensure no timeout is actively enforced on the socket
         osocket.settimeout(None)
         
         if wookiee_mode == 'server-source-relay':
@@ -344,8 +344,8 @@ def wookiee_relay_worker(peer, wookiee_mode, osocket, oaddr,
                     
                     if wookiee_mode.endswith('-destination-relay'):
                         destination_packet_count.value += 1
-                #sometimes when a peer is dropped relay packets may still get sent its way;
-                #simply ignore/drop them on relay if that's the case
+                # sometimes when a peer is dropped relay packets may still get sent its way;
+                # simply ignore/drop them on relay if that's the case
                 except TypeError:
                     logger.warning(f'WU P{peer} {wookiee_mode} --- Unknown or dropped remote peer. Dropping packet.')
             
@@ -426,12 +426,13 @@ def wookiee_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip, destinat
     try:
         while not wookie_peer_handler_exit_event.is_set():
             logger.info(f'WU P{peer} >>> Starting Wookiee Unicaster child processes...')
-            #reset all shared process events
+            # reset all shared process events
             link_event.clear()
             remote_peer_event.clear()
             exit_event.clear()
             
-            #only clients must spawn a peer count of -source-receive processes, since servers will only need one receive process
+            # only clients must spawn a peer count of -source-receive processes, 
+            # since servers will only need one receive process
             if wookiee_mode != 'server':
                 wookiee_proc_source_receive = multiprocessing.Process(target=wookiee_receive_worker, 
                                                                       args=(peer, ''.join((wookiee_mode, '-source-receive')), source, 
@@ -492,9 +493,9 @@ def wookiee_peer_handler(peer, wookiee_mode, intf, local_ip, source_ip, destinat
     logger.info(f'WU P{peer} >>> Stopping Wookiee Unicaster peer handler thread...')
 
 if __name__ == "__main__":
-    #catch SIGTERM and exit gracefully
+    # catch SIGTERM and exit gracefully
     signal.signal(signal.SIGTERM, sigterm_handler)
-    #catch SIGINT and exit gracefully
+    # catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
     
     configParser = ConfigParser()
@@ -511,11 +512,10 @@ if __name__ == "__main__":
         connection_section = None
         keep_alive_section = None
     
-    #parsing logging parameters
+    # parsing logging parameters
     try:
         LOGGING_LEVEL = logging_section.get('logging_level').upper()
         
-        #DEBUG, INFO, WARNING, ERROR, CRITICAL
         if LOGGING_LEVEL == 'DEBUG':
             logger.setLevel(logging.DEBUG)
         elif LOGGING_LEVEL == 'WARNING':
@@ -525,47 +525,47 @@ if __name__ == "__main__":
         elif LOGGING_LEVEL == 'CRITICAL':
             logger.setLevel(logging.CRITICAL)
     except:
-        #will use the default level (INFO)
+        # will use 'INFO' by default
         pass
     
-    #parsing connection parameters
+    # parsing connection parameters
     try:
         RECEIVE_BUFFER_SIZE = connection_section.getint('receive_buffer_size')
         logger.debug(f'WU >>> RECEIVE_BUFFER_SIZE: {RECEIVE_BUFFER_SIZE}')
     except:
-        RECEIVE_BUFFER_SIZE = 2048 #bytes
+        RECEIVE_BUFFER_SIZE = 2048 # bytes
     try:
         PACKET_QUEUE_SIZE = connection_section.getint('packet_queue_size')
         logger.debug(f'WU >>> PACKET_QUEUE_SIZE: {PACKET_QUEUE_SIZE}')
     except:
-        PACKET_QUEUE_SIZE = 8 #packets
+        PACKET_QUEUE_SIZE = 8 # packets
     try:
         SERVER_PEER_CONNECTION_TIMEOUT = connection_section.getint('server_peer_connection_timeout')
         logger.debug(f'WU >>> SERVER_PEER_CONNECTION_TIMEOUT: {SERVER_PEER_CONNECTION_TIMEOUT}')
     except:
-        SERVER_PEER_CONNECTION_TIMEOUT = 30 #seconds
+        SERVER_PEER_CONNECTION_TIMEOUT = 30 # seconds
     try:
         SERVER_CONNECTION_TIMEOUT = connection_section.getint('server_connection_timeout')
         logger.debug(f'WU >>> SERVER_CONNECTION_TIMEOUT: {SERVER_CONNECTION_TIMEOUT}')
     except:
-        SERVER_CONNECTION_TIMEOUT = 15 #seconds
+        SERVER_CONNECTION_TIMEOUT = 15 # seconds
     try:
         CLIENT_CONNECTION_TIMEOUT = connection_section.getint('client_connection_timeout')
         logger.debug(f'WU >>> CLIENT_CONNECTION_TIMEOUT: {CLIENT_CONNECTION_TIMEOUT}')
     except:
-        CLIENT_CONNECTION_TIMEOUT = 15 #seconds
+        CLIENT_CONNECTION_TIMEOUT = 15 # seconds
     
-    #parsing keep alive parameters
+    # parsing keep alive parameters
     try:
         KEEP_ALIVE_PING_INTERVAL = keep_alive_section.getint('ping_interval')
         logger.debug(f'WU >>> KEEP_ALIVE_PING_INTERVAL: {KEEP_ALIVE_PING_INTERVAL}')
     except:
-        KEEP_ALIVE_PING_INTERVAL = 2 #seconds
+        KEEP_ALIVE_PING_INTERVAL = 2 # seconds
     try:
         KEEP_ALIVE_CLIENT_TIMEOUT = keep_alive_section.getint('client_timeout')
         logger.debug(f'WU >>> KEEP_ALIVE_CLIENT_TIMEOUT: {KEEP_ALIVE_CLIENT_TIMEOUT}')
     except:
-        KEEP_ALIVE_CLIENT_TIMEOUT = 3 #seconds
+        KEEP_ALIVE_CLIENT_TIMEOUT = 3 # seconds
     
     parser = argparse.ArgumentParser(description=('-=|- The Wookiee Unicaster -|=- Relays UDP packets between a private host '
                                                   'and multiple remote peers by leveraging a public IP(v4) address. '
@@ -583,26 +583,26 @@ if __name__ == "__main__":
     
     optional.add_argument('-h', '--help', action='help', help='show this help message and exit')
     optional.add_argument('-p', '--peers', help='Number of remote peers. Is only useful for client-server UDP implementations.', 
-                          default=REMOTE_PEERS_DEFAULT)
+                          default=str(REMOTE_PEERS_DEFAULT))
     optional.add_argument('-s', '--sourceip', help='Source IP address. Only needed in client mode.')
     optional.add_argument('-d', '--destip', help='Destination IP address. Only needed in client mode.')
     optional.add_argument('-i', '--iport', help='Port on which the server will listen for incoming UDP packets from remote peers.')
     optional.add_argument('-o', '--oport', help='End relay port. Only needed in client mode.')
     optional.add_argument('--server-relay-base-port', help=('Base port in the range used for packet relaying on both server and client. '
                                                           f'Defaults to {SERVER_RELAY_BASE_PORT_DEFAULT} if unspecified.'), 
-                          default=SERVER_RELAY_BASE_PORT_DEFAULT)
+                          default=str(SERVER_RELAY_BASE_PORT_DEFAULT))
     optional.add_argument('--client-relay-base-port', help=('Base port in the range used as source for endpoint relaying on the client. '
                                                           f'Defaults to {CLIENT_RELAY_BASE_PORT_DEFAULT} if unspecified.'), 
-                          default=CLIENT_RELAY_BASE_PORT_DEFAULT)
+                          default=str(CLIENT_RELAY_BASE_PORT_DEFAULT))
     optional.add_argument('-q', '--quiet', help='Disable all logging output.', action='store_true')
     
     args = parser.parse_args()
     
-    #disable all logging in quiet mode
+    # disable all logging in quiet mode
     if args.quiet:
         logging.disable(logging.CRITICAL)
     
-    #input validation
+    # input validation
     if args.mode == 'server':
         if args.iport is None:
             logger.critical('WU >>> Server mode requires setting --iport')
@@ -623,13 +623,13 @@ if __name__ == "__main__":
     
     wookiee_mode = args.mode
     
-    #use the interface name on Linux and fallback to local IP value on Windows
+    # use the interface name on Linux and fallback to local IP value on Windows
     if args.interface is not None:
-        #the interface name will only be used in socket operations 
-        #and the API expects a byte sequence, not a string
+        # the interface name will only be used in socket operations 
+        # and the API expects a byte sequence, not a string
         intf = bytes(args.interface, 'utf-8')
         logger.debug(f'WU >>> intf: {args.interface}')
-        #determine the local_ip based on the network interface name
+        # determine the local_ip based on the network interface name
         local_ip_query_subprocess = subprocess.Popen(''.join(('ifconfig ', args.interface, ' | grep -w inet | awk \'{print $2;}\'')), 
                                                      shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         local_ip = local_ip_query_subprocess.communicate()[0].decode('utf-8').strip()
@@ -641,7 +641,7 @@ if __name__ == "__main__":
         intf = None
         
         try:
-            #test to see if the provided string is a valid IP address
+            # test to see if the provided string is a valid IP address
             ipaddress.ip_address(args.localip)
             local_ip = args.localip
         except ValueError:
@@ -649,7 +649,7 @@ if __name__ == "__main__":
             raise SystemExit(7)
     
     logger.debug(f'WU >>> Local IP address is: {local_ip}')
-    #the number of remote peers (defaults to 1 if otherwise unspecified)
+    # the number of remote peers (defaults to 1 if otherwise unspecified)
     try:
         peers = int(args.peers)
         logger.debug(f'WU >>> peers: {peers}')
@@ -661,12 +661,12 @@ if __name__ == "__main__":
     except ValueError:
         logger.critical('WU >>> Invalid number of peers specified.')
         raise SystemExit(8)
-    #the actual source_ip will be determined dynamically by the server
+    # the actual source_ip will be determined dynamically by the server
     try:
         if wookiee_mode == 'server':
             source_ip = None
         else:
-            #test to see if the provided string is a valid IP address
+            # test to see if the provided string is a valid IP address
             ipaddress.ip_address(args.sourceip)
             source_ip = args.sourceip
         
@@ -674,12 +674,12 @@ if __name__ == "__main__":
     except ValueError:
         logger.critical(f'Invalid source IP {args.sourceip}. Please retry with a valid IP address.')
         raise SystemExit(9)
-    #the destination ip will be determined dynamically by the server
+    # the destination ip will be determined dynamically by the server
     try:
         if wookiee_mode == 'server':
             destination_ip = None
         else:
-            #test to see if the provided string is a valid IP address
+            # test to see if the provided string is a valid IP address
             ipaddress.ip_address(args.destip)
             destination_ip = args.destip
         
@@ -687,51 +687,51 @@ if __name__ == "__main__":
     except ValueError:
         logger.critical(f'Invalid destination IP {args.destip}. Please retry with a valid IP address.')
         raise SystemExit(10)
-    #determine the value of the server relay port (can be passed as a parameter)
+    # determine the value of the server relay port (can be passed as a parameter)
     try:
         SERVER_RELAY_BASE_PORT = int(args.server_relay_base_port)
         logger.debug(f'WU >>> SERVER_RELAY_BASE_PORT: {SERVER_RELAY_BASE_PORT}')
         
-        if SERVER_RELAY_BASE_PORT < PORTS_RANGE_LOW_BOUND or SERVER_RELAY_BASE_PORT > PORTS_RANGE_HIGH_BOUND - peers:
+        if SERVER_RELAY_BASE_PORT < PORTS_RANGE[0] or SERVER_RELAY_BASE_PORT > PORTS_RANGE[1] - peers:
             logger.critical('WU >>> Invalid server relay base port specified.')
             raise SystemExit(11)
     except ValueError:
         logger.critical('WU >>> Invalid server relay base port specified.')
         raise SystemExit(11)
-    #determine the value of the server relay port (can be passed as a parameter)
+    # determine the value of the server relay port (can be passed as a parameter)
     try:
         CLIENT_RELAY_BASE_PORT = int(args.client_relay_base_port)
         logger.debug(f'WU >>> CLIENT_RELAY_BASE_PORT: {CLIENT_RELAY_BASE_PORT}')
         
-        if CLIENT_RELAY_BASE_PORT < PORTS_RANGE_LOW_BOUND or CLIENT_RELAY_BASE_PORT > PORTS_RANGE_HIGH_BOUND - peers:
+        if CLIENT_RELAY_BASE_PORT < PORTS_RANGE[0] or CLIENT_RELAY_BASE_PORT > PORTS_RANGE[1] - peers:
             logger.critical('WU >>> Invalid client relay base port specified.')
             raise SystemExit(12)
     except ValueError:
         logger.critical('WU >>> Invalid client relay base port specified.')
         raise SystemExit(12)
-    #the client will use the SERVER_RELAY_BASE_PORT as source
+    # the client will use the SERVER_RELAY_BASE_PORT as source
     try:
         source_port = int(args.iport) if wookiee_mode == 'server' else SERVER_RELAY_BASE_PORT
         logger.debug(f'WU >>> source_port: {source_port}')
         
-        if source_port < PORTS_RANGE_LOW_BOUND or source_port > PORTS_RANGE_HIGH_BOUND:
+        if source_port < PORTS_RANGE[0] or source_port > PORTS_RANGE[1]:
             logger.critical('WU >>> Invalid source port specified.')
             raise SystemExit(13)
     except ValueError:
         logger.critical('WU >>> Invalid source port specified.')
         raise SystemExit(13)
-    #the server will not need a destination port (its "destination" will be the relay port)
+    # the server will not need a destination port (its 'destination' will be the relay port)
     try:
         destination_port = CLIENT_RELAY_BASE_PORT if wookiee_mode == 'server' else int(args.oport)
         logger.debug(f'WU >>> destination_port: {destination_port}')
 
-        if destination_port < PORTS_RANGE_LOW_BOUND or destination_port > PORTS_RANGE_HIGH_BOUND:
+        if destination_port < PORTS_RANGE[0] or destination_port > PORTS_RANGE[1]:
             logger.critical('WU >>> Invalid destination port specified.')
             raise SystemExit(14)
     except ValueError:
         logger.critical('WU >>> Invalid destination port specified.')
         raise SystemExit(14)
-    #the relay port will be used internally for UDP packet forwarding
+    # the relay port will be used internally for UDP packet forwarding
     relay_port = SERVER_RELAY_BASE_PORT if wookiee_mode == 'server' else CLIENT_RELAY_BASE_PORT
     logger.debug(f'WU >>> relay_port: {relay_port}')
     
@@ -819,14 +819,14 @@ if __name__ == "__main__":
     
     if wookiee_mode == 'server':
         sleep(THREAD_SPAWN_WAIT_INTERVAL)
-        #signal the main remote peer process that all child threads have been started
+        # signal the main remote peer process that all child threads have been started
         child_proc_started_event.set()
     
     try:
         wookie_peer_handler_exit_event.wait()
     
     except SystemExit:
-        #exceptions may happen here as well due to logger syncronization mayhem on shutdown
+        # exceptions may happen here as well due to logger syncronization mayhem on shutdown
         try:
             if wookiee_mode == 'server':
                 remote_peer_worker_exit_event.set()
