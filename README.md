@@ -85,7 +85,7 @@ What about it? I expect the Wookiee Unicaster to work on macOS as well, but your
 
 ### Does every UDP-based Direct IP multiplayer game out there work?
 
-In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their multiplayer code on a client-server model will work with the maximum number of possible players, as advertised by the game.
+In theory, yes, however there are some limitations. Some games require a direct line of sight between all peers joining a game (i.e. fully connected mesh topology) and will not work with more than one remote peer in this case. Sadly, you will still need to use a VPN for anything other than 1 vs 1 matches in those games. Other games that structure their multiplayer code on a client-server model (i.e. hub-and-spoke topology) will work with the maximum number of possible players, as advertised by the game.
 
 To be more specific, based on the game list above, here is how things stand:
 
@@ -150,7 +150,7 @@ Such games won't need "tricks" like the Wookiee Unicaster, because you can simpl
 
 UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experienced this firsthand, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP. I've even tried to disable TCP's Nagle algorithm by setting the SCTP_NODELAY to 0, but that hasn't helped much. In case you want to try encapsulating for yourself, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel
 
-### Are there games that use both TCP and UPD?
+### Are there games that use both TCP and UDP?
 
 Why yes. Some even intermittently switch between the two on the same port, for some reason. A combination of TCP port forwarding and The Wookiee Unicaster can cater for these situations. See the provided sample setup script for some examples on how to handle this sort of madness.
 
