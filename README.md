@@ -17,17 +17,28 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Baldur's Gate - Enhanced Edition
 * Baldur's Gate II - Enhanced Edition
 * Civilization IV (& Addons, including "Colonization")
+* Daikatana
 * Deus Ex
 * Divinity Original Sin - Enhanced Edition
+* Doom 3
 * Empire Earth II
+* Empire Earth III
+* Empires: Dawn of the Modern World
 * Factorio
+* Haegemonia: Legions of Iron
+* Haegemonia: The Solon Heritage
 * Hammerwatch
-* Icewind Dale - Enhanced Edition 
+* Icewind Dale - Enhanced Edition
+* Iron Storm
+* I.G.I.-2: Covert Strike
+* Jazz Jackrabbit 2 (& Plus/JJ2+) 
 * Kohan: Immortal Sovereigns / Ahriman's Gift
 * Kohan II: Kings of War
 * Medal of Honor: Allied Assault (& Addons)
 * Neverwinter Nights - Enhanced Edition
+* Quake II (+ The Reckoning/Ground Zero)
 * Quake III Arena (+ Team Arena)
+* Quake 4
 * Red Faction
 * Return to Castle Wolfenstein
 * Scrapland (Remastered)
@@ -88,17 +99,29 @@ To be more specific, based on the game list above, here is how things stand:
 | Baldur's Gate - Enhanced Edition | **6 players** | 🟢 | |
 | Baldur's Gate II - Enhanced Edition | **6 players** | 🟢 | |
 | Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
+| Daikatana | **32 players** | 🟢 | |
 | Deus Ex | **16 players** | 🟢 | |
 | Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
-| Empire Earth II  | **10 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Doom 3 | **4 players** | 🟢 | |
+| Empire Earth II | **10 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Empire Earth III | **8 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Empires: Dawn of the Modern World | **8 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
 | Factorio | **"Unlimited" players** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **32** or so |
 | Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
+| Haegemonia: Legions of Iron | **8 players** | 🟢 | Manually enter the <public_ip> then press "Join Game" |
+| Haegemonia: The Solon Heritage | **8 players** | 🟢 | Manually enter the <public_ip> then press "Join Game" |
+| Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
 | Icewind Dale - Enhanced Edition | **6 players** | 🟢 | |
+| Iron Storm | **16 players** | 🟢 | |
+| I.G.I.-2: Covert Strike | **2 players** | 🔴 | Seems to work fine with only 2 players, but the game's netcode is generally unstable |
+| Jazz Jackrabbit 2 (& Plus/JJ2+) | **8 players** | 🟢 | Up to 4 players can play in splitscreen on a single peer, for a total of **32** players |
 | Kohan: Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
 | Kohan II: Kings of War | **12 players** | 🟢 | |
 | Medal of Honor: Allied Assault (& Addons) | **32 players** | 🟢 | |
 | Neverwinter Nights - Enhanced Edition | **6 players** (in theory) | 🟡 | Multiplayer is protected by a CD-key check and multiple peers with the same key aren't allowed on a server (was unable to test the LOS limitation) |
+| Quake II (+ The Reckoning/Ground Zero) | **16 players** | 🟢 | Enter the <public_ip> in the addres book and then refresh the server list |
 | Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter <public_ip> |
+| Quake 4 | **16 players** | 🟢 | Use "Join IP Address" to enter <public_ip> |
 | Red Faction | **32 players** | 🟢 | Use "Add Server" and enter <public_ip>:7755 to join |
 | Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Scrapland (Remastered) | **16 players** | 🟢 | |
@@ -126,6 +149,10 @@ Any IaaS vendor out there will provide a public IP with a Linux IaaS instance. J
 Such games won't need "tricks" like the Wookiee Unicaster, because you can simply sort them out by using remote port forwarding with SSH/Putty. More details here: https://phoenixnap.com/kb/ssh-port-forwarding
 
 UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides support for TCP traffic. There's the option to encapsulate UDP in TCP and using an SSH tunnel, by leveraging **nc** or **socat**, however that has the downside of breaking UDP packet boundaries, which causes serious hitches and general wonkiness with games - I've experienced this firsthand, which is why I decided to write a UDP packet forwarding utility to preserve the high performance and low latency of native UDP. I've even tried to disable TCP's Nagle algorithm by setting the SCTP_NODELAY to 0, but that hasn't helped much. In case you want to try encapsulating for yourself, here's a nice discussion on the topic, along with examples: https://superuser.com/questions/53103/udp-traffic-through-ssh-tunnel
+
+### Are there games that use both TCP and UPD?
+
+Why yes. Some even intermittently switch between the two on the same port, for some reason. A combination of TCP port forwarding and The Wookiee Unicaster can cater for these situations. See the provided sample setup script for some examples on how to handle this sort of madness.
 
 ### I still don't get it... can you draw it out for me?
 

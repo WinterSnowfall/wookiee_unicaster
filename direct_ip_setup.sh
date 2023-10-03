@@ -35,24 +35,49 @@ LOCAL_WU_NAME=$(basename $LOCAL_WU_PATH)
 # some games that use a client-server Direct IP approach will
 # work with the full number of advertised players, while P2P
 # implementations will only support the default of one remote peer
-# -> leave the value blank in order to set up one remote peer only
-# -> use "-p 3" to enable 3 remote peers, for a total of 4 players
-WU_REMOTE_PEERS=""
+# use "-p 3" to enable 3 remote peers, for a total of 4 players
+WU_REMOTE_PEERS="-p 1"
 # ports that will be open for WU internal relaying of traffic
-# use "23001" for one remote peer, and a range such as "23001:23003" 
+# use "23001" for one remote peer, and a range, such as "23001:23003", 
 # for 3 remote peers
 WU_RELAY_PORT_RANGE="23001"
 # local LAN interface name
 LAN_INTF_NAME="enp1s0"
 # local IP - this is where the game server needs to run, as all remote peers
 # connecting via the public IP will be forwarded to this address
-LOCAL_PRIVATE_IP=$(ifconfig $LAN_INTF_NAME | grep -w inet | awk '{print $2}')
+LOCAL_PRIVATE_IP=$(ifconfig $LAN_INTF_NAME 2>/dev/null | grep -w inet | awk '{print $2}')
 #
 #################################################################################
 
+# can only ever happen if an invalid LAN_INTF_NAME is used
+if [ -z $LOCAL_PRIVATE_IP ]
+then
+    echo "Unable to detect local IP address. Check the LAN_INFT_NAME parameter and retry."
+    exit 1
+fi
+
+if [ $(echo $WU_RELAY_PORT_RANGE | grep ":" | wc -l) -eq 0 ]
+then
+    # error out in case more than one peer is set for a single relay port
+    if [ ${WU_REMOTE_PEERS:0-1} -gt 1 ]
+    then
+        echo "The specified number of WU_REMOTE_PEERS doesn't match the WU_RELAY_PORT_RANGE."
+        exit 2
+    fi
+else
+    # split the WU_RELAY_PORT_RANGE in its two edge values for validation
+    WU_RELAY_PORT_RANGE_VALIDATION=($(echo $WU_RELAY_PORT_RANGE | tr ":" "\n"))
+    # the relay port range difference + 1 needs to coincide with the number of remote peers
+    if [ ! ${WU_REMOTE_PEERS:0-1} -eq $(expr ${WU_RELAY_PORT_RANGE_VALIDATION[1]} - ${WU_RELAY_PORT_RANGE_VALIDATION[0]} + 1) ]
+    then
+        echo "The specified number of WU_REMOTE_PEERS doesn't match the WU_RELAY_PORT_RANGE."
+        exit 2
+    fi
+fi
+
 start_tcp_forwarding () {
     ssh $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP "$REMOTE_SSH_SUDO ufw allow $1/tcp" > /dev/null 2>&1
-    ssh -fNT -R $1:$LOCAL_PRIVATE_IP:$1 $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP
+    ssh -fNT -R $1:$LOCAL_PRIVATE_IP:$1 $REMOTE_SSH_USER@$REMOTE_PUBLIC_IP > /dev/null 2>&1
 }
 
 start_udp_forwarding () {
@@ -86,41 +111,51 @@ echo "#  (2)   Anno 1701 (+ The Sunken Dragon)                    #"
 echo "#  (3)   ARMA: Cold War Assault / ARMA / ARMA 2 (& Addons)  #"
 echo "#  (4)   Baldur's Gate / II - Enhanced Edition              #"
 echo "#  (5)   Civilization IV (& Addons)                         #"
-echo "#  (6)   Deus Ex                                            #"
-echo "#  (7)   Divinity Original Sin - Enhanced Edition           #"
-echo "#  (8)   Empire Earth II                                    #"
-echo "#  (9)   Factorio                                           #"
-echo "#  (10)  Hammerwatch                                        #"
-echo "#  (11)  Icewind Dale - Enhanced Edition                    #"
-echo "#  (12)  Kohan: Immortal Sovereigns / Ahriman's Gift        #"
-echo "#  (13)  Kohan II: Kings of War                             #"
-echo "#  (14)  Medal of Honor: Allied Assault (& Addons)          #"
-echo "#  (15)  Mobile Forces                                      #"
-echo "#  (16)  Neverwinter Nights - Enhanced Edition              #"
-echo "#  (17)  OpenTTD                                            #"
-echo "#  (18)  Pandora: First Contact (+ Eclipse of Nashira)      #"
-echo "#  (19)  Quake III Arena (+ Team Arena)                     #"
-echo "#  (20)  Red Faction                                        #"
-echo "#  (21)  Return to Castle Wolfenstein                       #"
-echo "#  (22)  Scrapland (Remastered)                             #"
-echo "#  (23)  Sins of a Solar Empire: Rebellion                  #"
-echo "#  (24)  Soldier of Fortune 2                               #"
-echo "#  (25)  Star Trek: Voyager - Elite Force (Holomatch)       #"
-echo "#  (26)  Star Trek: Elite Force II                          #"
-echo "#  (27)  Star Wars: Jedi Knight - Jedi Academy              #"
-echo "#  (28)  Star Wars: Jedi Knight II                          #"
-echo "#  (29)  Star Wars: Republic Commando                       #"
-echo "#  (30)  Stardew Valley                                     #"
-echo "#  (31)  Supreme Commander (+ Forged Alliance)              #"
-echo "#  (32)  SWAT 4 (+ The Stetchkov Syndicate)                 #"
-echo "#  (33)  The Wheel of Time                                  #"
-echo "#  (34)  Tom Clancy's Ghost Recon                           #"
-echo "#  (35)  Unreal / Unreal Tournament '99 / 2004              #"
-echo "#  (36)  War for the Overworld                              #"
-echo "#  (37)  Warhammer 40,000 Gladius - Relics of War           #"
-echo "#  (38)  Windward                                           #"
-echo "#  (39)  World in Conflict (+ Soviet Assault)               #"
-echo "#  (40)  Worms Armageddon                                   #"
+echo "#  (6)   Daikatana                                          #"
+echo "#  (7)   Deus Ex                                            #"
+echo "#  (8)   Divinity Original Sin - Enhanced Edition           #"
+echo "#  (9)   Doom 3                                             #"
+echo "#  (10)  Empire Earth II / III                              #"
+echo "#  (11)  Empires: Dawn of the Modern World                  #"
+echo "#  (12)  Factorio                                           #"
+echo "#  (13)  Haegemonia: Legions of Iron                        #"
+echo "#  (14)  Haegemonia: The Solon Heritage                     #"
+echo "#  (15)  Hammerwatch                                        #"
+echo "#  (16)  Icewind Dale - Enhanced Edition                    #"
+echo "#  (17)  Iron Storm                                         #"
+echo "#  (18)  I.G.I.-2: Covert Strike                            #"
+echo "#  (19)  Jazz Jackrabbit 2 (& Plus/JJ2+)                    #"
+echo "#  (20)  Kohan: Immortal Sovereigns / Ahriman's Gift        #"
+echo "#  (21)  Kohan II: Kings of War                             #"
+echo "#  (22)  Medal of Honor: Allied Assault (& Addons)          #"
+echo "#  (23)  Mobile Forces                                      #"
+echo "#  (24)  Neverwinter Nights - Enhanced Edition              #"
+echo "#  (25)  OpenTTD                                            #"
+echo "#  (26)  Pandora: First Contact (+ Eclipse of Nashira)      #"
+echo "#  (27)  Quake II (+ The Reckoning/Ground Zero)             #"
+echo "#  (28)  Quake III Arena (+ Team Arena)                     #"
+echo "#  (29)  Quake 4                                            #"
+echo "#  (30)  Red Faction                                        #"
+echo "#  (31)  Return to Castle Wolfenstein                       #"
+echo "#  (32)  Scrapland (Remastered)                             #"
+echo "#  (33)  Sins of a Solar Empire: Rebellion                  #"
+echo "#  (34)  Soldier of Fortune 2                               #"
+echo "#  (35)  Star Trek: Voyager - Elite Force (Holomatch)       #"
+echo "#  (36)  Star Trek: Elite Force II                          #"
+echo "#  (37)  Star Wars: Jedi Knight - Jedi Academy              #"
+echo "#  (38)  Star Wars: Jedi Knight II                          #"
+echo "#  (39)  Star Wars: Republic Commando                       #"
+echo "#  (40)  Stardew Valley                                     #"
+echo "#  (41)  Supreme Commander (+ Forged Alliance)              #"
+echo "#  (42)  SWAT 4 (+ The Stetchkov Syndicate)                 #"
+echo "#  (43)  The Wheel of Time                                  #"
+echo "#  (44)  Tom Clancy's Ghost Recon                           #"
+echo "#  (45)  Unreal / Unreal Tournament '99 / 2004              #"
+echo "#  (46)  War for the Overworld                              #"
+echo "#  (47)  Warhammer 40,000 Gladius - Relics of War           #"
+echo "#  (48)  Windward                                           #"
+echo "#  (49)  World in Conflict (+ Soviet Assault)               #"
+echo "#  (50)  Worms Armageddon                                   #"
 echo "#                                                           #"
 echo "#############################################################"
 echo ""
@@ -130,237 +165,333 @@ case $GAME in
     1)
         # Age of Mythology (+ The Titans)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="2299"
+        UDP_PORT="2299"
         ;;
     2)
         # Anno 1701 (+ The Sunken Dragon)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="21701"
+        UDP_PORT="21701"
         ;;
     3)
         # ARMA: Cold War Assault / ARMA / ARMA 2 (& Addons)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="2302"
+        UDP_PORT="2302"
         ;;
     4)
         # Baldur's Gate / II - Enhanced Edition
         GAME_PROTOCOL="UDP"
-        GAME_PORT="47630"
+        UDP_PORT="47630"
         ;;
     5)
         # Civilization IV (& Addons)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="2056"
+        UDP_PORT="2056"
         ;;
     6)
-        # Deus Ex
+        # Daikatana
         GAME_PROTOCOL="UDP"
-        GAME_PORT="7790"
+        UDP_PORT="27992"
         ;;
     7)
-        # Divinity Original Sin - Enhanced Edition
+        # Deus Ex
         GAME_PROTOCOL="UDP"
-        GAME_PORT="23253"
+        UDP_PORT="7790"
         ;;
     8)
-        # Empire Earth II
+        # Divinity Original Sin - Enhanced Edition
         GAME_PROTOCOL="UDP"
-        GAME_PORT="26000"
+        UDP_PORT="23253"
         ;;
     9)
-        # Factorio
+        # Doom 3 (+ BFG Edition)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="34197"
+        UDP_PORT="27666"
         ;;
     10)
-        # Hammerwatch
+        # Empire Earth II / III
         GAME_PROTOCOL="UDP"
-        GAME_PORT="9995"
+        UDP_PORT="26000"
         ;;
     11)
-        # Icewind Dale - Enhanced Edition
-        GAME_PROTOCOL="UDP"
-        GAME_PORT="47630"
+        # Empires: Dawn of the Modern World
+        GAME_PROTOCOL="BOTH"
+        TCP_PORT="33335"
+        UDP_PORT="33321"
         ;;
     12)
-        # Kohan: Immortal Sovereigns / Ahriman's Gift
+        # Factorio
         GAME_PROTOCOL="UDP"
-        GAME_PORT="17437"
+        UDP_PORT="34197"
         ;;
     13)
-        # Kohan II: Kings of War
+        # Haegemonia: Legions of Iron
         GAME_PROTOCOL="UDP"
-        GAME_PORT="5860"
+        UDP_PORT="19664"
         ;;
     14)
-        # Medal of Honor: Allied Assault (& Addons)
-        GAME_PROTOCOL="UDP"
-        GAME_PORT="12203"
+        # Haegemonia: The Solon Heritage 
+        GAME_PROTOCOL="BOTH"
+        TCP_PORT="53324"
+        UDP_PORT="19664"
         ;;
     15)
-        # Mobile Forces
+        # Hammerwatch
         GAME_PROTOCOL="UDP"
-        GAME_PORT="7777"
+        UDP_PORT="9995"
         ;;
     16)
-        # Neverwinter Nights - Enhanced Edition
+        # Icewind Dale - Enhanced Edition
         GAME_PROTOCOL="UDP"
-        GAME_PORT="5121"
+        UDP_PORT="47630"
         ;;
     17)
-        # OpenTTD
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="3979"
+        # Iron Storm
+        GAME_PROTOCOL="BOTH"
+        TCP_PORT="3504"
+        UDP_PORT="3504"
         ;;
     18)
-        # Pandora: First Contact (+ Eclipse of Nashira)
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="6121"
+        # I.G.I.-2: Covert Strike 
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="26001"
         ;;
     19)
-        # Quake III Arena (+ Team Arena)
-        GAME_PROTOCOL="UDP"
-        GAME_PORT="27960"
+        # Jazz Jackrabbit 2 (& Plus/JJ2+)
+        GAME_PROTOCOL="BOTH"
+        TCP_PORT="10052"
+        UDP_PORT="10052"
         ;;
     20)
-        # Red Faction
+        # Kohan: Immortal Sovereigns / Ahriman's Gift
         GAME_PROTOCOL="UDP"
-        GAME_PORT="7755"
+        UDP_PORT="17437"
         ;;
     21)
-        # Return to Castle Wolfenstein
+        # Kohan II: Kings of War
         GAME_PROTOCOL="UDP"
-        GAME_PORT="27960"
+        UDP_PORT="5860"
         ;;
     22)
-        # Scrapland (Remastered)
+        # Medal of Honor: Allied Assault (& Addons)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="28086"
+        UDP_PORT="12203"
         ;;
     23)
-        # Sins of a Solar Empire: Rebellion
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="6112"
+        # Mobile Forces
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="7777"
         ;;
     24)
-        # Soldier of Fortune 2
+        # Neverwinter Nights - Enhanced Edition
         GAME_PROTOCOL="UDP"
-        GAME_PORT="20100"
+        UDP_PORT="5121"
         ;;
     25)
-        # Star Trek: Voyager - Elite Force (Holomatch)
-        GAME_PROTOCOL="UDP"
-        GAME_PORT="27960"
+        # OpenTTD
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="3979"
         ;;
     26)
-        # Star Trek: Elite Force II
-        GAME_PROTOCOL="UDP"
-        GAME_PORT="29253"
+        # Pandora: First Contact (+ Eclipse of Nashira)
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="6121"
         ;;
     27)
-        # Star Wars: Jedi Knight - Jedi Academy
+        # Quake II (+ The Reckoning/Ground Zero) 
         GAME_PROTOCOL="UDP"
-        GAME_PORT="29070"
+        UDP_PORT="27910"
         ;;
     28)
-        # Star Wars: Jedi Knight II
+        # Quake III Arena (+ Team Arena)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="28070"
+        UDP_PORT="27960"
         ;;
     29)
-        # Star Wars: Republic Commando
+        # Quake 4
         GAME_PROTOCOL="UDP"
-        GAME_PORT="7777"
+        UDP_PORT="28004"
         ;;
     30)
-        # Stardew Valley
+        # Red Faction
         GAME_PROTOCOL="UDP"
-        GAME_PORT="24642"
+        UDP_PORT="7755"
         ;;
     31)
-        # Supreme Commander (+ Forged Alliance)
+        # Return to Castle Wolfenstein
         GAME_PROTOCOL="UDP"
-        GAME_PORT="16010"
+        UDP_PORT="27960"
         ;;
     32)
-        # SWAT 4 (+ The Stetchkov Syndicate)
+        # Scrapland (Remastered)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="10480"
+        UDP_PORT="28086"
         ;;
     33)
-        # The Wheel of Time
-        GAME_PROTOCOL="UDP"
-        GAME_PORT="7777"
+        # Sins of a Solar Empire: Rebellion
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="6112"
         ;;
     34)
-        # Tom Clancy's Ghost Recon
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="2346"
+        # Soldier of Fortune 2
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="20100"
         ;;
     35)
-        # Unreal / Unreal Tournament '99 / 2004
+        # Star Trek: Voyager - Elite Force (Holomatch)
         GAME_PROTOCOL="UDP"
-        GAME_PORT="7777"
+        UDP_PORT="27960"
         ;;
     36)
-        # War for the Overworld
+        # Star Trek: Elite Force II
         GAME_PROTOCOL="UDP"
-        GAME_PORT="27015"
+        UDP_PORT="29253"
         ;;
     37)
-        # Warhammer 40,000 Gladius - Relics of War
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="6120"
+        # Star Wars: Jedi Knight - Jedi Academy
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="29070"
         ;;
     38)
-        # Windward
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="5127"
+        # Star Wars: Jedi Knight II
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="28070"
         ;;
     39)
-        # World in Conflict (+ Soviet Assault)
-        GAME_PROTOCOL="TCP"
-        GAME_PORT="48000"
+        # Star Wars: Republic Commando
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="7777"
         ;;
     40)
+        # Stardew Valley
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="24642"
+        ;;
+    41)
+        # Supreme Commander (+ Forged Alliance)
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="16010"
+        ;;
+    42)
+        # SWAT 4 (+ The Stetchkov Syndicate)
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="10480"
+        ;;
+    43)
+        # The Wheel of Time
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="7777"
+        ;;
+    44)
+        # Tom Clancy's Ghost Recon
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="2346"
+        ;;
+    45)
+        # Unreal / Unreal Tournament '99 / 2004
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="7777"
+        ;;
+    46)
+        # War for the Overworld
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="27015"
+        ;;
+    47)
+        # Warhammer 40,000 Gladius - Relics of War
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="6120"
+        ;;
+    48)
+        # Windward
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="5127"
+        ;;
+    49)
+        # World in Conflict (+ Soviet Assault)
+        GAME_PROTOCOL="TCP"
+        TCP_PORT="48000"
+        ;;
+    50)
         # Worms Armageddon
         GAME_PROTOCOL="TCP"
-        GAME_PORT="17011"
+        TCP_PORT="17011"
         ;;
     *)
-        read -p ">>> Select forwarding protcol (TCP or UDP): " GAME_PROTOCOL
-        read -p ">>> Select forwarding port: " GAME_PORT
-
-        if ! [[ "$GAME_PORT" =~ ^[0-9]+$ ]] || [ "$GAME_PORT" -lt 1024 -o "$GAME_PORT" -gt 65535 ]
+        read -p ">>> Select forwarding protcol (TCP, UDP or BOTH): " GAME_PROTOCOL
+        
+        case ${GAME_PROTOCOL^^} in
+            TCP)
+                read -p ">>> Select TCP forwarding port: " TCP_PORT
+                ;;
+            UDP)
+                read -p ">>> Select UDP forwarding port: " UDP_PORT
+                ;;
+            BOTH)
+                read -p ">>> Select TCP forwarding port: " TCP_PORT
+                read -p ">>> Select UDP forwarding port: " UDP_PORT
+                ;;
+            *)
+                echo ">>> Invalid protocol selection!"
+                exit 3
+                ;;
+        esac
+        
+        if [ ! -z "$TCP_PORT" ]
         then
-            echo ">>> Invalid port selection!"
-            exit 2
+            if ! [[ "$TCP_PORT" =~ ^[0-9]+$ ]] || [ "$TCP_PORT" -lt 1024 -o "$TCP_PORT" -gt 65535 ]
+            then
+                echo ">>> Invalid TCP port selection!"
+                exit 4
+            fi
         fi
+
+        if [ ! -z "$UDP_PORT" ]
+        then
+            if ! [[ "$UDP_PORT" =~ ^[0-9]+$ ]] || [ "$UDP_PORT" -lt 1024 -o "$UDP_PORT" -gt 65535 ]
+            then
+                echo ">>> Invalid UDP port selection!"
+                exit 5
+            fi
+        fi
+
         ;;
 esac
 
 case ${GAME_PROTOCOL^^} in
     TCP)
         # forward/tunnel ports through SSH based on the selected option
-        echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$GAME_PORT$DEFAULT
-        start_tcp_forwarding $GAME_PORT
+        echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$TCP_PORT$DEFAULT
+        start_tcp_forwarding $TCP_PORT
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
         echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
         read
-        stop_tcp_forwarding $GAME_PORT
+        stop_tcp_forwarding $TCP_PORT
         ;;
     UDP)
         # relay port traffic using the Wookiee Unicaster based on the selected option 
-        echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$GAME_PORT$DEFAULT
-        start_udp_forwarding $GAME_PORT
+        echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$UDP_PORT$DEFAULT
+        start_udp_forwarding $UDP_PORT
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "
         echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
         read
-        stop_udp_forwarding $GAME_PORT
+        stop_udp_forwarding $UDP_PORT
+        ;;
+    BOTH)
+        echo -e ">>> Setting up TCP relaying on port(s): "$BOLD$TCP_PORT$DEFAULT
+        start_tcp_forwarding $TCP_PORT
+        echo -en ">>> "$GREEN"DONE"$DEFAULT". "
+        echo -e $BLINK"!!! Press any key to terminate !!!"$DEFAULT
+        echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$UDP_PORT$DEFAULT
+        start_udp_forwarding $UDP_PORT
+        echo -en ">>> "$GREEN"DONE"$DEFAULT". "
+        echo -en $BLINK"!!! Press any key to terminate !!!"$DEFAULT
+        read
+        stop_tcp_forwarding $TCP_PORT
+        stop_udp_forwarding $UDP_PORT
         ;;
     *)
         echo ">>> Invalid protocol selection!"
-        exit 1
+        exit 3
         ;;
 esac
 
