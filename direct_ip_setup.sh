@@ -137,25 +137,27 @@ echo "#  (28)  Quake III Arena (+ Team Arena)                     #"
 echo "#  (29)  Quake 4                                            #"
 echo "#  (30)  Red Faction                                        #"
 echo "#  (31)  Return to Castle Wolfenstein                       #"
-echo "#  (32)  Scrapland (Remastered)                             #"
-echo "#  (33)  Sins of a Solar Empire: Rebellion                  #"
-echo "#  (34)  Soldier of Fortune 2                               #"
-echo "#  (35)  Star Trek: Voyager - Elite Force (Holomatch)       #"
-echo "#  (36)  Star Trek: Elite Force II                          #"
-echo "#  (37)  Star Wars: Jedi Knight - Jedi Academy              #"
-echo "#  (38)  Star Wars: Jedi Knight II                          #"
-echo "#  (39)  Star Wars: Republic Commando                       #"
-echo "#  (40)  Stardew Valley                                     #"
-echo "#  (41)  Supreme Commander (+ Forged Alliance)              #"
-echo "#  (42)  SWAT 4 (+ The Stetchkov Syndicate)                 #"
-echo "#  (43)  The Wheel of Time                                  #"
-echo "#  (44)  Tom Clancy's Ghost Recon                           #"
-echo "#  (45)  Unreal / Unreal Tournament '99 / 2004              #"
-echo "#  (46)  War for the Overworld                              #"
-echo "#  (47)  Warhammer 40,000 Gladius - Relics of War           #"
-echo "#  (48)  Windward                                           #"
-echo "#  (49)  World in Conflict (+ Soviet Assault)               #"
-echo "#  (50)  Worms Armageddon                                   #"
+echo "#  (32)  Rune Gold/Classic                                  #"
+echo "#  (33)  Scrapland (Remastered)                             #"
+echo "#  (34)  Sins of a Solar Empire: Rebellion                  #"
+echo "#  (35)  Soldier of Fortune                                 #"
+echo "#  (36)  Soldier of Fortune 2                               #"
+echo "#  (37)  Star Trek: Voyager - Elite Force (Holomatch)       #"
+echo "#  (38)  Star Trek: Elite Force II                          #"
+echo "#  (39)  Star Wars: Jedi Knight - Jedi Academy              #"
+echo "#  (40)  Star Wars: Jedi Knight II                          #"
+echo "#  (41)  Star Wars: Republic Commando                       #"
+echo "#  (42)  Stardew Valley                                     #"
+echo "#  (43)  Supreme Commander (+ Forged Alliance)              #"
+echo "#  (44)  SWAT 4 (+ The Stetchkov Syndicate)                 #"
+echo "#  (45)  The Wheel of Time                                  #"
+echo "#  (46)  Tom Clancy's Ghost Recon                           #"
+echo "#  (47)  Unreal / Unreal Tournament '99 / 2004              #"
+echo "#  (48)  War for the Overworld                              #"
+echo "#  (49)  Warhammer 40,000 Gladius - Relics of War           #"
+echo "#  (50)  Windward                                           #"
+echo "#  (51)  World in Conflict (+ Soviet Assault)               #"
+echo "#  (52)  Worms Armageddon                                   #"
 echo "#                                                           #"
 echo "#############################################################"
 echo ""
@@ -322,96 +324,106 @@ case $GAME in
         UDP_PORT="27960"
         ;;
     32)
+        # Rune Gold/Classic
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="7777"
+        ;;
+    33)
         # Scrapland (Remastered)
         GAME_PROTOCOL="UDP"
         UDP_PORT="28086"
         ;;
-    33)
+    34)
         # Sins of a Solar Empire: Rebellion
         GAME_PROTOCOL="TCP"
         TCP_PORT="6112"
         ;;
-    34)
+    35)
+        # Soldier of Fortune
+        GAME_PROTOCOL="UDP"
+        UDP_PORT="28910"
+        ;;
+    36)
         # Soldier of Fortune 2
         GAME_PROTOCOL="UDP"
         UDP_PORT="20100"
         ;;
-    35)
+    37)
         # Star Trek: Voyager - Elite Force (Holomatch)
         GAME_PROTOCOL="UDP"
         UDP_PORT="27960"
         ;;
-    36)
+    38)
         # Star Trek: Elite Force II
         GAME_PROTOCOL="UDP"
         UDP_PORT="29253"
         ;;
-    37)
+    39)
         # Star Wars: Jedi Knight - Jedi Academy
         GAME_PROTOCOL="UDP"
         UDP_PORT="29070"
         ;;
-    38)
+    40)
         # Star Wars: Jedi Knight II
         GAME_PROTOCOL="UDP"
         UDP_PORT="28070"
         ;;
-    39)
+    41)
         # Star Wars: Republic Commando
         GAME_PROTOCOL="UDP"
         UDP_PORT="7777"
         ;;
-    40)
+    42)
         # Stardew Valley
         GAME_PROTOCOL="UDP"
         UDP_PORT="24642"
         ;;
-    41)
+    43)
         # Supreme Commander (+ Forged Alliance)
         GAME_PROTOCOL="UDP"
         UDP_PORT="16010"
         ;;
-    42)
+    44)
         # SWAT 4 (+ The Stetchkov Syndicate)
         GAME_PROTOCOL="UDP"
         UDP_PORT="10480"
         ;;
-    43)
+    45)
         # The Wheel of Time
         GAME_PROTOCOL="UDP"
         UDP_PORT="7777"
         ;;
-    44)
+    46)
         # Tom Clancy's Ghost Recon
         GAME_PROTOCOL="TCP"
         TCP_PORT="2346"
         ;;
-    45)
+    47)
         # Unreal / Unreal Tournament '99 / 2004
         GAME_PROTOCOL="UDP"
         UDP_PORT="7777"
         ;;
-    46)
+    48)
         # War for the Overworld
         GAME_PROTOCOL="UDP"
         UDP_PORT="27015"
         ;;
-    47)
+    49)
         # Warhammer 40,000 Gladius - Relics of War
         GAME_PROTOCOL="TCP"
         TCP_PORT="6120"
         ;;
-    48)
+    50)
         # Windward
         GAME_PROTOCOL="TCP"
         TCP_PORT="5127"
         ;;
-    49)
+    51)
         # World in Conflict (+ Soviet Assault)
         GAME_PROTOCOL="TCP"
         TCP_PORT="48000"
         ;;
-    50)
+    52)
         # Worms Armageddon
         GAME_PROTOCOL="TCP"
         TCP_PORT="17011"

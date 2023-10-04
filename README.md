@@ -41,7 +41,9 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Quake 4
 * Red Faction
 * Return to Castle Wolfenstein
+* Rune Gold/Classic
 * Scrapland (Remastered)
+* Soldier of Fortune
 * Soldier of Fortune 2
 * Star Trek: Voyager - Elite Force (Holomatch)
 * Star Trek: Elite Force II
@@ -124,7 +126,9 @@ To be more specific, based on the game list above, here is how things stand:
 | Quake 4 | **16 players** | 🟢 | Use "Join IP Address" to enter <public_ip> |
 | Red Faction | **32 players** | 🟢 | Use "Add Server" and enter <public_ip>:7755 to join |
 | Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Rune Gold/Classic | **16 players** | 🟢 | Right click anywhere on the "LAN Servers" tab and use the "Open Location" option, then enter <public_ip> to join |
 | Scrapland (Remastered) | **16 players** | 🟢 | |
+| Soldier of Fortune | **32 players** | 🟢 | Use "Advanced" to enter <public_ip> under "Connect Directly to IP"  |
 | Soldier of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
 | Star Trek: Voyager - Elite Force (Holomatch) | **12 players** | 🟢 | |
 | Star Trek: Elite Force II | **32 players** | 🟢 | |
