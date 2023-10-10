@@ -115,7 +115,7 @@ To be more specific, based on the game list above, here is how things stand:
 | Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
 | Icewind Dale - Enhanced Edition | **6 players** | 🟢 | |
 | Iron Storm | **16 players** | 🟢 | |
-| I.G.I.-2: Covert Strike | **2 players** | 🔴 | Seems to work fine with only 2 players, but the game's netcode is generally unstable |
+| I.G.I.-2: Covert Strike | **2 players** | 🟡 | The games enforces broken CD authentication checks on remote peer joins even for LAN play (was unable to test the LOS limitation) |
 | Jazz Jackrabbit 2 (& Plus/JJ2+) | **8 players** | 🟢 | Up to 4 players can play in splitscreen on a single peer, for a total of **32** players |
 | Kohan: Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
 | Kohan II: Kings of War | **12 players** | 🟢 | |
