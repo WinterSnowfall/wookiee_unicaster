@@ -61,9 +61,9 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 
 ### UDP traffic over the internet? Is that... safe?
 
-No. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unencrypted traffic over the internet (including Direct IP UDP multiplayer without using the Wookiee Unicaster, assuming the game host has an ISP-provided public IP already), although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall.
+Not really. Use it at your own risk. Most games will not encrypt their UDP traffic, so you'll be running cleartext exchanges over the internet as if it were your LAN. Mind you this is just game data, so nothing all that critical, but especially older DirectPlay-based games are not to be considered examples of good network security practices. In essence it's not more unsafe than any other form of unencrypted traffic over the internet (including Direct IP UDP multiplayer without using the Wookiee Unicaster, assuming the game host has an ISP-provided public IP already), although some of the ancient game code that's out there can potentially be exploited to get nasty stuff onto your system even if you are behind a firewall.
 
-Since the Wookiee Unicaster only handles end-to-end traffic between the relay server and the game server, it can't offer a solution to this problem, like a VPN can, even if it were to encrypt the traffic it is relaying. If you are deeply worried about security, it's probably best to stick with a VPN, which typically does encrypt all traffic going over its interfaces, even if the games you are using it for do not.
+Since the Wookiee Unicaster only handles end-to-end traffic between the relay server and the game server, it can't offer a solution to this problem, like a VPN can, even if it were to encrypt the traffic it is relaying. If you are deeply worried about security, it's probably best to stick with a VPN, which typically encrypts all traffic going over its interfaces, even if the games you are using it for do not.
 
 That being said, will your system get hacked into if you occasionally play an Anno 1701 match over the internet with the Wookiee Unicaster (or even without it)? Probably not. But caveat emptor, since I have no desire or interest to sugar coat the situation and everyone should be aware of the risks.
 
@@ -144,9 +144,9 @@ To be more specific, based on the game list above, here is how things stand:
 | Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip> |
 | War for the Overworld | **4 players** | 🟢 | |
 
-### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
+### What about games with DirectPlay multiplayer that have Direct IP support?
 
-Any IaaS vendor out there will provide a public IP with a Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
+So, you've noticed a distinct lack of DirectPlay games in the list above, eh? You've got a sharp eye. Testing these under Linux is nearly impossible due to non-existent DirectPlay support in Wine (the directplay winetrick will make things work however, if you're inclined to use it), but on Windows I expect the Wookiee Unicaster to work quite well with any DirectPlay games relying on UDP. Just be careful when using this now ancient and very insecure network middleware to exchange data over the internet.
 
 ### What about Direct IP games that support TCP?
 
@@ -186,7 +186,11 @@ Remote Peer N         :
 
 The client can actually be run on a different host, not the computer where the game server is running, however that other host will need to be in the same LAN as the game server and UDP traffic must flow freely between them. This will add to the overall link latency, and is generally not recommended if it can be avoided.
 
-Also, please don't use wireless networks in these situations and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of Ethernet traffic, though it does employ some buffering.
+Also, please don't use shoddy wireless networks in these situations and expect good performance - the Wookiee Unicaster can't magically sort out any slowdowns caused by suboptimal routing of Ethernet traffic, though it does employ some buffering.
+
+### OK, but how do I get access to a public IP? It's not like they grow on trees, you know...
+
+Any IaaS vendor out there will provide a public IP with a Linux IaaS instance. Just pick whatever fits your needs and is cheapest. I'm using an Ubuntu "Nanode" from [Linode](https://www.linode.com/).
 
 ### How does it work?
 
