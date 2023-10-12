@@ -59,6 +59,7 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Supreme Commander (+ Forged Alliance)
 * SWAT 4 (+ The Stetchkov Syndicate)
 * The Wheel of Time
+* Turok 2: Seeds of Evil (Remastered)
 * Unreal (+ Return to Na Pali)
 * Unreal Tournament '99
 * Unreal Tournament 2004
@@ -151,6 +152,7 @@ To be more specific, based on the game list above, here is how things stand:
 | Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
 | SWAT 4 (+ The Stetchkov Syndicate) | **16 players** | 🟢 | |
 | The Wheel of Time | **16 players** | 🟢 | The host will need to launch a dedicated server first. All peers, including the host, must use "Favorites", then right click anywhere on the screen, select "New Favorite", enter the <public_ip> and a description, then double click on the created item to connect (ping being shown as 9999 and players as 0/0 is irrelevant, the connection should work).  |
+| Turok 2: Seeds of Evil (Remastered) | **16 players** | 🟢 | |
 | Unreal (+ Return to Na Pali) | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
 | Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
 | Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter the <public_ip> |
