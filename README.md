@@ -31,11 +31,14 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Icewind Dale - Enhanced Edition
 * Iron Storm
 * I.G.I.-2: Covert Strike
-* Jazz Jackrabbit 2 (& Plus/JJ2+) 
+* Jazz Jackrabbit 2 (& Plus/JJ2+)
+* Kingpin: Life of Crime
 * Kohan: Immortal Sovereigns / Ahriman's Gift
 * Kohan II: Kings of War
 * Medal of Honor: Allied Assault (& Addons)
 * Neverwinter Nights - Enhanced Edition
+* Painkiller (+ Black Edition)
+* Painkiller: Overdose
 * Quake II (+ The Reckoning/Ground Zero)
 * Quake III Arena (+ Team Arena)
 * Quake 4
@@ -43,6 +46,8 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Return to Castle Wolfenstein
 * Rune Gold/Classic
 * Scrapland (Remastered)
+* SiN (+ Wages of Sin)
+* Seven Kingdoms: Ancient Adversaries
 * Soldier of Fortune
 * Soldier of Fortune 2
 * Star Trek: Voyager - Elite Force (Holomatch)
@@ -58,6 +63,8 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Unreal Tournament '99
 * Unreal Tournament 2004
 * War for the Overworld
+* Warhammer 40,000: Fire Warrior
+* Wolfenstein: Enemy Territory
 
 ### UDP traffic over the internet? Is that... safe?
 
@@ -117,23 +124,28 @@ To be more specific, based on the game list above, here is how things stand:
 | Iron Storm | **16 players** | 🟢 | |
 | I.G.I.-2: Covert Strike | **16 players** (in theory) | 🟡 | The games enforces broken CD authentication checks on remote peer joins even for LAN play (was unable to test the LOS limitation) |
 | Jazz Jackrabbit 2 (& Plus/JJ2+) | **8 players** | 🟢 | Up to 4 players can play in splitscreen on a single peer, for a total of **32** players |
+| Kingpin: Life of Crime | **16 players** | 🟢 | Enter the <public_ip> in the address book and then refresh the server list |
 | Kohan: Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
 | Kohan II: Kings of War | **12 players** | 🟢 | |
 | Medal of Honor: Allied Assault (& Addons) | **32 players** | 🟢 | |
 | Neverwinter Nights - Enhanced Edition | **6 players** (in theory) | 🟡 | Multiplayer is protected by a CD-key check and multiple peers with the same key aren't allowed on a server (was unable to test the LOS limitation) |
-| Quake II (+ The Reckoning/Ground Zero) | **16 players** | 🟢 | Enter the <public_ip> in the addres book and then refresh the server list |
-| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter <public_ip> |
-| Quake 4 | **16 players** | 🟢 | Use "Join IP Address" to enter <public_ip> |
+| Painkiller (+ Black Edition) | **16 players** | 🟢 | Fill in the <public_ip> under "Enter IP" to join |
+| Painkiller: Overdose | **16 players** | 🟢 | Fill in the <public_ip> under "Enter IP" to join |
+| Quake II (+ The Reckoning/Ground Zero) | **16 players** | 🟢 | Enter the <public_ip> in the address book and then refresh the server list |
+| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter the <public_ip> |
+| Quake 4 | **16 players** | 🟢 | Use "Join IP Address" to enter the <public_ip> |
 | Red Faction | **32 players** | 🟢 | Use "Add Server" and enter <public_ip>:7755 to join |
-| Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
-| Rune Gold/Classic | **16 players** | 🟢 | Right click anywhere on the "LAN Servers" tab and use the "Open Location" option, then enter <public_ip> to join |
+| Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
+| Rune Gold/Classic | **16 players** | 🟢 | Right click anywhere on the "LAN Servers" tab and use the "Open Location" option, then enter the <public_ip> to join |
 | Scrapland (Remastered) | **16 players** | 🟢 | |
-| Soldier of Fortune | **32 players** | 🟢 | Use "Advanced" to enter <public_ip> under "Connect Directly to IP"  |
-| Soldier of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| SiN (+ Wages of Sin) | **16 players** | 🟢 | Enter the <public_ip> in the server address book and then refresh the server list |
+| Seven Kingdoms: Ancient Adversaries | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start properly with more than one remote peer due to the lack of inter-peer connectivity |
+| Soldier of Fortune | **32 players** | 🟢 | Use "Advanced" to enter the <public_ip> under "Connect Directly to IP"  |
+| Soldier of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
 | Star Trek: Voyager - Elite Force (Holomatch) | **12 players** | 🟢 | |
 | Star Trek: Elite Force II | **32 players** | 🟢 | |
-| Star Wars: Jedi Knight - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
-| Star Wars: Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars: Jedi Knight - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars: Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
 | Star Wars: Republic Commando | **8 players** | 🟢 | The host must start a game using "Create Internet Game", otherwise some remote peers may be auto-kicked with key validation errors (happens with the GOG version of the game) |
 | Stardew Valley | **4 players** | 🟢 | |
 | Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
@@ -141,8 +153,10 @@ To be more specific, based on the game list above, here is how things stand:
 | The Wheel of Time | **16 players** | 🟢 | The host will need to launch a dedicated server first. All peers, including the host, must use "Favorites", then right click anywhere on the screen, select "New Favorite", enter the <public_ip> and a description, then double click on the created item to connect (ping being shown as 9999 and players as 0/0 is irrelevant, the connection should work).  |
 | Unreal (+ Return to Na Pali) | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
 | Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
-| Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter <public_ip> |
+| Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter the <public_ip> |
 | War for the Overworld | **4 players** | 🟢 | |
+| Warhammer 40,000: Fire Warrior | **2 players** | 🔴 | Only one remote player can join the lobby, due to the lack of inter-peer connectivity. Any additional remote peers that try to join will error out. |
+| Wolfenstein: Enemy Territory | **64 players** | 🟢 | Use "Connect to IP" to enter the <public_ip> |
 
 ### What about games with DirectPlay multiplayer that have Direct IP support?
 
