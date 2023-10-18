@@ -16,7 +16,9 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * ARMA 2 (& Addons)
 * Baldur's Gate - Enhanced Edition
 * Baldur's Gate II - Enhanced Edition
+* Celtic Kings: Rage of War 
 * Civilization IV (& Addons, including "Colonization")
+* Codename: Panzers - Phase One / Two
 * Daikatana
 * Deus Ex
 * Divinity Original Sin - Enhanced Edition
@@ -24,6 +26,8 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Empire Earth II
 * Empire Earth III
 * Empires: Dawn of the Modern World
+* Etherlords
+* Etherlords II
 * Factorio
 * Haegemonia: Legions of Iron
 * Haegemonia: The Solon Heritage
@@ -31,22 +35,24 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * Icewind Dale - Enhanced Edition
 * Iron Storm
 * I.G.I.-2: Covert Strike
-* Jazz Jackrabbit 2 (& Plus/JJ2+)
+* Jazz Jackrabbit 2 (& Plus / JJ2+)
 * Kingpin: Life of Crime
 * Kohan: Immortal Sovereigns / Ahriman's Gift
 * Kohan II: Kings of War
 * Medal of Honor: Allied Assault (& Addons)
+* Mobile Forces
 * Neverwinter Nights - Enhanced Edition
 * Painkiller (+ Black Edition)
 * Painkiller: Overdose
-* Quake II (+ The Reckoning/Ground Zero)
+* Quake II (+ The Reckoning / Ground Zero)
 * Quake III Arena (+ Team Arena)
 * Quake 4
 * Red Faction
 * Return to Castle Wolfenstein
-* Rune Gold/Classic
+* Rune Gold / Classic
 * Scrapland (Remastered)
 * SiN (+ Wages of Sin)
+* Serious Sam: The First Encounter
 * Seven Kingdoms: Ancient Adversaries
 * Soldier of Fortune
 * Soldier of Fortune 2
@@ -60,6 +66,7 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * SWAT 4 (+ The Stetchkov Syndicate)
 * The Wheel of Time
 * Turok 2: Seeds of Evil (Remastered)
+* Tzar: The Burden of the Crown
 * Unreal (+ Return to Na Pali)
 * Unreal Tournament '99
 * Unreal Tournament 2004
@@ -99,70 +106,77 @@ In theory, yes, however there are some limitations. Some games require a direct 
 
 To be more specific, based on the game list above, here is how things stand:
 
-| Game Title | Maximum Number Of Players | Peer LOS Limitation | Comments |
-| --- | :-: | :-: | --- |
-| Age of Mythology (+ The Titans) | **12 players** | 🟢 | |
-| Anno 1701 (+The Sunken Dragon) | **4 players** | 🟢 | |
-| ARMA: Cold War Assault (Operation Flashpoint) | **16 players** | 🟢 | |
-| ARMA: Armed Assault (+ Queen's Gambit) | **60+ players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
-| ARMA 2 (& Addons) | **60+ players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
-| Baldur's Gate - Enhanced Edition | **6 players** | 🟢 | |
-| Baldur's Gate II - Enhanced Edition | **6 players** | 🟢 | |
-| Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
-| Daikatana | **32 players** | 🟢 | |
-| Deus Ex | **16 players** | 🟢 | |
-| Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | The game only supports a maximum of 2 players |
-| Doom 3 | **4 players** | 🟢 | |
-| Empire Earth II | **10 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
-| Empire Earth III | **8 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
-| Empires: Dawn of the Modern World | **8 players** (in theory) | 🟡 | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
-| Factorio | **"Unlimited" players** | 🟢 | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **32** or so |
-| Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
-| Haegemonia: Legions of Iron | **8 players** | 🟢 | Manually enter the <public_ip> then press "Join Game" |
-| Haegemonia: The Solon Heritage | **8 players** | 🟢 | Manually enter the <public_ip> then press "Join Game" |
-| Hammerwatch | **4 players** | 🟢 | The player limit imposed by the game can allegedly be increased through hacks |
-| Icewind Dale - Enhanced Edition | **6 players** | 🟢 | |
-| Iron Storm | **16 players** | 🟢 | |
-| I.G.I.-2: Covert Strike | **16 players** (in theory) | 🟡 | The games enforces broken CD authentication checks on remote peer joins even for LAN play (was unable to test the LOS limitation) |
-| Jazz Jackrabbit 2 (& Plus/JJ2+) | **8 players** | 🟢 | Up to 4 players can play in splitscreen on a single peer, for a total of **32** players |
-| Kingpin: Life of Crime | **16 players** | 🟢 | Enter the <public_ip> in the address book and then refresh the server list |
-| Kohan: Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | |
-| Kohan II: Kings of War | **12 players** | 🟢 | |
-| Medal of Honor: Allied Assault (& Addons) | **32 players** | 🟢 | |
-| Neverwinter Nights - Enhanced Edition | **6 players** (in theory) | 🟡 | Multiplayer is protected by a CD-key check and multiple peers with the same key aren't allowed on a server (was unable to test the LOS limitation) |
-| Painkiller (+ Black Edition) | **16 players** | 🟢 | Fill in the <public_ip> under "Enter IP" to join |
-| Painkiller: Overdose | **16 players** | 🟢 | Fill in the <public_ip> under "Enter IP" to join |
-| Quake II (+ The Reckoning/Ground Zero) | **16 players** | 🟢 | Enter the <public_ip> in the address book and then refresh the server list |
-| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | Use "Specify" to enter the <public_ip> |
-| Quake 4 | **16 players** | 🟢 | Use "Join IP Address" to enter the <public_ip> |
-| Red Faction | **32 players** | 🟢 | Use "Add Server" and enter <public_ip>:7755 to join |
-| Return to Castle Wolfenstein | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
-| Rune Gold/Classic | **16 players** | 🟢 | Right click anywhere on the "LAN Servers" tab and use the "Open Location" option, then enter the <public_ip> to join |
-| Scrapland (Remastered) | **16 players** | 🟢 | |
-| SiN (+ Wages of Sin) | **16 players** | 🟢 | Enter the <public_ip> in the server address book and then refresh the server list |
-| Seven Kingdoms: Ancient Adversaries | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start properly with more than one remote peer due to the lack of inter-peer connectivity |
-| Soldier of Fortune | **32 players** | 🟢 | Use "Advanced" to enter the <public_ip> under "Connect Directly to IP"  |
-| Soldier of Fortune 2 | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
-| Star Trek: Voyager - Elite Force (Holomatch) | **12 players** | 🟢 | |
-| Star Trek: Elite Force II | **32 players** | 🟢 | |
-| Star Wars: Jedi Knight - Jedi Academy | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
-| Star Wars: Jedi Knight II | **16 players** | 🟢 | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
-| Star Wars: Republic Commando | **8 players** | 🟢 | The host must start a game using "Create Internet Game", otherwise some remote peers may be auto-kicked with key validation errors (happens with the GOG version of the game) |
-| Stardew Valley | **4 players** | 🟢 | |
-| Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
-| SWAT 4 (+ The Stetchkov Syndicate) | **16 players** | 🟢 | |
-| The Wheel of Time | **16 players** | 🟢 | The host will need to launch a dedicated server first. All peers, including the host, must use "Favorites", then right click anywhere on the screen, select "New Favorite", enter the <public_ip> and a description, then double click on the created item to connect (ping being shown as 9999 and players as 0/0 is irrelevant, the connection should work).  |
-| Turok 2: Seeds of Evil (Remastered) | **16 players** | 🟢 | |
-| Unreal (+ Return to Na Pali) | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
-| Unreal Tournament '99 | **16 players** | 🟢 | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
-| Unreal Tournament 2004 | **16 players** | 🟢 | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter the <public_ip> |
-| War for the Overworld | **4 players** | 🟢 | |
-| Warhammer 40,000: Fire Warrior | **2 players** | 🔴 | Only one remote player can join the lobby, due to the lack of inter-peer connectivity. Any additional remote peers that try to join will error out. |
-| Wolfenstein: Enemy Territory | **64 players** | 🟢 | Use "Connect to IP" to enter the <public_ip> |
+| Game Title | Maximum Number Of Players | Peer LOS Limitation | UDP Only | Comments |
+| --- | :-: | :-: | :-: | --- |
+| Age of Mythology (+ The Titans) | **12 players** | 🟢 | ✔ | |
+| Anno 1701 (+The Sunken Dragon) | **4 players** | 🟢 | ✔ | |
+| ARMA: Cold War Assault (Operation Flashpoint) | **16 players** | 🟢 | ✔ | |
+| ARMA: Armed Assault (+ Queen's Gambit) | **60+ players** (in theory) | 🟡 | ✔ | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| ARMA 2 (& Addons) | **60+ players** (in theory) | 🟡 | ✔ | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Baldur's Gate - Enhanced Edition | **6 players** | 🟢 | ✔ | |
+| Baldur's Gate II - Enhanced Edition | **6 players** | 🟢 | ✔ | |
+| Celtic Kings: Rage of War | **8 players** | 🟢 | ✘ | |
+| Civilization IV (& Addons, including "Colonization") | **2 players** | 🔴 | ✔ | Multiple remote peers can attempt to join the lobby, but no more than one remote peer can connect properly due to the lack of inter-peer connectivity |
+| Codename: Panzers - Phase One / Two | **8 players** | 🟢 | ✔ | |
+| Daikatana | **32 players** | 🟢 | ✔ | |
+| Deus Ex | **16 players** | 🟢 | ✔ | |
+| Divinity Original Sin - Enhanced Edition | **2 players** | 🟢 | ✔ | The game only supports a maximum of 2 players |
+| Doom 3 | **4 players** | 🟢 | ✔ | |
+| Empire Earth II | **10 players** (in theory) | 🟡 | ✔ | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Empire Earth III | **8 players** (in theory) | 🟡 | ✔ | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Empires: Dawn of the Modern World | **8 players** (in theory) | 🟡 | ✘ | The game checks the uniqueness of CD-keys even for LAN play (was unable to test the LOS limitation) |
+| Etherlords | **2 players** | 🔴 | ✔ | Only one remote peer can connect to the lobby, due to the lack of inter-peer connectivity (applies to "Strategy" games, since "Duel" only accepts a maximum of two players by design) |
+| Etherlords II | **2 players** | 🟢 | ✔ | The game only supports a maximum of two players in "Duel" mode |
+| Factorio | **"Unlimited" players** | 🟢 | ✔ | Hard limited to 65535 players in theory, but please don't use the Wookiee Unicaster for more than **32** or so |
+| Hammerwatch | **4 players** | 🟢 | ✔ | The player limit imposed by the game can allegedly be increased through hacks |
+| Haegemonia: Legions of Iron | **8 players** | 🟢 | ✔ | Manually enter the <public_ip> then press "Join Game" |
+| Haegemonia: The Solon Heritage | **8 players** | 🟢 | ✘ (Uses TCP for map upload) | Manually enter the <public_ip> then press "Join Game" |
+| Hammerwatch | **4 players** | 🟢 | ✔ | The player limit imposed by the game can allegedly be increased through hacks |
+| Icewind Dale - Enhanced Edition | **6 players** | 🟢 | ✔ | |
+| Iron Storm | **16 players** | 🟢 | ✘ | |
+| I.G.I.-2: Covert Strike | **16 players** (in theory) | 🟡 | ✔ | The games enforces broken CD authentication checks on remote peer joins even for LAN play (was unable to test the LOS limitation) |
+| Jazz Jackrabbit 2 (& Plus / JJ2+) | **8 players** | 🟢 | ✘ | Up to 4 players can play in splitscreen on a single peer, for a total of **32** players |
+| Kingpin: Life of Crime | **16 players** | 🟢 | ✔ | Enter the <public_ip> in the address book and then refresh the server list |
+| Kohan: Immortal Sovereigns / Ahriman's Gift | **8 players** | 🟢 | ✔ | |
+| Kohan II: Kings of War | **12 players** | 🟢 | ✔ | |
+| Medal of Honor: Allied Assault (& Addons) | **32 players** | 🟢 | ✔ | |
+| Mobile Forces | **16 players** | 🟢 | ✔ | |
+| Neverwinter Nights - Enhanced Edition | **6 players** (in theory) | 🟡 | ✔ | Multiplayer is protected by a CD-key check and multiple peers with the same key aren't allowed on a server (was unable to test the LOS limitation) |
+| Painkiller (+ Black Edition) | **16 players** | 🟢 | ✔ | Fill in the <public_ip> under "Enter IP" to join |
+| Painkiller: Overdose | **16 players** | 🟢 | ✔ | Fill in the <public_ip> under "Enter IP" to join |
+| Quake II (+ The Reckoning / Ground Zero) | **16 players** | 🟢 | ✔ | Enter the <public_ip> in the address book and then refresh the server list |
+| Quake III Arena (+ Team Arena) | **16 players** | 🟢 | ✔ | Use "Specify" to enter the <public_ip> |
+| Quake 4 | **16 players** | 🟢 | ✔ | Use "Join IP Address" to enter the <public_ip> |
+| Red Faction | **32 players** | 🟢 | ✔ | Use "Add Server" and enter <public_ip>:7755 to join |
+| Return to Castle Wolfenstein | **16 players** | 🟢 | ✔ | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
+| Rune Gold / Classic | **16 players** | 🟢 | ✔ | Right click anywhere on the "LAN Servers" tab and use the "Open Location" option, then enter the <public_ip> to join |
+| Scrapland (Remastered) | **16 players** | 🟢 | ✔ | |
+| SiN (+ Wages of Sin) | **16 players** | 🟢 | ✔ | Enter the <public_ip> in the server address book and then refresh the server list |
+| Serious Sam: The First Encounter| **16 players** | 🟢 | ✘ | Note that "The Second Encounter" has a different netcode which does not work properly with the Wookiee Unicaster |
+| Seven Kingdoms: Ancient Adversaries | **2 players** | 🔴 | ✔ | Multiple remote peers can join the lobby, but the game won't start properly with more than one remote peer due to the lack of inter-peer connectivity |
+| Soldier of Fortune | **32 players** | 🟢 | ✔ | Use "Advanced" to enter the <public_ip> under "Connect Directly to IP"  |
+| Soldier of Fortune 2 | **16 players** | 🟢 | ✔ | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
+| Star Trek: Voyager - Elite Force (Holomatch) | **12 players** | 🟢 | ✔ | |
+| Star Trek: Elite Force II | **32 players** | 🟢 | ✔ | |
+| Star Wars: Jedi Knight - Jedi Academy | **16 players** | 🟢 | ✔ | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars: Jedi Knight II | **16 players** | 🟢 | ✔ | Use "New Favorite" to enter the <public_ip>, then filter by "Source: Favorites" to join |
+| Star Wars: Republic Commando | **8 players** | 🟢 | ✔ | The host must start a game using "Create Internet Game", otherwise some remote peers may be auto-kicked with key validation errors (happens with the GOG version of the game) |
+| Stardew Valley | **4 players** | 🟢 | ✔ | |
+| Supreme Commander (+ Forged Alliance) | **2 players** | 🔴 | ✔ | Multiple remote peers can join the lobby, but the game won't start with more than one remote peer due to the lack of inter-peer connectivity |
+| SWAT 4 (+ The Stetchkov Syndicate) | **16 players** | 🟢 | ✔ | |
+| The Wheel of Time | **16 players** | 🟢 | ✔ | The host will need to launch a dedicated server first. All peers, including the host, must use "Favorites", then right click anywhere on the screen, select "New Favorite", enter the <public_ip> and a description, then double click on the created item to connect (ping being shown as 9999 and players as 0/0 is irrelevant, the connection should work).  |
+| Turok 2: Seeds of Evil (Remastered) | **16 players** | 🟢 | ✔ | |
+| Tzar: The Burden of the Crown | **8 players** | 🟢 | ✘ | |
+| Unreal (+ Return to Na Pali) | **16 players** | 🟢 | ✔ | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
+| Unreal Tournament '99 | **16 players** | 🟢 | ✔ | Use the "Open Location" option with "unreal://<public_ip>:7777" for Direct IP multiplayer. OldUnreal patches are optional, but recommended. |
+| Unreal Tournament 2004 | **16 players** | 🟢 | ✔ | Use "Favorites", then right click in the bottom left side of the screen and select "Open IP" to enter the <public_ip> |
+| War for the Overworld | **4 players** | 🟢 | ✔ | |
+| Warhammer 40,000: Fire Warrior | **2 players** | 🔴 | ✔ | Only one remote player can join the lobby, due to the lack of inter-peer connectivity. Any additional remote peers that try to join will error out. |
+| Wolfenstein: Enemy Territory | **64 players** | 🟢 | ✔ | Use "Connect to IP" to enter the <public_ip> |
 
 ### What about games with DirectPlay multiplayer that have Direct IP support?
 
-So, you've noticed a distinct lack of DirectPlay games in the list above, eh? You've got a sharp eye. Testing these under Linux is nearly impossible due to non-existent DirectPlay support in Wine (the directplay winetrick will make things work however, if you're inclined to use it), but on Windows I expect the Wookiee Unicaster to work quite well with any DirectPlay games relying on UDP. Just be careful when using this now ancient and very insecure network middleware to exchange data over the internet.
+So, you've noticed a distinct lack of DirectPlay games in the list above, eh? You've got a sharp eye. Testing these under Linux is nearly impossible due to nearly non-existent DirectPlay support in Wine (the directplay winetrick will make things work however, if you're inclined to use it), but on Windows I expect the Wookiee Unicaster to work quite well with any DirectPlay games relying on UDP. Just be careful when using this now ancient and very insecure network middleware to exchange data over the internet.
 
 ### What about Direct IP games that support TCP?
 
@@ -172,7 +186,11 @@ UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides 
 
 ### Are there games that use both TCP and UDP?
 
-Why yes. Some even intermittently switch between the two on the same port, for some reason. A combination of TCP port forwarding and The Wookiee Unicaster can cater for these situations. See the provided sample setup script for some examples on how to handle this sort of madness.
+Why yes - see the dreaded "UDP Only" ✘-mark on the list above. Some even intermittently switch between the two on the same port, for some reason... 
+
+Note that the Wookiee Unicaster won't support these games by itself, but a combination of TCP port forwarding with SSH/Putty and UDP relaying with the Wookiee Unicaster will cater for these situations. Yes, even for mixed traffic sent on the same port. It's the magic of protocol-specific socket bindings that will ensure packets for each protocol get routed and handled properly.
+
+Also see the provided sample setup script for some ready-to-go recepies on how to handle this sort of madness.
 
 ### I still don't get it... can you draw it out for me?
 
