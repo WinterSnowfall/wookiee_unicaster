@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 3.00
-@date: 18/10/2023
+@version: 3.10
+@date: 20/10/2023
 '''
 
 import os
@@ -12,6 +12,7 @@ import struct
 import logging
 import multiprocessing
 import argparse
+import platform
 import subprocess
 import signal
 import queue
@@ -36,9 +37,6 @@ REMOTE_PEERS_DEFAULT = 1
 # default relay port base values, to be used if otherwise unspecified
 SERVER_RELAY_BASE_PORT_DEFAULT = 23000
 CLIENT_RELAY_BASE_PORT_DEFAULT = 23100
-# allows processes to end gracefully when no data is sent
-# or received, based on the value of a shared exit event
-WOOKIEE_DEFAULT_TIMEOUT = 2 #seconds
 
 ############################ WOOKIEE MODE ############################
 WOOKIEE_MODE_CLIENT = b'0'
@@ -74,19 +72,21 @@ def sigint_handler(signum, frame):
 
 class ServerHandler:
 
-    def __init__(self, peers, server_socket, remote_peer_event_list,
-                 source_queue_list, remote_peer_addr_array, remote_peer_port_array,
+    def __init__(self, peers, intf, local_ip, source_port,
+                 remote_peer_event_list, source_queue_list,
+                 remote_peer_addr_array, remote_peer_port_array,
                  max_packet_size, source_packet_count):
         # the server will have a single source-receive queue worker process
         self.peer = 0
 
         self.peers = peers
 
-        self.server_socket = server_socket
+        self.inft = intf
+        self.local_ip = local_ip
+        self.source_port = source_port
+
         self.remote_peer_event_list = remote_peer_event_list
-
         self.source_queue_list = source_queue_list
-
         self.remote_peer_addr_array = remote_peer_addr_array
         self.remote_peer_port_array = remote_peer_port_array
 
@@ -94,6 +94,27 @@ class ServerHandler:
         self.source_packet_count = source_packet_count
 
         logger.info(f'WU P{self.peer} >>> Initializing server handler...')
+
+        ####################### SOCKET BIND VALIDATIONS #######################
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        try:
+            self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, self.intf)
+        except TypeError:
+            logger.debug(f'WU P{self.peer} >>> Using manually specified local IP value on Linux.')
+        except AttributeError:
+            logger.warning(f'WU P{self.peer} >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
+        except OSError:
+            logger.critical(f'WU P{self.peer} >>> Interface not found or unavailable.')
+            raise SystemExit(15)
+        try:
+            self.server_socket.bind((self.local_ip, self.source_port))
+        except OSError:
+            if self.intf is None:
+                logger.critical(f'WU P{self.peer} >>> Invalid local IP {self.local_ip} or port {self.source_port} is in use.')
+            else:
+                logger.critical(f'WU P{self.peer} >>> Interface unavailable or port {self.source_port} is in use.')
+            raise SystemExit(16)
+        #######################################################################
 
         self.child_proc_started_event = multiprocessing.Event()
         self.child_proc_started_event.clear()
@@ -111,7 +132,7 @@ class ServerHandler:
             pass
 
     def wookiee_server_handler_start(self):
-        logger.info(f'WU P{self.peer} >>> Starting Wookiee Unicaster server processes...')
+        logger.info(f'WU P{self.peer} >>> Starting server processes...')
 
         self.wookiee_server_proc = multiprocessing.Process(target=self.wookiee_server_worker,
                                                            args=(self.peer, self.peers, self.server_socket, self.remote_peer_event_list,
@@ -121,7 +142,7 @@ class ServerHandler:
                                                            daemon=True)
         self.wookiee_server_proc.start()
 
-        logger.info(f'WU P{self.peer} >>> Started Wookiee Unicaster server processes.')
+        logger.info(f'WU P{self.peer} >>> Started server processes.')
 
     def wookiee_server_worker(self, peer, peers, isocket, remote_peer_event_list, source_queue_list,
                               remote_peer_worker_exit_event, remote_peer_addr_array, remote_peer_port_array,
@@ -134,7 +155,7 @@ class ServerHandler:
         # 'server-source-receive'
         wookiee_name = WOOKIEE_MODE_NAMES.get(b'100')
 
-        logger.info(f'WU P{peer} {wookiee_name} *** Worker thread started.')
+        logger.debug(f'WU P{peer} {wookiee_name} *** Server worker started.')
 
         try:
             remote_peer_queue_dict = {}
@@ -203,7 +224,7 @@ class ServerHandler:
 
                         logger.debug(f'WU P{peer} {wookiee_name} *** remote_peer_queue_dict: {remote_peer_queue_dict}')
                         if source_queue_list[queue_index].full():
-                            logger.warning(f'WU P{peer} {wookiee_name} *** Packet queue has hit its capacity limit.')
+                            logger.error(f'WU P{peer} {wookiee_name} *** Packet queue has hit its capacity limit!')
                         source_queue_list[queue_index].put(idata)
 
                         source_packet_count.value += 1
@@ -235,19 +256,22 @@ class ServerHandler:
         except SystemExit:
             pass
 
-        logger.info(f'WU P{peer} {wookiee_name} *** Worker thread stopped.')
+        logger.debug(f'WU P{peer} {wookiee_name} *** Server worker stopped.')
 
 class RemotePeerHandler:
     # keep alive packet content (featuring bowcaster ASCII art guards)
-    KEEP_ALIVE_CLIENT_PACKET = b'-=|- Hello there! -|=-'
-    KEEP_ALIVE_SERVER_PACKET = b'-=|- General Kenobi! -|=-'
-    KEEP_ALIVE_SERVER_HALT_PACKET = b'-=|- You are a bold one! -|=-'
+    KEEP_ALIVE_PACKET = b'-=|-WU-KEEP-ALIVE-|=-'
+    KEEP_ALIVE_HALT_PACKET = b'-=|-WU-HALT-KEEP-ALIVE-|=-'
+
+    # allows processes to end gracefully when no data is sent
+    # or received, based on the value of a shared exit event
+    DEFAULT_TIMEOUT = 2 #seconds
 
     def __init__(self, peer, wookiee_mode, intf, local_ip, source_ip, destination_ip,
                  source_port, destination_port, relay_port, source_queue,
-                 remote_peer_event, remote_peer_handlers_reset_queue,
-                 remote_peer_addr_array, remote_peer_port_array, server_socket, max_packet_size,
-                 source_packet_count, destination_packet_count):
+                 destination_queue, remote_peer_event, remote_peer_handlers_reset_queue,
+                 remote_peer_addr_array, remote_peer_port_array, server_socket,
+                 max_packet_size, source_packet_count, destination_packet_count):
         self.peer = peer
         self.wookiee_mode = wookiee_mode
 
@@ -260,6 +284,7 @@ class RemotePeerHandler:
         self.relay_port = relay_port
 
         self.source_queue = source_queue
+        self.destination_queue = destination_queue
         self.remote_peer_event = remote_peer_event
         self.remote_peer_event.clear()
         self.remote_peer_handlers_reset_queue = remote_peer_handlers_reset_queue
@@ -274,25 +299,13 @@ class RemotePeerHandler:
 
         logger.info(f'WU P{self.peer} >>> Initializing remote peer handler...')
 
-        self.destination_queue = multiprocessing.Queue(PACKET_QUEUE_SIZE)
-
-        self.link_event = multiprocessing.Event()
-        self.link_event.clear()
-        self.exit_event = multiprocessing.Event()
-        self.exit_event.clear()
-
-        self.socket_timeout = None
-        self.source = None
-        self.destination = None
-
-        self.wookiee_processes = [None, None, None, None]
-
         logger.debug(f'WU P{self.peer} >>> source_ip: {self.source_ip}')
         logger.debug(f'WU P{self.peer} >>> destination_ip: {self.destination_ip}')
         logger.debug(f'WU P{self.peer} >>> source_port: {self.source_port}')
         logger.debug(f'WU P{self.peer} >>> destination_port: {self.destination_port}')
         logger.debug(f'WU P{self.peer} >>> relay_port: {self.relay_port}')
 
+        ####################### SOCKET BIND VALIDATIONS #######################
         self.socket_timeout = SERVER_CONNECTION_TIMEOUT if self.wookiee_mode == WOOKIEE_MODE_SERVER else CLIENT_CONNECTION_TIMEOUT
 
         if self.wookiee_mode == WOOKIEE_MODE_SERVER:
@@ -337,6 +350,14 @@ class RemotePeerHandler:
             else:
                 logger.critical(f'WU P{self.peer} >>> Interface unavailable or port {self.relay_port} is in use.')
             raise SystemExit(20)
+        #######################################################################
+
+        self.link_event = multiprocessing.Event()
+        self.link_event.clear()
+        self.exit_event = multiprocessing.Event()
+        self.exit_event.clear()
+
+        self.wookiee_processes = [None, None, None, None]
 
     def __del__(self):
         if self.wookiee_mode == WOOKIEE_MODE_CLIENT:
@@ -365,7 +386,7 @@ class RemotePeerHandler:
 
         wookiee_name = WOOKIEE_MODE_NAMES.get(wookiee_mode)
 
-        logger.info(f'WU P{peer} {wookiee_name} +++ Worker thread started.')
+        logger.debug(f'WU P{peer} {wookiee_name} +++ Receive worker started.')
 
         try:
             # ensure no timeout is actively enforced on the socket
@@ -380,30 +401,34 @@ class RemotePeerHandler:
 
                     while not remote_peer_event.is_set():
                         logger.debug(f'WU P{peer} {wookiee_name} +++ Sending a keep alive packet...')
-                        isocket.sendto(RemotePeerHandler.KEEP_ALIVE_CLIENT_PACKET, iaddr)
+                        isocket.sendto(RemotePeerHandler.KEEP_ALIVE_PACKET, iaddr)
 
                         logger.debug(f'WU P{peer} {wookiee_name} +++ Listening for a keep alive packet...')
                         isocket.settimeout(KEEP_ALIVE_PING_TIMEOUT)
 
                         try:
-                            idata, iaddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
-                            #logger.debug(f'WU P{peer} {wookiee_name} +++ {iaddr[0]}:{iaddr[1]} sent: {idata}')
+                            kadata, kaaddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
+                            #logger.debug(f'WU P{peer} {wookiee_name} +++ {kaaddr[0]}:{kaaddr[1]} sent: {kadata}')
 
-                            if idata == RemotePeerHandler.KEEP_ALIVE_SERVER_PACKET:
-                                logger.debug(f'WU P{peer} {wookiee_name} +++ Received a keep alive packet.')
+                            if kaaddr == iaddr:
+                                if kadata == RemotePeerHandler.KEEP_ALIVE_PACKET:
+                                    logger.debug(f'WU P{peer} {wookiee_name} +++ Received a keep alive packet.')
 
-                                if not peer_connection_received:
-                                    logger.info(f'WU P{peer} {wookiee_name} +++ Server connection confirmed!')
-                                    peer_connection_received = True
+                                    if not peer_connection_received:
+                                        logger.info(f'WU P{peer} {wookiee_name} +++ Server connection confirmed!')
+                                        peer_connection_received = True
 
-                                sleep(KEEP_ALIVE_PING_INTERVAL)
+                                    sleep(KEEP_ALIVE_PING_INTERVAL)
 
-                            elif idata == RemotePeerHandler.KEEP_ALIVE_SERVER_HALT_PACKET:
-                                logger.info(f'WU P{peer} {wookiee_name} +++ Connection keep alive halted.')
-                                remote_peer_event.set()
+                                elif kadata == RemotePeerHandler.KEEP_ALIVE_HALT_PACKET:
+                                    logger.info(f'WU P{peer} {wookiee_name} +++ Connection keep alive halted.')
+                                    remote_peer_event.set()
 
+                                # the server should reset sockets on the next keep alive packet trasmission
+                                else:
+                                    logger.warning(f'WU P{peer} {wookiee_name} +++ Invalid keep alive packet content.')
                             else:
-                                logger.warning(f'WU P{peer} {wookiee_name} +++ Invalid keep alive packet content.')
+                                logger.warning(f'WU P{peer} {wookiee_name} +++ Received a packet from an unexpected source.')
 
                         except socket.timeout:
                             logger.debug(f'WU P{peer} {wookiee_name} +++ Timed out waiting for a reply.')
@@ -427,7 +452,7 @@ class RemotePeerHandler:
                     if remote_peer_event.is_set():
                         # '*-source-receive'
                         if wookiee_mode[1:] == b'00':
-                            isocket.settimeout(WOOKIEE_DEFAULT_TIMEOUT)
+                            isocket.settimeout(RemotePeerHandler.DEFAULT_TIMEOUT)
                         else:
                             isocket.settimeout(socket_timeout)
                     idata, iaddr = isocket.recvfrom(RECEIVE_BUFFER_SIZE)
@@ -435,7 +460,7 @@ class RemotePeerHandler:
                     if remote_peer_event.is_set():
                         isocket.settimeout(None)
 
-                    if idata != RemotePeerHandler.KEEP_ALIVE_SERVER_PACKET and idata != RemotePeerHandler.KEEP_ALIVE_CLIENT_PACKET:
+                    if idata != RemotePeerHandler.KEEP_ALIVE_PACKET:
                         logger.debug(f'WU P{peer} {wookiee_name} +++ Received a packet from {iaddr[0]}:{iaddr[1]}...')
                         packet_size = len(idata)
                         logger.debug(f'WU P{peer} {wookiee_name} +++ Packet size: {packet_size}')
@@ -447,7 +472,7 @@ class RemotePeerHandler:
                         # '*-source-receive'
                         if wookiee_mode[1:] == b'00':
                             if source_queue.full():
-                                logger.warning(f'WU P{peer} {wookiee_name} +++ Packet queue has hit its capacity limit.')
+                                logger.error(f'WU P{peer} {wookiee_name} +++ Packet queue has hit its capacity limit!')
                             source_queue.put(idata)
 
                             source_packet_count.value += 1
@@ -457,14 +482,14 @@ class RemotePeerHandler:
                                 logger.debug(f'WU P{peer} {wookiee_name} +++ New max_packet_size is: {max_packet_size.value}')
                         else:
                             if destination_queue.full():
-                                logger.warning(f'WU P{peer} {wookiee_name} +++ Packet queue has hit its capacity limit.')
+                                logger.error(f'WU P{peer} {wookiee_name} +++ Packet queue has hit its capacity limit!')
                             destination_queue.put(idata)
 
                         logger.debug(f'WU P{peer} {wookiee_name} +++ Packet queued for replication...')
 
                     # can actually happen in case game servers keep pinging dropped clients
                     else:
-                        logger.warning(f'WU P{peer} {wookiee_name} +++ Keep alive packet detected during normal operation. Resetting sockets...')
+                        logger.warning(f'WU P{peer} {wookiee_name} +++ Keep alive packet detected. Resetting sockets...')
                         remote_peer_handlers_reset_queue.put(peer)
                         exit_event.set()
 
@@ -491,12 +516,12 @@ class RemotePeerHandler:
         except:
             pass
 
-        logger.info(f'WU P{peer} {wookiee_name} +++ Worker thread stopped.')
+        logger.debug(f'WU P{peer} {wookiee_name} +++ Receive worker stopped.')
 
     def wookiee_relay_worker(self, peer, wookiee_mode, osocket, oaddr,
                              link_event, remote_peer_event, exit_event, source_queue,
-                             destination_queue, remote_peer_addr_array, remote_peer_port_array,
-                             destination_packet_count):
+                             destination_queue, remote_peer_addr_array,
+                             remote_peer_port_array, destination_packet_count):
         # catch SIGTERM and exit gracefully
         signal.signal(signal.SIGTERM, sigterm_handler)
         # catch SIGINT and exit gracefully
@@ -504,7 +529,7 @@ class RemotePeerHandler:
 
         wookiee_name = WOOKIEE_MODE_NAMES.get(wookiee_mode)
 
-        logger.info(f'WU P{peer} {wookiee_name} --- Worker thread started.')
+        logger.debug(f'WU P{peer} {wookiee_name} --- Relay worker started.')
 
         # 'server-destination-relay'
         if wookiee_mode == b'111':
@@ -523,10 +548,10 @@ class RemotePeerHandler:
 
                     while not remote_peer_event.is_set():
                         logger.debug(f'WU P{peer} {wookiee_name} --- Listening for a keep alive packet...')
-                        odata, oaddr = osocket.recvfrom(RECEIVE_BUFFER_SIZE)
-                        #logger.debug(f'WU P{peer} {wookiee_name} --- {oaddr[0]}:{oaddr[1]} sent: {odata}')
+                        kadata, kaaddr = osocket.recvfrom(RECEIVE_BUFFER_SIZE)
+                        #logger.debug(f'WU P{peer} {wookiee_name} --- {kaaddr[0]}:{kaaddr[1]} sent: {kadata}')
 
-                        if odata == RemotePeerHandler.KEEP_ALIVE_CLIENT_PACKET:
+                        if kadata == RemotePeerHandler.KEEP_ALIVE_PACKET:
                             logger.debug(f'WU P{peer} {wookiee_name} --- Received a keep alive packet.')
 
                             if not peer_connection_received:
@@ -534,16 +559,20 @@ class RemotePeerHandler:
                                 peer_connection_received = True
 
                             sleep(KEEP_ALIVE_PING_INTERVAL)
+                        # the client should reset sockets on the next keep alive packet trasmission
                         else:
                             logger.warning(f'WU P{peer} {wookiee_name} --- Invalid keep alive packet content.')
 
                         if not remote_peer_event.is_set():
                             logger.debug(f'WU P{peer} {wookiee_name} --- Sending a keep alive packet...')
-                            osocket.sendto(RemotePeerHandler.KEEP_ALIVE_SERVER_PACKET, oaddr)
+                            osocket.sendto(RemotePeerHandler.KEEP_ALIVE_PACKET, kaaddr)
                         else:
                             logger.debug(f'WU P{peer} {wookiee_name} --- Halting keep alive...')
-                            osocket.sendto(RemotePeerHandler.KEEP_ALIVE_SERVER_HALT_PACKET, oaddr)
+                            osocket.sendto(RemotePeerHandler.KEEP_ALIVE_HALT_PACKET, kaaddr)
                             logger.info(f'WU P{peer} {wookiee_name} --- Connection keep alive halted.')
+
+                # the server can't otherwise know the public (exit) IP address of the client
+                oaddr = kaaddr
 
                 logger.debug(f'WU P{peer} {wookiee_name} --- Clearing link event...')
                 link_event.set()
@@ -572,9 +601,9 @@ class RemotePeerHandler:
                 try:
                     # '*-source-relay'
                     if wookiee_mode[1:] == b'01':
-                        odata = source_queue.get(True, WOOKIEE_DEFAULT_TIMEOUT)
+                        odata = source_queue.get(True, RemotePeerHandler.DEFAULT_TIMEOUT)
                     else:
-                        odata = destination_queue.get(True, WOOKIEE_DEFAULT_TIMEOUT)
+                        odata = destination_queue.get(True, RemotePeerHandler.DEFAULT_TIMEOUT)
 
                     try:
                         logger.debug(f'WU P{peer} {wookiee_name} --- Using remote peer: {oaddr}')
@@ -604,11 +633,10 @@ class RemotePeerHandler:
         except:
             pass
 
-        logger.info(f'WU P{peer} {wookiee_name} --- Worker thread stopped.')
+        logger.debug(f'WU P{peer} {wookiee_name} --- Relay worker stopped.')
 
     def wookiee_peer_handler_start(self):
-        logger.info(f'WU P{self.peer} >>> Starting Wookiee Unicaster child processes...')
-
+        logger.info(f'WU P{self.peer} >>> Starting remote peer handler processes...')
         # reset all shared process events
         self.exit_event.clear()
         self.link_event.clear()
@@ -620,7 +648,8 @@ class RemotePeerHandler:
             self.wookiee_processes[0] = multiprocessing.Process(target=self.wookiee_receive_worker,
                                                                   # + '-source-receive'
                                                                   args=(self.peer, self.wookiee_mode + b'00', self.source,
-                                                                        (self.source_ip, self.source_port), self.socket_timeout, self.link_event, self.remote_peer_event,
+                                                                        (self.source_ip, self.source_port), self.socket_timeout,
+                                                                        self.link_event, self.remote_peer_event,
                                                                         self.exit_event, self.remote_peer_handlers_reset_queue,
                                                                         self.source_queue, self.destination_queue,
                                                                         self.max_packet_size, self.source_packet_count),
@@ -630,16 +659,18 @@ class RemotePeerHandler:
         self.wookiee_processes[1] = multiprocessing.Process(target=self.wookiee_relay_worker,
                                                             # + '-source-relay'
                                                             args=(self.peer, self.wookiee_mode + b'01', self.destination,
-                                                                  (self.destination_ip, self.destination_port), self.link_event, self.remote_peer_event,
-                                                                  self.exit_event, self.source_queue, self.destination_queue, None, None,
-                                                                  self.destination_packet_count),
+                                                                  (self.destination_ip, self.destination_port), self.link_event,
+                                                                  self.remote_peer_event, self.exit_event, self.source_queue,
+                                                                  self.destination_queue, None,
+                                                                  None, self.destination_packet_count),
                                                             daemon=True)
         self.wookiee_processes[1].start()
 
         self.wookiee_processes[2] = multiprocessing.Process(target=self.wookiee_receive_worker,
                                                                    # + '-destination-receive'
                                                                    args=(self.peer, self.wookiee_mode + b'10', self.destination,
-                                                                         (None, None), self.socket_timeout, self.link_event, self.remote_peer_event,
+                                                                         (None, None), self.socket_timeout,
+                                                                         self.link_event, self.remote_peer_event,
                                                                          self.exit_event, self.remote_peer_handlers_reset_queue,
                                                                          self.source_queue, self.destination_queue,
                                                                          self.max_packet_size, self.source_packet_count),
@@ -649,13 +680,14 @@ class RemotePeerHandler:
         self.wookiee_processes[3] = multiprocessing.Process(target=self.wookiee_relay_worker,
                                                                  # + '-destination-relay'
                                                                  args=(self.peer, self.wookiee_mode + b'11', self.source,
-                                                                       (self.source_ip, self.source_port), self.link_event, self.remote_peer_event, self.exit_event,
-                                                                       self.source_queue, self.destination_queue, self.remote_peer_addr_array, self.remote_peer_port_array,
-                                                                       self.destination_packet_count),
+                                                                       (self.source_ip, self.source_port), self.link_event,
+                                                                       self.remote_peer_event, self.exit_event, self.source_queue,
+                                                                       self.destination_queue, self.remote_peer_addr_array,
+                                                                       self.remote_peer_port_array, self.destination_packet_count),
                                                                  daemon=True)
         self.wookiee_processes[3].start()
 
-        logger.info(f'WU P{self.peer} >>> Started Wookiee Unicaster child processes.')
+        logger.info(f'WU P{self.peer} >>> Started remote peer handler processes.')
 
 if __name__ == "__main__":
     # catch SIGTERM and exit gracefully
@@ -794,28 +826,36 @@ if __name__ == "__main__":
         raise SystemExit(1)
 
     # use the interface name on Linux and fallback to local IP value on Windows
-    if args.interface is not None:
+    if platform.system() == 'Linux' and args.interface is not None:
         # the interface name will only be used in socket operations
         # and the API expects a byte sequence, not a string
         intf = bytes(args.interface, 'utf-8')
         logger.debug(f'WU >>> intf: {args.interface}')
         # determine the local_ip based on the network interface name
-        local_ip_query_subprocess = subprocess.Popen(''.join(('ifconfig ', args.interface, ' | grep -w inet | awk \'{print $2}\'')),
-                                                     shell=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-        local_ip = local_ip_query_subprocess.communicate()[0].decode('utf-8').strip()
-
-        if local_ip == '':
-            logger.critical(f'Invalid interface {args.interface}. Please retry with a valid interface name.')
+        try:
+            local_ip_query_subprocess = subprocess.run(['ip', '-4', 'addr', 'show', args.interface],
+                                                       stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                                       check=True)
+            local_ip_query_output = local_ip_query_subprocess.stdout.decode('utf-8')
+            #logger.debug(f'WU >>> local_ip_query_output: {local_ip_query_output})')
+            # bit of a hack in terms of parsing, but I'm just not keen on using regex for something this silly
+            local_ip = local_ip_query_output[local_ip_query_output.find('inet ') + 5:local_ip_query_output.find('/')]
+        except:
+            logger.critical(f'WU >>> Invalid interface {args.interface}. Please retry with a valid interface name.')
             raise SystemExit(6)
     else:
         intf = None
+
+        if args.localip is None:
+            logger.critical(f'WU >>> Please specify a network interface name (Linux) or a local IP address.')
+            raise SystemExit(7)
 
         try:
             # test to see if the provided string is a valid IP address
             ipaddress.ip_address(args.localip)
             local_ip = args.localip
         except ValueError:
-            logger.critical(f'Invalid local IP {args.localip}. Please retry with a valid IP address.')
+            logger.critical(f'WU >>> Invalid local IP {args.localip}. Please retry with a valid IP address.')
             raise SystemExit(7)
 
     logger.debug(f'WU >>> Local IP address is: {local_ip}')
@@ -844,7 +884,7 @@ if __name__ == "__main__":
 
         logger.debug(f'WU >>> source_ip: {source_ip}')
     except ValueError:
-        logger.critical(f'Invalid source IP {args.sourceip}. Please retry with a valid IP address.')
+        logger.critical(f'WU >>> Invalid source IP {args.sourceip}. Please retry with a valid IP address.')
         raise SystemExit(9)
 
     try:
@@ -858,7 +898,7 @@ if __name__ == "__main__":
 
         logger.debug(f'WU >>> destination_ip: {destination_ip}')
     except ValueError:
-        logger.critical(f'Invalid destination IP {args.destip}. Please retry with a valid IP address.')
+        logger.critical(f'WU >>> Invalid destination IP {args.destip}. Please retry with a valid IP address.')
         raise SystemExit(10)
 
     try:
@@ -923,7 +963,7 @@ if __name__ == "__main__":
     if no_config_file:
         logger.info('WU >>> The Wookiee Unicaster configuration file is absent. Built-in defaults will be used.')
 
-    #################### multiprocess shared memory ####################
+    #################### MULTIPROCESS SHARED MEMORY ####################
     # 'I' = unsigned int
     remote_peer_port_array = multiprocessing.Array('I', [0] * peers)
     # 'L' = unsigned long
@@ -936,42 +976,23 @@ if __name__ == "__main__":
     destination_packet_count = multiprocessing.Value('L', 0)
     ####################################################################
 
-    # these two need to be shared between the server handler and remote peer handlers
     source_queue_list = [multiprocessing.Queue(PACKET_QUEUE_SIZE) for peer in range(peers)]
+    destination_queue_list = [multiprocessing.Queue(PACKET_QUEUE_SIZE) for peer in range(peers)]
     remote_peer_event_list = [multiprocessing.Event() for peer in range(peers)]
 
-    ###################### server handler process ######################
+    ###################### SERVER HANDLER PROCESS ######################
     if wookiee_mode == WOOKIEE_MODE_SERVER:
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        try:
-            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, intf)
-        except TypeError:
-            logger.debug(f'WU >>> Using manually specified local IP value on Linux.')
-        except AttributeError:
-            logger.warning('WU >>> SO_BINDTODEVICE is not available. This is normal on Windows.')
-        except OSError:
-            logger.critical('WU >>> Interface not found or unavailable.')
-            raise SystemExit(15)
-        try:
-            server_socket.bind((local_ip, source_port))
-        except OSError:
-            if intf is None:
-                logger.critical(f'WU >>> Invalid local IP {local_ip} or port {source_port} is in use.')
-            else:
-                logger.critical(f'WU >>> Interface unavailable or port {source_port} is in use.')
-            raise SystemExit(16)
-
-        server_handler = ServerHandler(peers, server_socket, remote_peer_event_list,
+        server_handler = ServerHandler(peers, intf, local_ip, source_port, remote_peer_event_list,
                                        source_queue_list, remote_peer_addr_array, remote_peer_port_array,
                                        max_packet_size, source_packet_count)
         server_handler.wookiee_server_handler_start()
-    else:
-        server_socket = None
     ####################################################################
 
-    ################### remote peer handler processes ##################
+    ################### REMOTE PEER HANDLER PROCESS ##################
     remote_peer_handlers = [None] * peers
     remote_peer_handlers_reset_queue = multiprocessing.Queue(peers)
+
+    server_socket = None if wookiee_mode == WOOKIEE_MODE_CLIENT else server_handler.server_socket
 
     for peer in range(peers):
         if wookiee_mode == WOOKIEE_MODE_SERVER:
@@ -983,9 +1004,9 @@ if __name__ == "__main__":
 
         remote_peer_handlers[peer] = RemotePeerHandler(peer + 1, wookiee_mode, intf, local_ip, source_ip,
                                                        destination_ip, source_port, destination_port, relay_port,
-                                                       source_queue_list[peer], remote_peer_event_list[peer],
-                                                       remote_peer_handlers_reset_queue, remote_peer_addr_array,
-                                                       remote_peer_port_array, server_socket,
+                                                       source_queue_list[peer], destination_queue_list[peer],
+                                                       remote_peer_event_list[peer], remote_peer_handlers_reset_queue,
+                                                       remote_peer_addr_array, remote_peer_port_array, server_socket,
                                                        max_packet_size, source_packet_count, destination_packet_count)
 
         remote_peer_handlers[peer].wookiee_peer_handler_start()
@@ -1024,16 +1045,16 @@ if __name__ == "__main__":
 
     finally:
         if wookiee_mode == WOOKIEE_MODE_SERVER:
-            logger.info('WU >>> Waiting for the server handler process to complete...')
+            logger.debug('WU >>> Waiting for the server handler process to complete...')
 
             if server_handler.wookiee_server_proc.is_alive():
                 server_handler.wookiee_server_proc.join()
             # clear server handler reference to trigger the destructor
             server_handler = None
 
-            logger.info('WU >>> The server handler process has been stopped.')
+            logger.debug('WU >>> The server handler process has been stopped.')
 
-        logger.info('WU >>> Waiting for the remote peer handler threads to complete...')
+        logger.debug('WU >>> Waiting for the remote peer handler threads to complete...')
 
         for peer in range(peers):
             for process in remote_peer_handlers[peer].wookiee_processes:
@@ -1042,7 +1063,7 @@ if __name__ == "__main__":
             # clear remote peer handler references to trigger the destructor
             remote_peer_handlers[peer] = None
 
-        logger.info('WU >>> The remote peer handler threads have been stopped.')
+        logger.debug('WU >>> The remote peer handler threads have been stopped.')
 
         logger.info('WU >>> *********************** STATS ***********************')
         logger.info(f'WU >>> max_packet_size (inbound): {max_packet_size.value}')
