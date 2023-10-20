@@ -838,8 +838,12 @@ if __name__ == "__main__":
                                                        check=True)
             local_ip_query_output = local_ip_query_subprocess.stdout.decode('utf-8')
             #logger.debug(f'WU >>> local_ip_query_output: {local_ip_query_output})')
-            # bit of a hack in terms of parsing, but I'm just not keen on using regex for something this silly
-            local_ip = local_ip_query_output[local_ip_query_output.find('inet ') + 5:local_ip_query_output.find('/')]
+            local_ip = local_ip_query_output[local_ip_query_output.find('inet ') + 5:
+                                             local_ip_query_output.find('/')]
+            
+            if local_ip == '':
+                logger.critical(f'WU >>> Unable to obtain an IP address for {args.interface}. Please retry with a valid interface name.')
+                raise SystemExit(6)
         except:
             logger.critical(f'WU >>> Invalid interface {args.interface}. Please retry with a valid interface name.')
             raise SystemExit(6)
@@ -988,7 +992,7 @@ if __name__ == "__main__":
         server_handler.wookiee_server_handler_start()
     ####################################################################
 
-    ################### REMOTE PEER HANDLER PROCESS ##################
+    ################### REMOTE PEER HANDLER PROCESSES ##################
     remote_peer_handlers = [None] * peers
     remote_peer_handlers_reset_queue = multiprocessing.Queue(peers)
 
