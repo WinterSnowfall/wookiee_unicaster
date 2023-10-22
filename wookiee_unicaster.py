@@ -36,13 +36,6 @@ REMOTE_PEERS_DEFAULT = 1
 SERVER_RELAY_BASE_PORT_DEFAULT = 23000
 CLIENT_RELAY_BASE_PORT_DEFAULT = 23100
 
-# 'spawn' will be the default starting with Python 3.14
-# (since it is more thread-safe), but since we want to ensure
-# compatibility with Nuitka, set it to 'fork' manually;
-# change it back to 'spawn' if you plan to run the Wookiee Unicaster
-# Python script directly as is on Windows (not using binaries)
-MULTIPROCESS_START_METHOD = 'fork'
-
 def sigterm_handler(signum, frame):
     # exceptions may happen here as well due to logger syncronization mayhem on shutdown
     try:
@@ -62,6 +55,8 @@ def sigint_handler(signum, frame):
     raise SystemExit(0)
 
 class WookieeConstants:
+    '''Shared static and runtime constants'''
+    
     ############################ WOOKIEE MODE ############################
     WOOKIEE_MODE_CLIENT = b'0'
     WOOKIEE_MODE_SERVER = b'1'
@@ -90,6 +85,7 @@ class WookieeConstants:
     ######################################################################
 
 class ServerHandler:
+    '''Handles inbound connections for all remote peers'''
 
     def __init__(self, peers, intf, local_ip, source_port,
                  remote_peer_event_list, source_queue_list,
@@ -284,13 +280,14 @@ class ServerHandler:
         logger.info(f'WU P{peer} {wookiee_name} *** Server worker stopped.')
 
 class RemotePeerHandler:
-    # keep alive packet content (featuring bowcaster ASCII art guards)
-    KEEP_ALIVE_PACKET = b'-=|-WU-KEEP-ALIVE-|=-'
-    KEEP_ALIVE_HALT_PACKET = b'-=|-WU-HALT-KEEP-ALIVE-|=-'
-
+    '''Handles remote peer channel workers for full duplex communication'''
+    
     # allows processes to end gracefully when no data is sent
     # or received, based on the value of a shared exit event
     DEFAULT_TIMEOUT = 2 #seconds
+    # keep alive packet content (featuring bowcaster ASCII art guards)
+    KEEP_ALIVE_PACKET = b'-=|-WU-KEEP-ALIVE-|=-'
+    KEEP_ALIVE_HALT_PACKET = b'-=|-WU-HALT-KEEP-ALIVE-|=-'
 
     def __init__(self, peer, wookiee_mode, intf, local_ip, source_ip, destination_ip,
                  source_port, destination_port, relay_port, source_queue,
@@ -744,7 +741,12 @@ if __name__ == "__main__":
     # catch SIGINT and exit gracefully
     signal.signal(signal.SIGINT, sigint_handler)
 
-    multiprocessing.set_start_method(MULTIPROCESS_START_METHOD)
+    if platform.system() == 'Linux':
+        # 'spawn' will be the default for Linux starting with Python 3.14
+        # (since it is more thread-safe), but since we want to ensure
+        # compatibility with Nuitka, set it to 'fork' manually;
+        # 'spawn' is already the default on Windows and macOS
+        multiprocessing.set_start_method('fork')
 
     configParser = ConfigParser()
     no_config_file = False
