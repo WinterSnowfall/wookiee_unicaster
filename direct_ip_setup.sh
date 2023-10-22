@@ -47,7 +47,7 @@ WU_RELAY_PORT_RANGE="23001"
 LAN_INTF_NAME="enp1s0"
 # local IP - this is where the game server needs to run, as all remote peers
 # connecting via the public IP will be forwarded to this address
-LOCAL_PRIVATE_IP=$(ifconfig $LAN_INTF_NAME 2>/dev/null | grep -w inet | awk '{print $2}')
+LOCAL_PRIVATE_IP=$(ip -4 addr show $LAN_INTF_NAME 2>/dev/null | grep -w inet | awk '{print $2}' | cut -d '/' -f 1)
 #
 #################################################################################
 
