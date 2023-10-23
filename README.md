@@ -233,7 +233,7 @@ You'll need a **python 3.6+** environment on the machine you plan to run it on. 
 You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'll need to specify:
 
 * -m <mode> = enables "server" or "client" mode
-* -e <interface> = the name of the network interface (as listed by ifconfig) on which the script will listen to perform the relaying of UDP packets - to be used on Linux
+* -e <interface> = the name of the network interface (as listed by `ip addr`) on which the script will listen to perform the relaying of UDP packets - to be used on Linux
 * -l <localip> = directly specify the local IP address - this is only explicitly needed on Windows and replaces -e
 * -s <sourceip> = source IP address - only needed in client mode, where it represents the relay server's public IP
 * -d <destip> = destination IP address - only needed in client mode, where is represents the end IP of the game server
