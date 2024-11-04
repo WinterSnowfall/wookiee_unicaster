@@ -282,3 +282,5 @@ Please remember to specify the same number of peers (**-p**) for all instances, 
 
 Yes, it is interpreted - you're not going crazy. The scripts use [Nuitka](https://nuitka.net/doc/user-manual.html), which optimizes then compiles Python code down to C, packing it, along with dependent libraries, in a portable executable. Based on my testing the improvements are only marginal when a small number of remote peers are involved, however it will help provide some extra performance when things get crowded. If you're aiming to shave every nanosecond off of your overall latency, then you should probably consider getting Nuitka and using either the .bat or .sh build script to generate a portable executable for your platform/architecture of choice.
 
+Alternatively, the latest Wookiee Unicaster binaries can be downloaded from the GitHub Actions section of this repository, by selecting the most recent Wookiee Unicaster Build job (note that you need to be logged in in order to see the downloadable artifacts at the bottom of the job details page).
+
