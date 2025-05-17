@@ -16,7 +16,7 @@ Here's a non-exhaustive list of games I've tested myself and are known to work:
 * ARMA 2 (& Addons)
 * Baldur's Gate - Enhanced Edition
 * Baldur's Gate II - Enhanced Edition
-* Celtic Kings: Rage of War 
+* Celtic Kings: Rage of War
 * Civilization IV (& Addons, including "Colonization")
 * Codename: Panzers - Phase One / Two
 * Daikatana
@@ -86,7 +86,7 @@ That being said, will your system get hacked into if you occasionally play an An
 
 Run it on a potato. Profiling has shown that ~98% of its execution time will be spent on waiting (aka idling) to receive UDP packets.
 
-Also ensure ports starting from **23001** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23002 will be used as well when configuring 2 remote peers, 23003 as well for 3 peers etc). Ports in the **23101+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used as points of origin to locally relay traffic onto the end destination).
+Also ensure ports starting from **23601** and above are open on both the server and the client, since they will be used for UDP packet relaying and NAT punch-through (incremental port numbers will be used for multiple remote peers: 23602 will be used as well when configuring 2 remote peers, 23603 as well for 3 peers etc). Ports in the **23801+** range also need to be unused/available on the client (there's no requirement for them to be open, since they will only be used as points of origin to locally relay traffic onto the end destination).
 
 ### Does it work on Windows?
 
@@ -186,7 +186,7 @@ UDP packets can't, unfortunately, be tunneled through SSH, as SSH only provides 
 
 ### Are there games that use both TCP and UDP?
 
-Why yes - see the dreaded "UDP Only" ✘-mark on the list above. Some even intermittently switch between the two on the same port, for some reason... 
+Why yes - see the dreaded "UDP Only" ✘-mark on the list above. Some even intermittently switch between the two on the same port, for some reason...
 
 Note that the Wookiee Unicaster won't support these games by itself, but a combination of TCP port forwarding with SSH/Putty and UDP relaying with the Wookiee Unicaster will cater for these situations. Yes, even for mixed traffic sent on the same port. It's the magic of protocol-specific socket bindings that will ensure packets for each protocol get routed and handled properly.
 
@@ -243,8 +243,8 @@ You can run **./wookiee_unicaster.py -h** to get some hints, but in short, you'l
 There are also a few optional command line arguments:
 
 * -p <peers> = number of remote peers you want to relay - must be set identically on both server and client (defaults to **1** if unspecified)
-* --server-relay-base-port <server_relay_base_port> = base port in the range used for packet relaying on both server and client (defaults to **23000** if unspecified)
-* --client-relay-base-port <client_relay_base_port> = base port in the range used as source for endpoint relaying on the client (defaults to **23100** if unspecified)
+* --server-relay-base-port <server_relay_base_port> = base port in the range used for packet relaying on both server and client (defaults to **23600** if unspecified)
+* --client-relay-base-port <client_relay_base_port> = base port in the range used as source for endpoint relaying on the client (defaults to **23800** if unspecified)
 * -q = quiet mode - suppresses all logging messages (defaults to **False** if unspecified)
 
 **Note**: All port values must be specified in the bindable, non-protected range of **1024:65535**.
@@ -272,9 +272,9 @@ can be used on Windows to start a client with the same configuration as in the e
 
 ### The Wookiee Unicaster handles a single port, but what if a game needs multiple ports?
 
-For Direct IP multiplayer? That's very, very rare from what I've seen so far, but should you run across any such cases, it is now possible to start multiple instances of the Wookiee Unicaster in parallel without running into any conflicts by specifying your own (non-overlapping) **--server-relay-base-port** and **--client-relay-base-port** along with different **-i** and **-o** values for any additional ports you want to relay. 
+For Direct IP multiplayer? That's very, very rare from what I've seen so far, but should you run across any such cases, it is now possible to start multiple instances of the Wookiee Unicaster in parallel without running into any conflicts by specifying your own (non-overlapping) **--server-relay-base-port** and **--client-relay-base-port** along with different **-i** and **-o** values for any additional ports you want to relay.
 
-Even though peer handling and connection management will be entirely independent between concurrent instances of the Wookiee Unicaster, and therefore between multiple relayed ports used by the same game, this will not pose a problem since UDP is a stateless protocol anyway. If anything it should be faster and more reliable, at least in theory. 
+Even though peer handling and connection management will be entirely independent between concurrent instances of the Wookiee Unicaster, and therefore between multiple relayed ports used by the same game, this will not pose a problem since UDP is a stateless protocol anyway. If anything it should be faster and more reliable, at least in theory.
 
 Please remember to specify the same number of peers (**-p**) for all instances, otherwise you will most certainly run into issues.
 

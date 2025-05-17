@@ -40,9 +40,9 @@ LOCAL_WU_NAME=$(basename $LOCAL_WU_PATH)
 # use "-p 3" to enable 3 remote peers, for a total of 4 players
 WU_REMOTE_PEERS="-p 1"
 # ports that will be open for WU internal relaying of traffic
-# use "23001" for one remote peer, and a range, such as "23001:23003", 
+# use "23601" for one remote peer, and a range, such as "23601:23603",
 # for 3 remote peers
-WU_RELAY_PORT_RANGE="23001"
+WU_RELAY_PORT_RANGE="23601"
 # local LAN interface name
 LAN_INTF_NAME="enp1s0"
 # local IP - this is where the game server needs to run, as all remote peers
@@ -272,7 +272,7 @@ case $GAME in
         UDP_PORT="19664"
         ;;
     18)
-        # Haegemonia: The Solon Heritage 
+        # Haegemonia: The Solon Heritage
         GAME_PROTOCOL="BOTH"
         TCP_PORT="53324"
         UDP_PORT="19664"
@@ -294,7 +294,7 @@ case $GAME in
         UDP_PORT="3504"
         ;;
     22)
-        # I.G.I.-2: Covert Strike 
+        # I.G.I.-2: Covert Strike
         GAME_PROTOCOL="UDP"
         UDP_PORT="26001"
         ;;
@@ -365,7 +365,7 @@ case $GAME in
         TCP_PORT="36936"
         ;;
     36)
-        # Quake II (+ The Reckoning / Ground Zero) 
+        # Quake II (+ The Reckoning / Ground Zero)
         GAME_PROTOCOL="UDP"
         UDP_PORT="27910"
         ;;
@@ -543,7 +543,7 @@ case $GAME in
         ;;
     *)
         read -p ">>> Select forwarding protcol (TCP, UDP or BOTH): " GAME_PROTOCOL
-        
+
         case ${GAME_PROTOCOL^^} in
             TCP)
                 read -p ">>> Select TCP forwarding port: " TCP_PORT
@@ -560,7 +560,7 @@ case $GAME in
                 exit 3
                 ;;
         esac
-        
+
         if [ ! -z "$TCP_PORT" ]
         then
             if ! [[ "$TCP_PORT" =~ ^[0-9]+$ ]] || [ "$TCP_PORT" -lt 1024 -o "$TCP_PORT" -gt 65535 ]
@@ -593,7 +593,7 @@ case ${GAME_PROTOCOL^^} in
         stop_tcp_forwarding $TCP_PORT
         ;;
     UDP)
-        # relay port traffic using the Wookiee Unicaster based on the selected option 
+        # relay port traffic using the Wookiee Unicaster based on the selected option
         echo -e ">>> Setting up UDP relaying on port(s): "$BOLD$UDP_PORT$DEFAULT
         start_udp_forwarding $UDP_PORT
         echo -en ">>> "$GREEN"DONE"$DEFAULT". "

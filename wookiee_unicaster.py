@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''
 @author: Winter Snowfall
-@version: 3.12
-@date: 22/10/2023
+@version: 3.14
+@date: 16/05/2025
 '''
 
 import os
@@ -33,8 +33,8 @@ PORTS_RANGE = (1024, 65535)
 # default number of supported remote peers
 REMOTE_PEERS_DEFAULT = 1
 # default relay port base values, to be used if otherwise unspecified
-SERVER_RELAY_BASE_PORT_DEFAULT = 23000
-CLIENT_RELAY_BASE_PORT_DEFAULT = 23100
+SERVER_RELAY_BASE_PORT_DEFAULT = 23600
+CLIENT_RELAY_BASE_PORT_DEFAULT = 23800
 
 def sigterm_handler(signum, frame):
     # exceptions may happen here as well due to logger syncronization mayhem on shutdown
@@ -56,7 +56,7 @@ def sigint_handler(signum, frame):
 
 class WookieeConstants:
     '''Shared static and runtime constants'''
-    
+
     ############################ WOOKIEE MODE ############################
     WOOKIEE_MODE_CLIENT = b'0'
     WOOKIEE_MODE_SERVER = b'1'
@@ -281,7 +281,7 @@ class ServerHandler:
 
 class RemotePeerHandler:
     '''Handles remote peer channel workers for full duplex communication'''
-    
+
     # allows processes to end gracefully when no data is sent
     # or received, based on the value of a shared exit event
     DEFAULT_TIMEOUT = 2 #seconds
